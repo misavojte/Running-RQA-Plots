@@ -14,6 +14,14 @@
         { id: 9, timestamp: 900, aoi: ["AOI9"] },
         { id: 10, timestamp: 1000, aoi: ["AOI1"] },
         { id: 11, timestamp: 1100, aoi: ["AOI1"] },
+        { id: 1, timestamp: 100, aoi: ["AOI1"] },
+        { id: 2, timestamp: 200, aoi: ["AOI2"] },
+        { id: 3, timestamp: 300, aoi: ["AOI3"] },
+        { id: 7, timestamp: 700, aoi: ["AOI7"] },
+        { id: 8, timestamp: 800, aoi: ["AOI8"] },
+        { id: 9, timestamp: 900, aoi: ["AOI9"] },
+        { id: 10, timestamp: 1000, aoi: ["AOI1"] },
+        { id: 11, timestamp: 1100, aoi: ["AOI1"] },
     ];
 
 </script>

@@ -5,7 +5,7 @@
   // SVG layout constants
   const Y_AXIS_WIDTH = 40;       // Total width reserved for y-axis label
   const X_AXIS_HEIGHT = 40;      // Total height reserved for x-axis label
-  const LABEL_OFFSET = 30;       // Distance of axis labels from plot
+  const LABEL_OFFSET = 40;       // Distance of axis labels from plot
 
   let { 
     fixations, 
@@ -114,7 +114,7 @@
       x={-LABEL_OFFSET}
       y={size / 2}
       text-anchor="middle"
-      transform={`rotate(-90 -${LABEL_OFFSET} ${(size / 2) - 10})`}
+      transform={`rotate(-90 -${LABEL_OFFSET} ${size / 2}) translate(0, 15)`}
     >
       {yLabel}
     </text>
@@ -169,7 +169,7 @@
       <!-- Y-axis labels -->
       {#each axisLabels() as label}
         <text
-          x="-8"
+          x="-6"
           y={size - (label * (size / (recurrenceMatrix.length + 1)))}
           text-anchor="end"
           dominant-baseline="middle"
@@ -193,7 +193,7 @@
 
       <!-- Single origin label (0) -->
       <text
-        x="-8"
+        x="-6"
         y={size + 16}
         text-anchor="middle"
         font-size="12"
