@@ -15,7 +15,8 @@
     showGrid = false, 
     gridColor = "#CCCCCC",
     xLabel = "Fixation i",
-    yLabel = "Fixation j"
+    yLabel = "Fixation j",
+    labelStep = 5  // New prop for controlling label frequency
   } = $props<{
     fixations: Fixation[];
     size?: number;
@@ -25,6 +26,7 @@
     gridColor?: string;
     xLabel?: string;
     yLabel?: string;
+    labelStep?: number;
   }>();
 
   interface RecurrencePoint {
@@ -69,6 +71,15 @@
     const n = recurrenceMatrix.length;
     const cellSize = size / (n + 1);
     return Array.from({ length: n + 1 }, (_, i) => i * cellSize); // Back to n+2 for proper grid coverage
+  });
+
+  // Add new computed state for axis labels
+  const axisLabels = $state(() => {
+    const n = recurrenceMatrix.length;
+    if (n === 0) return [];
+    // Start from 1 * labelStep to skip zero (will be added separately)
+    return Array.from({ length: Math.floor(n / labelStep) }, (_, i) => (i + 1) * labelStep)
+      .filter(val => val <= n);
   });
 
   // Hover event handlers
@@ -154,6 +165,41 @@
           Fixation {hoverPoint.i} ↔ {hoverPoint.j}
         </text>
       {/if}
+
+      <!-- Y-axis labels -->
+      {#each axisLabels() as label}
+        <text
+          x="-8"
+          y={size - (label * (size / (recurrenceMatrix.length + 1)))}
+          text-anchor="end"
+          dominant-baseline="middle"
+          font-size="12"
+        >
+          {label}
+        </text>
+      {/each}
+
+      <!-- X-axis labels -->
+      {#each axisLabels() as label}
+        <text
+          x={label * (size / (recurrenceMatrix.length + 1))}
+          y={size + 16}
+          text-anchor="middle"
+          font-size="12"
+        >
+          {label}
+        </text>
+      {/each}
+
+      <!-- Single origin label (0) -->
+      <text
+        x="-8"
+        y={size + 16}
+        text-anchor="middle"
+        font-size="12"
+      >
+        0
+      </text>
     </g>
   </svg>
 </div>
