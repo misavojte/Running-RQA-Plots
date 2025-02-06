@@ -13,6 +13,7 @@
         { id: 8, timestamp: 800, aoi: ["AOI8"] },
         { id: 9, timestamp: 900, aoi: ["AOI9"] },
         { id: 10, timestamp: 1000, aoi: ["AOI1"] },
+        { id: 11, timestamp: 1100, aoi: ["AOI1"] },
     ];
 
 </script>
