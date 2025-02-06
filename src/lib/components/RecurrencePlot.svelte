@@ -2,11 +2,12 @@
   import { computeRecurrenceMatrix } from "../utility/recurrenceMatrix.js";
   import type { Fixation } from "../types/Fixation.js";
 
-  let { fixations, size = 500, pointSize = 4, highlightColor = "blue" } = $props<{
+  let { fixations, size = 500, pointSize = 4, highlightColor = "blue", showGrid = false } = $props<{
     fixations: Fixation[]; // Input fixations
     size?: number; // Canvas size
     pointSize?: number; // Dot size
     highlightColor?: string; // Highlight color on hover
+    showGrid?: boolean; // Enable or disable grid
   }>();
 
   interface RecurrencePoint {
@@ -33,11 +34,27 @@
     if (n === 0) return [];
 
     const cellSize = size / n;
+    const halfCell = cellSize / 2; // Add half-cell offset for centering
     return recurrenceMatrix.flatMap((row: number[], i: number) =>
       row.map((value: number, j: number) => 
-        value === 1 ? { x: j * cellSize, y: i * cellSize, i, j } : null
+        value === 1 ? { 
+          x: j * cellSize + halfCell, // Add halfCell to center points
+          y: i * cellSize + halfCell, // Add halfCell to center points
+          i, 
+          j 
+        } : null
       )
     ).filter((point: RecurrencePoint | null): point is RecurrencePoint => point !== null);
+  });
+
+  // Grid line positions (computed when showGrid is true)
+  const gridLines = $state(() => {
+    if (!showGrid) return [];
+    const n = recurrenceMatrix.length;
+    const cellSize = size / n;
+    const halfCell = cellSize / 2;
+    // Start from -halfCell to create margin at the beginning, and add one more line at the end
+    return Array.from({ length: n + 1 }, (_, i) => i * cellSize - halfCell);
   });
 
   // Hover event handlers
@@ -51,6 +68,18 @@
 </script>
 
 <svg width={size} height={size} style="border: 1px solid black;">
+  {#if showGrid}
+    <!-- Draw vertical grid lines -->
+    {#each gridLines() as x}
+      <line x1={x} y1="0" x2={x} y2={size} stroke="gray" stroke-width="0.5" />
+    {/each}
+
+    <!-- Draw horizontal grid lines -->
+    {#each gridLines() as y}
+      <line x1="0" y1={y} x2={size} y2={y} stroke="gray" stroke-width="0.5" />
+    {/each}
+  {/if}
+
   <!-- Draw recurrence points -->
   {#each points() as point}
     <circle
