@@ -2,13 +2,29 @@
   import { computeRecurrenceMatrix } from "../utility/recurrenceMatrix.js";
   import type { Fixation } from "../types/Fixation.js";
 
-  let { fixations, size = 500, pointSize = 4, highlightColor = "blue", showGrid = false, gridColor = "#CCCCCC" } = $props<{
-    fixations: Fixation[]; // Input fixations
-    size?: number; // Canvas size
-    pointSize?: number; // Dot size
-    highlightColor?: string; // Highlight color on hover
-    showGrid?: boolean; // Enable or disable grid
-    gridColor?: string; // Grid line color
+  // SVG layout constants
+  const Y_AXIS_WIDTH = 40;       // Total width reserved for y-axis label
+  const X_AXIS_HEIGHT = 40;      // Total height reserved for x-axis label
+  const LABEL_OFFSET = 30;       // Distance of axis labels from plot
+
+  let { 
+    fixations, 
+    size = 500, 
+    pointSize = 4, 
+    highlightColor = "blue", 
+    showGrid = false, 
+    gridColor = "#CCCCCC",
+    xLabel = "Fixation i",
+    yLabel = "Fixation j"
+  } = $props<{
+    fixations: Fixation[];
+    size?: number;
+    pointSize?: number;
+    highlightColor?: string;
+    showGrid?: boolean;
+    gridColor?: string;
+    xLabel?: string;
+    yLabel?: string;
   }>();
 
   interface RecurrencePoint {
@@ -34,12 +50,12 @@
     const n = recurrenceMatrix.length;
     if (n === 0) return [];
 
-    const cellSize = size / (n + 1); // Keep the cell size calculation for margins
+    const cellSize = size / (n + 1);
     return recurrenceMatrix.flatMap((row: number[], i: number) =>
       row.map((value: number, j: number) => 
         value === 1 ? { 
-          x: (j + 1) * cellSize, // Keep the starting margin
-          y: (i + 1) * cellSize, // Keep the starting margin
+          x: (j + 1) * cellSize,
+          y: size - (i + 1) * cellSize, // Invert the y-coordinate
           i, 
           j 
         } : null
@@ -65,45 +81,79 @@
   };
 </script>
 
-<svg 
-  width={size} 
-  height={size} 
-  style="border: 1px solid black;"
-  viewBox={`0 0 ${size} ${size}`}
->
-  {#if showGrid}
-    <!-- Draw vertical grid lines -->
-    {#each gridLines() as x}
-      <line x1={x} y1="0" x2={x} y2={size} stroke={gridColor} stroke-width="0.5" />
-    {/each}
-
-    <!-- Draw horizontal grid lines -->
-    {#each gridLines() as y}
-      <line x1="0" y1={y} x2={size} y2={y} stroke={gridColor} stroke-width="0.5" />
-    {/each}
-  {/if}
-
-  <!-- Draw recurrence points -->
-  {#each points() as point}
-    <circle
-      role="button"
-      aria-label="Recurrence point"
-      tabindex="-1"
-      cx={point.x}
-      cy={point.y}
-      r={hoverPoint && hoverPoint.i === point.i && hoverPoint.j === point.j ? pointSize * 1.5 : pointSize}
-      fill={hoverPoint && hoverPoint.i === point.i && hoverPoint.j === point.j ? highlightColor : "red"}
-      onmouseover={() => handleHover(point)}
-      onfocus={() => handleHover(point)}
-      onmouseleave={clearHover}
-      onblur={clearHover}
+<div style="position: relative;">
+  <svg 
+    width={size + Y_AXIS_WIDTH}
+    height={size + X_AXIS_HEIGHT}
+    style="background: transparent;"
+    viewBox={`-${Y_AXIS_WIDTH} -${X_AXIS_HEIGHT} ${size + 2 * Y_AXIS_WIDTH} ${size + 2 * X_AXIS_HEIGHT}`}
+  >
+    <rect
+      x="0"
+      y="0"
+      width={size}
+      height={size}
+      fill="none"
+      stroke="black"
+      stroke-width="1"
     />
-  {/each}
 
-  <!-- Display tooltip on hover -->
-  {#if hoverPoint}
-    <text x={hoverPoint.x + 10} y={hoverPoint.y - 10} font-size="12" fill="black">
-      Fixation {hoverPoint.i} ↔ {hoverPoint.j}
+    <!-- Y-axis label -->
+    <text
+      x={-LABEL_OFFSET}
+      y={size / 2}
+      text-anchor="middle"
+      transform={`rotate(-90 -${LABEL_OFFSET} ${(size / 2) - 10})`}
+    >
+      {yLabel}
     </text>
-  {/if}
-</svg>
+
+    <!-- X-axis label -->
+    <text
+      x={size / 2}
+      y={size + LABEL_OFFSET}
+      text-anchor="middle"
+    >
+      {xLabel}
+    </text>
+
+    <!-- Translate the main plot content to accommodate labels -->
+    <g transform="translate(0, 0)">
+      {#if showGrid}
+        <!-- Draw vertical grid lines -->
+        {#each gridLines() as x}
+          <line x1={x} y1="0" x2={x} y2={size} stroke={gridColor} stroke-width="0.5" />
+        {/each}
+
+        <!-- Draw horizontal grid lines -->
+        {#each gridLines() as y}
+          <line x1="0" y1={y} x2={size} y2={y} stroke={gridColor} stroke-width="0.5" />
+        {/each}
+      {/if}
+
+      <!-- Draw recurrence points -->
+      {#each points() as point}
+        <circle
+          role="button"
+          aria-label="Recurrence point"
+          tabindex="-1"
+          cx={point.x}
+          cy={point.y}
+          r={hoverPoint && hoverPoint.i === point.i && hoverPoint.j === point.j ? pointSize * 1.5 : pointSize}
+          fill={hoverPoint && hoverPoint.i === point.i && hoverPoint.j === point.j ? highlightColor : "red"}
+          onmouseover={() => handleHover(point)}
+          onfocus={() => handleHover(point)}
+          onmouseleave={clearHover}
+          onblur={clearHover}
+        />
+      {/each}
+
+      <!-- Display tooltip on hover -->
+      {#if hoverPoint}
+        <text x={hoverPoint.x + 10} y={hoverPoint.y - 10} font-size="12" fill="black">
+          Fixation {hoverPoint.i} ↔ {hoverPoint.j}
+        </text>
+      {/if}
+    </g>
+  </svg>
+</div>
