@@ -16,7 +16,8 @@
     gridColor = "#CCCCCC",
     xLabel = "Fixation i",
     yLabel = "Fixation j",
-    labelStep = 5  // New prop for controlling label frequency
+    labelStep = 5,  // Controls both labels and main grid
+    showMainGrid = true  // New prop for showing main grid lines
   } = $props<{
     fixations: Fixation[];
     size?: number;
@@ -27,6 +28,7 @@
     xLabel?: string;
     yLabel?: string;
     labelStep?: number;
+    showMainGrid?: boolean;
   }>();
 
   interface RecurrencePoint {
@@ -104,6 +106,22 @@
             fill="none" 
             stroke={gridColor} 
             stroke-width="1"
+            stroke-opacity="1"
+          />
+        </pattern>
+      {/if}
+      {#if showMainGrid}
+        <pattern 
+          id="mainGrid" 
+          width={size * labelStep / (recurrenceMatrix.length + 1)} 
+          height={size * labelStep / (recurrenceMatrix.length + 1)} 
+          patternUnits="userSpaceOnUse"
+        >
+          <path 
+            d={`M ${size * labelStep / (recurrenceMatrix.length + 1)} 0 L 0 0 0 ${size * labelStep / (recurrenceMatrix.length + 1)}`}
+            fill="none" 
+            stroke={gridColor} 
+            stroke-width="2"
           />
         </pattern>
       {/if}
@@ -140,13 +158,22 @@
 
     <!-- Translate the main plot content to accommodate labels -->
     <g transform="translate(0, 0)">
-      {#if showGrid}
+      <!-- Grid layers -->
+      <!-- Base grid is always visible -->
+      <rect
+        x="0"
+        y="0"
+        width={size}
+        height={size}
+        fill="url(#grid)"
+      />
+      {#if showMainGrid}
         <rect
           x="0"
           y="0"
           width={size}
           height={size}
-          fill="url(#grid)"
+          fill="url(#mainGrid)"
         />
       {/if}
 
