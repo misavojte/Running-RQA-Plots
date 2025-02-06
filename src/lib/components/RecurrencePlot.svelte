@@ -65,14 +65,6 @@
     ).filter((point: RecurrencePoint | null): point is RecurrencePoint => point !== null);
   });
 
-  // Grid line positions (computed when showGrid is true)
-  const gridLines = $state(() => {
-    if (!showGrid) return [];
-    const n = recurrenceMatrix.length;
-    const cellSize = size / (n + 1);
-    return Array.from({ length: n + 1 }, (_, i) => i * cellSize); // Back to n+2 for proper grid coverage
-  });
-
   // Add new computed state for axis labels
   const axisLabels = $state(() => {
     const n = recurrenceMatrix.length;
@@ -99,6 +91,24 @@
     style="background: transparent;"
     viewBox={`-${Y_AXIS_WIDTH} -${X_AXIS_HEIGHT} ${size + 2 * Y_AXIS_WIDTH} ${size + 2 * X_AXIS_HEIGHT}`}
   >
+    <defs>
+      {#if showGrid}
+        <pattern 
+          id="grid" 
+          width={size / (recurrenceMatrix.length + 1)} 
+          height={size / (recurrenceMatrix.length + 1)} 
+          patternUnits="userSpaceOnUse"
+        >
+          <path 
+            d={`M ${size / (recurrenceMatrix.length + 1)} 0 L 0 0 0 ${size / (recurrenceMatrix.length + 1)}`}
+            fill="none" 
+            stroke={gridColor} 
+            stroke-width="1"
+          />
+        </pattern>
+      {/if}
+    </defs>
+
     <rect
       x="0"
       y="0"
@@ -131,15 +141,13 @@
     <!-- Translate the main plot content to accommodate labels -->
     <g transform="translate(0, 0)">
       {#if showGrid}
-        <!-- Draw vertical grid lines -->
-        {#each gridLines() as x}
-          <line x1={x} y1="0" x2={x} y2={size} stroke={gridColor} stroke-width="0.5" />
-        {/each}
-
-        <!-- Draw horizontal grid lines -->
-        {#each gridLines() as y}
-          <line x1="0" y1={y} x2={size} y2={y} stroke={gridColor} stroke-width="0.5" />
-        {/each}
+        <rect
+          x="0"
+          y="0"
+          width={size}
+          height={size}
+          fill="url(#grid)"
+        />
       {/if}
 
       <!-- Draw recurrence points -->
