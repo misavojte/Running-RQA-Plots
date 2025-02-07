@@ -219,7 +219,7 @@
       <!-- Display tooltip on hover -->
       {#if hoverPoint}
         <text x={hoverPoint.x + 10} y={hoverPoint.y - 10} font-size="12" fill="black">
-          Fixation {hoverPoint.i} ↔ {hoverPoint.j}
+          Fixation {hoverPoint.i + 1} ↔ {hoverPoint.j + 1}
         </text>
         <text x={hoverPoint.x + 10} y={hoverPoint.y + 5} font-size="12" fill="black">
           AOI: {fixations[hoverPoint.i]?.aoi || 'none'}
