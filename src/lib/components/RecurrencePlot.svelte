@@ -66,8 +66,8 @@
         if (value !== 1) return null;
         
         const currentAoi = fixations[i]?.aoi;
-        const colorMapping = aoiColors.find((ac: { aoi: string; color: string }) => ac.aoi === currentAoi[0]);
-        const pointColor = colorMapping?.color;
+        const colorMapping = currentAoi ? aoiColors.find((ac: { aoi: string; color: string }) => ac.aoi === currentAoi[0]) : null;
+        const pointColor = colorMapping?.color ?? '#000000';
         
         return { 
           x: (j + 1) * cellSize,

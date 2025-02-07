@@ -4,13 +4,14 @@
     import RunningRQAPlotBarGeneric from "./RunningRQAPlotBarLine.svelte";
     import RunningRQAPlotBarBars from "./RunningRQAPlotBarBars.svelte";
     import type { Fixation } from "../types/Fixation.js";
+	import type { Snippet } from "svelte";
 
     interface FixationGroup {
         label: string;
         fixations: Fixation[];
     }
   
-    let { fixationGroups, metric = "recurrenceRate", width = 500, height = 100, lineColor = "black", backgroundColor = "white", gridColor = "#CCCCCC", showGrid = false, displayType = "line" } = $props<{
+    let { fixationGroups, metric = "recurrenceRate", width = 500, height = 100, lineColor = "black", backgroundColor = "white", gridColor = "#CCCCCC", showGrid = false, displayType = "line", tooltipSnippet = null } = $props<{
         fixationGroups: FixationGroup[];
         metric: "determinism" | "determinism2" | "recurrenceRate" | "laminarity" | "laminarity2" | "horizontalLaminarity" | "verticalLaminarity" | "horizontalLaminarity2" | "verticalLaminarity2";
         width?: number;
@@ -20,6 +21,7 @@
         gridColor?: string;
         showGrid?: boolean;
         displayType?: "line" | "bars";
+        tooltipSnippet?: Snippet<[{ x: number; y: number; value: number | null; label: string; fixationIndex: number }]> | null;
     }>();
 
     // Calculate the maximum number of fixations across all groups
@@ -122,8 +124,9 @@
             rowHighlight.setAttribute("pointer-events", "none");
             rowHighlight.setAttribute("class", "highlight-rect-row");
             
-            event.currentTarget.appendChild(highlight);
-            event.currentTarget.appendChild(rowHighlight);
+            const svg = event.currentTarget as SVGSVGElement;
+            svg.appendChild(highlight);
+            svg.appendChild(rowHighlight);
 
             // Update tooltip data
             const group = groupValues()[rowIndex];
@@ -203,6 +206,12 @@
         {/each}
     </svg>
 
+    {#snippet tooltipSnippetDefault(tooltipData: { x: number; y: number; value: number | null; label: string; fixationIndex: number })}
+        <strong>{tooltipData.label}</strong><br>
+        Fixation: {tooltipData.fixationIndex}<br>
+        Value: {tooltipData.value ? tooltipData.value.toFixed(3) : "N/A"}
+    {/snippet}
+
     {#if tooltipData && tooltipData.value !== null}
         <div 
             class="tooltip" 
@@ -211,9 +220,11 @@
                 top: {tooltipData.y + 15}px;
             "
         >
-            <strong>{tooltipData.label}</strong><br>
-            Fixation: {tooltipData.fixationIndex}<br>
-            Value: {tooltipData.value.toFixed(3)}
+            {#if tooltipSnippet}
+                {@render tooltipSnippet(tooltipData)}
+            {:else}
+                {@render tooltipSnippetDefault(tooltipData)}
+            {/if}
         </div>
     {/if}
 </div>
