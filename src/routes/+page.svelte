@@ -70,7 +70,7 @@
             ]} width={500} height={70} lineColor="blue" showGrid={true} />
         </div>
 
-        <div class="flex flex-col items-center justify-center border-gray-300">
+        <div class="flex flex-col items-center justify-center border-gray-300 my-4">
             <RunningRqaPlot metric={metric} fixationGroups={[
                 {label: "14 fixations", fixations: fixationsShorter},
                 {label: "Bigger fixations", fixations: fixationsBigger},

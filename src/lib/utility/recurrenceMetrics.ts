@@ -40,8 +40,6 @@ export const computeReccurencePointCount = (matrix: number[][]): number => {
 export const computeRecurrenceRate = (matrix: number[][]): number => {
    const N = matrix.length;
    if (N < 2) return 0; // Avoid division by zero for small matrices
-
-   console.log(N);
    // Apply recurrence formula
    const R = computeReccurencePointCount(matrix); // Total recurrence points in upper triangle
    return (100 * (2 * R)) / (N * (N - 1)); // REC as a percentage
@@ -158,7 +156,8 @@ export const computeNumberOfPointsInHorizontalLines = (matrix: number[][], minLe
         while (
             x + currentHorizontalLength < N &&
             matrix[x + currentHorizontalLength][y] === 1 &&
-            !visited.has(`${x + currentHorizontalLength},${y}`)
+            !visited.has(`${x + currentHorizontalLength},${y}`) &&
+            x + currentHorizontalLength !== y
         ) {
             visited.add(`${x},${y}`);
             x++;
@@ -169,7 +168,7 @@ export const computeNumberOfPointsInHorizontalLines = (matrix: number[][], minLe
             numberOfPointsInHorizontalLines += currentHorizontalLength;
         }
     });
-
+    console.log(`Metric: horizontal points, value: ${numberOfPointsInHorizontalLines} in matrix of size ${N}`);
     return numberOfPointsInHorizontalLines;
 }
 
