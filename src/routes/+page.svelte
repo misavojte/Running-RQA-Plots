@@ -107,4 +107,7 @@
             ]} width={500} height={70} lineColor="#006FAD" showGrid={true} displayType="bars" />
         </div>
     </div>
+    <footer class="text-center text-sm text-gray-500 mt-8">
+        <p>Created by <a href="https://vojtechovska.com" class="text-gray-500 hover:text-gray-700">Michael Vojtechovska</a> and <a href="https://muczka.com" class="text-gray-500 hover:text-gray-700">Marketa Muczka</a></p>
+    </footer>
 </main>
