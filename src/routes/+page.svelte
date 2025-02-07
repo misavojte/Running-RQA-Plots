@@ -2,8 +2,6 @@
 
 	import RecurrencePlot from "$lib/components/RecurrencePlot.svelte";
 	import RunningRqaPlot from "$lib/components/RunningRQAPlot.svelte";
-	import RunningRqaPlotBarDeterminism from "$lib/components/RunningRQAPlot.svelte";
-	import RunningRqaPlotBarGeneric from "$lib/components/RunningRQAPlotBarGeneric.svelte";
 
     const fixations = [
         { id: 1, timestamp: 100, aoi: ["AOI1"] },
@@ -37,6 +35,7 @@
     ];
 
     const fixationsShorter = fixations.slice(0, 14).sort(() => Math.random() - 0.5);
+    const fixationsBigger = fixations.slice(0, 20).sort(() => Math.random() - 0.5);
 
     let metric: "recurrenceRate" | "determinism" | "determinism2" | "laminarity" | "laminarity2" | "verticalLaminarity" | "verticalLaminarity2" | "horizontalLaminarity" | "horizontalLaminarity2" = $state("recurrenceRate");
 
@@ -48,7 +47,7 @@
     <p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
     <br>
     <div class="flex flex-col items-center justify-center">
-        <RecurrencePlot fixations={fixations} size={500} pointSize={4} highlightColor="blue" showGrid={true} />
+        <RecurrencePlot fixations={fixationsBigger} size={500} pointSize={4} highlightColor="blue" showGrid={true} />
         <br>
         </div>
         <div class="flex flex-col items-center justify-center">
@@ -64,11 +63,18 @@
         <option value="horizontalLaminarity2">Horizontal Laminarity2</option>
         </select>
 
-        <div class="flex flex-col items-center justify-center border-t border-b border-gray-300">
+        <div class="flex flex-col items-center justify-center border-gray-300">
             <RunningRqaPlot metric={metric} fixationGroups={[
                 {label: "14 fixations", fixations: fixationsShorter},
-                {label: "14 fixations", fixations: fixations},
+                {label: "Bigger fixations", fixations: fixationsBigger},
             ]} width={500} height={70} lineColor="blue" showGrid={true} />
+        </div>
+
+        <div class="flex flex-col items-center justify-center border-gray-300">
+            <RunningRqaPlot metric={metric} fixationGroups={[
+                {label: "14 fixations", fixations: fixationsShorter},
+                {label: "Bigger fixations", fixations: fixationsBigger},
+            ]} width={500} height={70} lineColor="blue" showGrid={true} displayType="bars" />
         </div>
     </div>
 </main>

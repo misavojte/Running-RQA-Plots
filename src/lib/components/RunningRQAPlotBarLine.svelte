@@ -1,5 +1,5 @@
 <script lang="ts">
-    let { values, width = 500, height = 100, lineColor = "black", backgroundColor = "transparent", margin = 2 } = $props<{
+    let { values, width = 500, height = 100, lineColor = "black", backgroundColor = "transparent", margin = 0 } = $props<{
       values: number[]; // Array of values between 0 and 100
       width?: number; // Total width of the bar
       height?: number; // Total height of the bar
