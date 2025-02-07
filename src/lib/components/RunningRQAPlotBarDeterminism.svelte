@@ -1,12 +1,12 @@
 <script lang="ts">
-    import { computeDeterminism, computeRecurrenceRate } from "../utility/recurrenceMetrics.js";
+    import { computeDeterminism, computeDeterminism2, computeRecurrenceRate } from "../utility/recurrenceMetrics.js";
     import { computeRecurrenceMatrix } from "../utility/recurrenceMatrix.js";
     import RunningRQAPlotBarGeneric from "./RunningRQAPlotBarGeneric.svelte";
     import type { Fixation } from "../types/Fixation.js";
   
     let { fixations, metric = "recurrenceRate", width = 500, height = 100, lineColor = "black", backgroundColor = "white" } = $props<{
       fixations: Fixation[];
-      metric: "determinism" | "recurrenceRate";
+      metric: "determinism" | "determinism2" | "recurrenceRate";
       width?: number;
       height?: number;
       lineColor?: string;
@@ -27,7 +27,10 @@
                 result.push(computeRecurrenceRate(matrix));
             } else if (metric === "determinism") {
                 result.push(computeDeterminism(matrix));
+            } else if (metric === "determinism2") {
+                result.push(computeDeterminism2(matrix));
             }
+
         }
         
         return result;
@@ -47,3 +50,11 @@
         backgroundColor={backgroundColor} 
     />
 </svg>
+
+<div>
+    <p>Value: {values()[values().length - 1]}</p>
+    <p>Fixations: {fixations.length}</p>
+    {#each values() as value, i}
+        <p>{i} {value}</p>
+    {/each}
+</div>

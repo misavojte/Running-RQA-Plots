@@ -24,6 +24,15 @@
         { id: 9, timestamp: 900, aoi: ["AOI9"] },
         { id: 10, timestamp: 1000, aoi: ["AOI1"] },
         { id: 11, timestamp: 1100, aoi: ["AOI1"] },
+        { id: 12, timestamp: 1200, aoi: ["AOI12"] },
+        { id: 13, timestamp: 1300, aoi: ["AOI13"] },
+        { id: 14, timestamp: 1400, aoi: ["AOI14"] },
+        { id: 15, timestamp: 1500, aoi: ["AOI15"] },
+        { id: 16, timestamp: 1600, aoi: ["AOI16"] },
+        { id: 17, timestamp: 1700, aoi: ["AOI17"] },
+        { id: 18, timestamp: 1800, aoi: ["AOI18"] },
+        { id: 19, timestamp: 1900, aoi: ["AOI19"] },
+        { id: 20, timestamp: 2000, aoi: ["AOI20"] },
     ];
 
 </script>
@@ -36,5 +45,6 @@
     <RecurrencePlot fixations={fixations} size={500} pointSize={4} highlightColor="blue" showGrid={true} />
     <br>
     <RunningRqaPlotBarDeterminism metric="determinism" fixations={fixations} width={500} height={100} lineColor="blue" />
+    <RunningRqaPlotBarDeterminism metric="determinism2" fixations={fixations} width={500} height={100} lineColor="blue" />
     <RunningRqaPlotBarDeterminism metric="recurrenceRate" fixations={fixations} width={500} height={100} lineColor="blue" />
 </main>
