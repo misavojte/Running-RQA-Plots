@@ -1,7 +1,8 @@
 <script lang="ts">
 
 	import RecurrencePlot from "$lib/components/RecurrencePlot.svelte";
-	import RunningRqaPlotBarDeterminism from "$lib/components/RunningRQAPlotBarDeterminism.svelte";
+	import RunningRqaPlot from "$lib/components/RunningRQAPlot.svelte";
+	import RunningRqaPlotBarDeterminism from "$lib/components/RunningRQAPlot.svelte";
 	import RunningRqaPlotBarGeneric from "$lib/components/RunningRQAPlotBarGeneric.svelte";
 
     const fixations = [
@@ -35,6 +36,8 @@
         { id: 20, timestamp: 2000, aoi: ["AOI20"] },
     ];
 
+    const fixationsShorter = fixations.slice(0, 14).sort(() => Math.random() - 0.5);
+
     let metric: "recurrenceRate" | "determinism" | "determinism2" | "laminarity" | "laminarity2" | "verticalLaminarity" | "verticalLaminarity2" | "horizontalLaminarity" | "horizontalLaminarity2" = $state("recurrenceRate");
 
 </script>
@@ -62,7 +65,10 @@
         </select>
 
         <div class="flex flex-col items-center justify-center border-t border-b border-gray-300">
-            <RunningRqaPlotBarDeterminism metric={metric} fixations={fixations} width={500} height={70} lineColor="blue" />
+            <RunningRqaPlot metric={metric} fixationGroups={[
+                {label: "14 fixations", fixations: fixationsShorter},
+                {label: "14 fixations", fixations: fixations},
+            ]} width={500} height={70} lineColor="blue" showGrid={true} />
         </div>
     </div>
 </main>
