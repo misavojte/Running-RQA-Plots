@@ -22,7 +22,12 @@
         displayType?: "line" | "bars";
     }>();
 
-    // Compute values for each group
+    // Calculate the maximum number of fixations across all groups
+    const maxFixations = $derived(() => {
+        return Math.max(...fixationGroups.map((group: FixationGroup) => group.fixations.length));
+    });
+
+    // Modify groupValues to pad shorter sequences with null values
     let groupValues = $derived(() => {
         return fixationGroups.map((group: FixationGroup) => {
             const matrices = [];
@@ -52,6 +57,11 @@
                 } else if (metric === "verticalLaminarity2") {
                     result.push(computeVerticalLaminarity2(matrix));
                 }
+            }
+            
+            // Pad with null values if this group has fewer fixations
+            while (result.length < maxFixations()) {
+                result.push(null);
             }
             
             return {
@@ -121,7 +131,7 @@
                         height={barHeight()} 
                         barColor={lineColor} 
                         backgroundColor="transparent"
-                        margin={0}
+                        margin={1}
                     />
                 {/if}
             </g>
