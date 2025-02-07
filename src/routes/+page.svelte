@@ -64,13 +64,20 @@
 
 </script>
 
+{#snippet tooltipSnippet(aoiLabel: string, fixationLabel: string)}
+    <div class="bg-white p-2 rounded-md border-gray-300 border text-sm w-32">
+        <p>{aoiLabel}</p>
+        <p>{fixationLabel}</p>
+    </div>
+{/snippet}
+
 <main class="p-8 max-w-screen-md mx-auto">
     <h1 class="text-2xl font-bold">Running RQA visualizations for eye-tracking research</h1>
     <p>Create your package using @sveltejs/package and preview/showcase your work with SvelteKit</p>
     <p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
     <br>
     <div class="flex flex-col items-center justify-center">
-        <RecurrencePlot fixations={fixationsBigger} size={500} pointSize={4} highlightColor="#006FAD" showGrid={true} aoiColors={aoiColors} />
+        <RecurrencePlot fixations={fixationsBigger} size={500} pointSize={4} highlightColor="#006FAD" showGrid={true} aoiColors={aoiColors} tooltipSnippet={tooltipSnippet} />
         <br>
         </div>
         <div class="flex flex-col items-center justify-center">
