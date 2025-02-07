@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 
 	import RecurrencePlot from "$lib/components/RecurrencePlot.svelte";
 	import RunningRqaPlotBarDeterminism from "$lib/components/RunningRQAPlotBarDeterminism.svelte";
@@ -35,6 +35,8 @@
         { id: 20, timestamp: 2000, aoi: ["AOI20"] },
     ];
 
+    let metric: "recurrenceRate" | "determinism" | "determinism2" | "laminarity" | "laminarity2" | "verticalLaminarity" | "verticalLaminarity2" | "horizontalLaminarity" | "horizontalLaminarity2" = $state("recurrenceRate");
+
 </script>
 
 <main class="p-8">
@@ -42,9 +44,22 @@
     <p>Create your package using @sveltejs/package and preview/showcase your work with SvelteKit</p>
     <p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
     <br>
-    <RecurrencePlot fixations={fixations} size={500} pointSize={4} highlightColor="blue" showGrid={true} />
-    <br>
-    <RunningRqaPlotBarDeterminism metric="determinism" fixations={fixations} width={500} height={100} lineColor="blue" />
-    <RunningRqaPlotBarDeterminism metric="determinism2" fixations={fixations} width={500} height={100} lineColor="blue" />
-    <RunningRqaPlotBarDeterminism metric="recurrenceRate" fixations={fixations} width={500} height={100} lineColor="blue" />
+    <div class="flex flex-col items-center justify-center">
+        <RecurrencePlot fixations={fixations} size={500} pointSize={4} highlightColor="blue" showGrid={true} />
+        <br>
+        </div>
+        <div class="flex flex-col items-center justify-center">
+    <select bind:value={metric} class="bg-gray-200 p-2 rounded-md border-gray-300 border-1">
+        <option value="recurrenceRate">Recurrence Rate</option>
+        <option value="determinism">Determinism</option>
+        <option value="determinism2">Determinism2</option>
+        <option value="laminarity">Laminarity</option>
+        <option value="laminarity2">Laminarity2</option>
+        <option value="verticalLaminarity">Vertical Laminarity</option>
+        <option value="verticalLaminarity2">Vertical Laminarity2</option>
+        <option value="horizontalLaminarity">Horizontal Laminarity</option>
+        <option value="horizontalLaminarity2">Horizontal Laminarity2</option>
+        </select>
+        <RunningRqaPlotBarDeterminism metric={metric} fixations={fixations} width={500} height={100} lineColor="blue" />
+    </div>
 </main>

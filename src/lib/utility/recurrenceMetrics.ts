@@ -134,3 +134,112 @@ export const computeDeterminism = (matrix: number[][], minLength = 2): number =>
     return (100 * numberOfPointsInDiagonalLines) / recurrentFixations;
 };
 
+/**
+ * Computes the number of points in horizontal lines from a recurrence matrix.
+ * Horizontal lines look like in i,j coordinates:
+ * i,j
+ * i+1,j
+ * i+2,j
+ * ...
+ * @param matrix - Binary recurrence matrix (NxN)
+ * @param minLength - Minimum horizontal line length (L)
+ * @returns Number of points in horizontal lines
+ */
+export const computeNumberOfPointsInHorizontalLines = (matrix: number[][], minLength = 2): number => {
+    const N = matrix.length;
+    if (N < minLength) return 0;
+    let numberOfPointsInHorizontalLines = 0;
+    const visited = new Set<string>();
+
+    forEachUpperTriangle(matrix, (i, j, value) => {
+        if (value !== 1 || visited.has(`${i},${j}`)) return;
+        let x = i, y = j;
+        let currentHorizontalLength = 1;
+        while (
+            x + currentHorizontalLength < N &&
+            matrix[x + currentHorizontalLength][y] === 1 &&
+            !visited.has(`${x + currentHorizontalLength},${y}`)
+        ) {
+            visited.add(`${x},${y}`);
+            x++;
+            currentHorizontalLength++;
+        }
+        visited.add(`${x},${y}`);
+        if (currentHorizontalLength >= minLength) {
+            numberOfPointsInHorizontalLines += currentHorizontalLength;
+        }
+    });
+
+    return numberOfPointsInHorizontalLines;
+}
+
+/**
+ * Computes the number of points in vertical lines from a recurrence matrix.
+ * Vertical lines look like in i,j coordinates:
+ * i,j
+ * i,j+1
+ * i,j+2
+ * ...
+ * i,j+L-1
+ */
+export const computeNumberOfPointsInVerticalLines = (matrix: number[][], minLength = 2): number => {
+    const N = matrix.length;
+    if (N < minLength) return 0;
+    let numberOfPointsInVerticalLines = 0;
+    const visited = new Set<string>();
+
+    forEachUpperTriangle(matrix, (i, j, value) => {
+        if (value !== 1 || visited.has(`${i},${j}`)) return;
+        let x = i, y = j;
+        let currentVerticalLength = 1;
+        while (
+            y + currentVerticalLength < N &&
+            matrix[x][y + currentVerticalLength] === 1 &&
+            !visited.has(`${x},${y + currentVerticalLength}`)
+        ) {
+            visited.add(`${x},${y}`);
+            y++;
+            currentVerticalLength++;
+        }
+        visited.add(`${x},${y}`);
+        if (currentVerticalLength >= minLength) {
+            numberOfPointsInVerticalLines += currentVerticalLength;
+        }
+    });
+    console.log(`Metric: vertical laminarity, value: ${numberOfPointsInVerticalLines} in matrix of size ${N}`);
+    return numberOfPointsInVerticalLines;
+}
+
+/**
+ * Computes laminarity (LAM) from a recurrence matrix.
+ * LAM is the sum of the number of points in horizontal and vertical lines.
+ */
+export const computeLaminarity = (matrix: number[][], minLength = 2): number => {
+    const numberOfRecurrencePoints = computeReccurencePointCount(matrix);
+    if (numberOfRecurrencePoints === 0) return 0;
+    return 100 * (computeNumberOfPointsInHorizontalLines(matrix, minLength) + computeNumberOfPointsInVerticalLines(matrix, minLength)) / ( 2 * numberOfRecurrencePoints);
+}
+
+export const computeLaminarity2 = (matrix: number[][], minLength = 2): number => {
+    return 100 * (computeNumberOfPointsInHorizontalLines(matrix, minLength) + computeNumberOfPointsInVerticalLines(matrix, minLength)) / ( 2 * matrix.length);
+}
+
+export const computeHorizontalLaminarity = (matrix: number[][], minLength = 2): number => {
+    const numberOfRecurrencePoints = computeReccurencePointCount(matrix);
+    if (numberOfRecurrencePoints === 0) return 0;
+    return 100 * computeNumberOfPointsInHorizontalLines(matrix, minLength) / ( numberOfRecurrencePoints);
+}
+
+export const computeVerticalLaminarity = (matrix: number[][], minLength = 2): number => {
+    const numberOfRecurrencePoints = computeReccurencePointCount(matrix);
+    if (numberOfRecurrencePoints === 0) return 0;
+    return 100 * computeNumberOfPointsInVerticalLines(matrix, minLength) / ( numberOfRecurrencePoints);
+}
+
+export const computeHorizontalLaminarity2 = (matrix: number[][], minLength = 2): number => {
+    return 100 * computeNumberOfPointsInHorizontalLines(matrix, minLength) / ( matrix.length);
+}
+
+export const computeVerticalLaminarity2 = (matrix: number[][], minLength = 2): number => {
+    return 100 * computeNumberOfPointsInVerticalLines(matrix, minLength) / ( matrix.length);
+}
