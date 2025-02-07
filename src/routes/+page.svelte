@@ -1,6 +1,8 @@
 <script>
 
 	import RecurrencePlot from "$lib/components/RecurrencePlot.svelte";
+	import RunningRqaPlotBarDeterminism from "$lib/components/RunningRQAPlotBarDeterminism.svelte";
+	import RunningRqaPlotBarGeneric from "$lib/components/RunningRQAPlotBarGeneric.svelte";
 
     const fixations = [
         { id: 1, timestamp: 100, aoi: ["AOI1"] },
@@ -30,6 +32,9 @@
     <h1>Welcome to your library project</h1>
     <p>Create your package using @sveltejs/package and preview/showcase your work with SvelteKit</p>
     <p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
-
+    <br>
     <RecurrencePlot fixations={fixations} size={500} pointSize={4} highlightColor="blue" showGrid={true} />
+    <br>
+    <RunningRqaPlotBarDeterminism metric="determinism" fixations={fixations} width={500} height={100} lineColor="blue" />
+    <RunningRqaPlotBarDeterminism metric="recurrenceRate" fixations={fixations} width={500} height={100} lineColor="blue" />
 </main>
