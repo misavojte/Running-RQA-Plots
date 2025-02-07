@@ -39,6 +39,29 @@
 
     let metric: "recurrenceRate" | "determinism" | "determinism2" | "laminarity" | "laminarity2" | "verticalLaminarity" | "verticalLaminarity2" | "horizontalLaminarity" | "horizontalLaminarity2" = $state("recurrenceRate");
 
+    const aoiColors = [
+        { aoi: "AOI1", color: "red" },
+        { aoi: "AOI2", color: "blue" },
+        { aoi: "AOI3", color: "green" },
+        { aoi: "AOI4", color: "yellow" },
+        { aoi: "AOI5", color: "purple" },
+        { aoi: "AOI6", color: "orange" },
+        { aoi: "AOI7", color: "pink" },
+        { aoi: "AOI8", color: "gray" },
+        { aoi: "AOI9", color: "brown" },
+        { aoi: "AOI10", color: "black" },
+        { aoi: "AOI11", color: "white" },
+        { aoi: "AOI12", color: "gray" },
+        { aoi: "AOI13", color: "brown" },
+        { aoi: "AOI14", color: "black" },
+        { aoi: "AOI15", color: "white" },
+        { aoi: "AOI16", color: "gray" },
+        { aoi: "AOI17", color: "brown" },
+        { aoi: "AOI18", color: "black" },
+        { aoi: "AOI19", color: "white" },
+        { aoi: "AOI20", color: "gray" },
+    ];
+
 </script>
 
 <main class="p-8 max-w-screen-md mx-auto">
@@ -47,7 +70,7 @@
     <p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
     <br>
     <div class="flex flex-col items-center justify-center">
-        <RecurrencePlot fixations={fixationsBigger} size={500} pointSize={4} highlightColor="blue" showGrid={true} />
+        <RecurrencePlot fixations={fixationsBigger} size={500} pointSize={4} highlightColor="#006FAD" showGrid={true} aoiColors={aoiColors} />
         <br>
         </div>
         <div class="flex flex-col items-center justify-center">
@@ -67,14 +90,14 @@
             <RunningRqaPlot metric={metric} fixationGroups={[
                 {label: "14 fixations", fixations: fixationsShorter},
                 {label: "Bigger fixations", fixations: fixationsBigger},
-            ]} width={500} height={70} lineColor="blue" showGrid={true} />
+            ]} width={500} height={70} lineColor="#006FAD" showGrid={true} />
         </div>
 
         <div class="flex flex-col items-center justify-center border-gray-300 my-4">
             <RunningRqaPlot metric={metric} fixationGroups={[
                 {label: "14 fixations", fixations: fixationsShorter},
                 {label: "Bigger fixations", fixations: fixationsBigger},
-            ]} width={500} height={70} lineColor="blue" showGrid={true} displayType="bars" />
+            ]} width={500} height={70} lineColor="#006FAD" showGrid={true} displayType="bars" />
         </div>
     </div>
 </main>

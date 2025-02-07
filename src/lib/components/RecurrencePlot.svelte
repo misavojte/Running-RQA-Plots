@@ -11,13 +11,14 @@
     fixations, 
     size = 500, 
     pointSize = 4, 
-    highlightColor = "blue", 
+    highlightColor = "#006FAD",
     showGrid = false, 
     gridColor = "#CCCCCC",
     xLabel = "Fixation i",
     yLabel = "Fixation j",
     labelStep = 5,  // Controls both labels and main grid
-    showMainGrid = true  // New prop for showing main grid lines
+    showMainGrid = true,  // New prop for showing main grid lines
+    aoiColors = []  // Changed to array of objects
   } = $props<{
     fixations: Fixation[];
     size?: number;
@@ -29,6 +30,7 @@
     yLabel?: string;
     labelStep?: number;
     showMainGrid?: boolean;
+    aoiColors?: Array<{ aoi: string; color: string }>;  // New type for AOI colors
   }>();
 
   interface RecurrencePoint {
@@ -36,6 +38,7 @@
     y: number;
     i: number;
     j: number;
+    color: string;
   }
 
   // Reactive hover state
@@ -50,20 +53,27 @@
   });
 
   // Compute recurrence points reactively
-  const points = $state((): RecurrencePoint[] => {
+  const points = $derived((): RecurrencePoint[] => {
     const n = recurrenceMatrix.length;
     if (n === 0) return [];
 
     const cellSize = size / (n + 1);
     return recurrenceMatrix.flatMap((row: number[], i: number) =>
-      row.map((value: number, j: number) => 
-        value === 1 ? { 
+      row.map((value: number, j: number) => {
+        if (value !== 1) return null;
+        
+        const currentAoi = fixations[i]?.aoi;
+        const colorMapping = aoiColors.find((ac: { aoi: string; color: string }) => ac.aoi === currentAoi[0]);
+        const pointColor = colorMapping?.color;
+        
+        return { 
           x: (j + 1) * cellSize,
-          y: size - (i + 1) * cellSize, // Invert the y-coordinate
+          y: size - (i + 1) * cellSize,
           i, 
-          j 
-        } : null
-      )
+          j,
+          color: pointColor
+        };
+      })
     ).filter((point: RecurrencePoint | null): point is RecurrencePoint => point !== null);
   });
 
@@ -179,14 +189,26 @@
 
       <!-- Draw recurrence points -->
       {#each points() as point}
+        <!-- Hover outline circle -->
+        {#if hoverPoint && hoverPoint.i === point.i && hoverPoint.j === point.j}
+          <circle
+            cx={point.x}
+            cy={point.y}
+            r={pointSize + 3}
+            fill="none"
+            stroke={highlightColor}
+            stroke-width="2"
+          />
+        {/if}
+        <!-- Main point circle -->
         <circle
           role="button"
           aria-label="Recurrence point"
           tabindex="-1"
           cx={point.x}
           cy={point.y}
-          r={hoverPoint && hoverPoint.i === point.i && hoverPoint.j === point.j ? pointSize * 1.5 : pointSize}
-          fill={hoverPoint && hoverPoint.i === point.i && hoverPoint.j === point.j ? highlightColor : "red"}
+          r={pointSize}
+          fill={point.color}
           onmouseover={() => handleHover(point)}
           onfocus={() => handleHover(point)}
           onmouseleave={clearHover}
@@ -198,6 +220,9 @@
       {#if hoverPoint}
         <text x={hoverPoint.x + 10} y={hoverPoint.y - 10} font-size="12" fill="black">
           Fixation {hoverPoint.i} ↔ {hoverPoint.j}
+        </text>
+        <text x={hoverPoint.x + 10} y={hoverPoint.y + 5} font-size="12" fill="black">
+          AOI: {fixations[hoverPoint.i]?.aoi || 'none'}
         </text>
       {/if}
 
