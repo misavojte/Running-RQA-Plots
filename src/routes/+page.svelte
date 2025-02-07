@@ -39,8 +39,8 @@
 
 </script>
 
-<main class="p-8">
-    <h1>Welcome to your library project</h1>
+<main class="p-8 max-w-screen-md mx-auto">
+    <h1 class="text-2xl font-bold">Running RQA visualizations for eye-tracking research</h1>
     <p>Create your package using @sveltejs/package and preview/showcase your work with SvelteKit</p>
     <p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
     <br>
@@ -49,7 +49,7 @@
         <br>
         </div>
         <div class="flex flex-col items-center justify-center">
-    <select bind:value={metric} class="bg-gray-200 p-2 rounded-md border-gray-300 border-1">
+    <select bind:value={metric} class="bg-gray-200 p-2 rounded-md border-gray-300 border">
         <option value="recurrenceRate">Recurrence Rate</option>
         <option value="determinism">Determinism</option>
         <option value="determinism2">Determinism2</option>
@@ -60,6 +60,9 @@
         <option value="horizontalLaminarity">Horizontal Laminarity</option>
         <option value="horizontalLaminarity2">Horizontal Laminarity2</option>
         </select>
-        <RunningRqaPlotBarDeterminism metric={metric} fixations={fixations} width={500} height={100} lineColor="blue" />
+
+        <div class="flex flex-col items-center justify-center border-t border-b border-gray-300">
+            <RunningRqaPlotBarDeterminism metric={metric} fixations={fixations} width={500} height={70} lineColor="blue" />
+        </div>
     </div>
 </main>
