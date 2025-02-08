@@ -67,9 +67,14 @@
     <!-- RQA Value Line -->
     <polyline points={polylinePoints()} fill="none" stroke={lineColor} stroke-width="1" />
     {/key}
-    {#if endPoint() !== null}
+    {#if endPoint()}
         <!-- Circle at the end of the line -->
-        <circle cx={endPoint().x - 2} cy={endPoint().y} r="2" fill={lineColor} />
+        <circle 
+            cx={endPoint()!.x - 2} 
+            cy={endPoint()!.y} 
+            r="2" 
+            fill={lineColor} 
+        />
     {/if}
 </svg>
   
