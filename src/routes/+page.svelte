@@ -86,7 +86,8 @@
     <p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
     <br>
     <div class="flex flex-col items-center justify-center">
-        <select bind:value={selectedParticipantIndex} class="mb-4 bg-gray-200 p-2 rounded-md border-gray-300 border">
+        <h2 class="text-lg font-bold">Recurrence Plot</h2>
+        <select bind:value={selectedParticipantIndex} class="mb-4 bg-gray-200 p-1 rounded-md border-gray-300 border text-sm">
             {#each arrayOfRandomFixationSetsWithLabels as participant, index}
                 <option value={index}>{participant.label}</option>
             {/each}
@@ -104,7 +105,8 @@
         <br>
         </div>
         <div class="flex flex-col items-center justify-center">
-    <select bind:value={metric} class="bg-gray-200 p-2 rounded-md border-gray-300 border">
+            <h2 class="text-lg font-bold">RRQA Ensemble Plot</h2>
+            <select bind:value={metric} class="mb-4 bg-gray-200 p-1 rounded-md border-gray-300 border text-sm">
         <option value="recurrenceRate">Recurrence Rate</option>
         <option value="determinism">Determinism</option>
         <option value="determinism2">Determinism2</option>
@@ -121,7 +123,8 @@
         </div>
 
         <div class="flex flex-col items-center justify-center border-gray-300 my-4">
-            <select bind:value={selectedParticipantIndex2} class="bg-gray-200 p-2 rounded-md border-gray-300 border mb-4">
+            <h2 class="text-lg font-bold">RRQA Prism Plot</h2>
+            <select bind:value={selectedParticipantIndex2} class="bg-gray-200 p-1 rounded-md border-gray-300 border mb-4 text-sm">
                 {#each arrayOfRandomFixationSetsWithLabels as participant, index}
                     <option value={index}>{participant.label}</option>
                 {/each}
