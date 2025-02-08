@@ -11,7 +11,7 @@
         fixations: Fixation[];
     }
   
-    let { fixationGroups, metric = "recurrenceRate", width = 500, height = 100, lineColor = "black", backgroundColor = "white", gridColor = "#CCCCCC", showGrid = false, displayType = "line", tooltipSnippet = null } = $props<{
+    let { fixationGroups, metric = "recurrenceRate", width = 500, height = 100, lineColor = "black", backgroundColor = "white", gridColor = "#CCCCCC", showGrid = false, displayType = "line", tooltipSnippet = null, aoiColors = [] } = $props<{
         fixationGroups: FixationGroup[];
         metric: "determinism" | "determinism2" | "recurrenceRate" | "laminarity" | "laminarity2" | "horizontalLaminarity" | "verticalLaminarity" | "horizontalLaminarity2" | "verticalLaminarity2";
         width?: number;
@@ -22,6 +22,7 @@
         showGrid?: boolean;
         displayType?: "line" | "bars";
         tooltipSnippet?: Snippet<[{ x: number; y: number; value: number | null; label: string; fixationIndex: number }]> | null;
+        aoiColors?: Array<{ aoi: string; color: string }>;
     }>();
 
     // Calculate the maximum number of fixations across all groups
@@ -68,7 +69,8 @@
             
             return {
                 label: group.label,
-                values: result
+                values: result,
+                fixations: group.fixations
             };
         });
     });
@@ -152,8 +154,10 @@
         width={width} 
         height={height} 
         style="background: {backgroundColor};"
-        on:mousemove={handleMouseMove}
-        on:mouseleave={handleMouseLeave}
+        onmousemove={handleMouseMove}
+        onmouseleave={handleMouseLeave}
+        aria-label="Running RQA Plot"
+        role="img"
     >
         {#if showGrid}
             <pattern 
@@ -187,9 +191,14 @@
                         <RunningRQAPlotBarGeneric 
                             values={group.values} 
                             width={plotWidth()} 
-                            height={barHeight()} 
-                            lineColor={lineColor} 
+                            height={barHeight()}
                             backgroundColor="transparent"
+                            margin={2}
+                            lineColor={lineColor}
+                            colorFilling={group.fixations.map((f: { aoi?: string[] }) => {
+                                const aoiMapping = aoiColors.find((ac: { aoi: string; color: string }) => ac.aoi === f.aoi?.[0]);
+                                return aoiMapping?.color ?? 'gray';  // Map to actual hex colors
+                            })}
                         />
                     {:else}
                         <RunningRQAPlotBarBars
@@ -210,6 +219,17 @@
         <strong>{tooltipData.label}</strong><br>
         Fixation: {tooltipData.fixationIndex}<br>
         Value: {tooltipData.value ? tooltipData.value.toFixed(3) : "N/A"}
+        {#if tooltipData.value !== null}
+            <br>
+            Change: {(() => {
+                const group = groupValues().find((g: FixationGroup) => g.label === tooltipData.label);
+                if (!group || tooltipData.fixationIndex <= 1) return "+0.000";
+                const prevValue = group.values[tooltipData.fixationIndex - 2];
+                if (prevValue === null) return "N/A";
+                const change = tooltipData.value - prevValue;
+                return (change >= 0 ? "+" : "") + change.toFixed(3);
+            })()}
+        {/if}
     {/snippet}
 
     {#if tooltipData && tooltipData.value !== null}

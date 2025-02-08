@@ -113,12 +113,12 @@
         <option value="horizontalLaminarity2">Horizontal Laminarity2</option>
         </select>
 
-        <div class="flex flex-col items-center justify-center border-gray-300">
-            <RunningRqaPlot metric={metric} fixationGroups={arrayOfRandomFixationSetsWithLabels} width={500} height={200} lineColor="#006FAD" showGrid={true} />
+        <div class="flex flex-col items-center justify-center border-gray-300 my-4">
+            <RunningRqaPlot metric={metric} fixationGroups={arrayOfRandomFixationSetsWithLabels} width={500} height={200} lineColor="#006FAD" showGrid={true} aoiColors={aoiColors} />
         </div>
 
         <div class="flex flex-col items-center justify-center border-gray-300 my-4">
-            <RunningRqaPlot metric={metric} fixationGroups={arrayOfRandomFixationSetsWithLabels} width={500} height={200} lineColor="#006FAD" showGrid={true} displayType="bars" />
+            <RunningRqaPlot metric={metric} fixationGroups={arrayOfRandomFixationSetsWithLabels} width={500} height={200} lineColor="#006FAD" showGrid={true} displayType="bars" aoiColors={aoiColors} />
         </div>
     </div>
     <footer class="text-center text-sm text-gray-500 mt-8">
