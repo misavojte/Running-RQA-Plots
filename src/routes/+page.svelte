@@ -1,4 +1,6 @@
 <script lang="ts">
+	import FocusedRqaPlot from "$lib/components/FocusedRQAPlot.svelte";
+
 
 	import RecurrencePlot from "$lib/components/RecurrencePlot.svelte";
 	import RunningRqaPlot from "$lib/components/RunningRQAPlot.svelte";
@@ -44,6 +46,7 @@
     let metric: "recurrenceRate" | "determinism" | "determinism2" | "laminarity" | "laminarity2" | "verticalLaminarity" | "verticalLaminarity2" | "horizontalLaminarity" | "horizontalLaminarity2" = $state("recurrenceRate");
     
     let selectedParticipantIndex: number = $state(0);
+    let selectedParticipantIndex2: number = $state(0);
 
     const aoiColors = [
         { aoi: "AOI1", color: "#FF0000" },  // red
@@ -118,8 +121,19 @@
         </div>
 
         <div class="flex flex-col items-center justify-center border-gray-300 my-4">
-            <RunningRqaPlot metric={metric} fixationGroups={arrayOfRandomFixationSetsWithLabels} width={500} height={200} lineColor="#006FAD" showGrid={true} displayType="bars" aoiColors={aoiColors} />
-        </div>
+            <select bind:value={selectedParticipantIndex2} class="bg-gray-200 p-2 rounded-md border-gray-300 border mb-4">
+                {#each arrayOfRandomFixationSetsWithLabels as participant, index}
+                    <option value={index}>{participant.label}</option>
+                {/each}
+            </select>
+            <FocusedRqaPlot
+                fixationGroup={arrayOfRandomFixationSetsWithLabels[selectedParticipantIndex2]}
+                width={500}
+                height={400}
+                lineColor="#006FAD"
+                showGrid={true}
+            aoiColors={aoiColors}
+        />
     </div>
     <footer class="text-center text-sm text-gray-500 mt-8">
         <p>Created by <a href="https://vojtechovska.com" class="text-gray-500 hover:text-gray-700">Michael Vojtechovska</a> and <a href="https://muczka.com" class="text-gray-500 hover:text-gray-700">Marketa Muczka</a></p>
