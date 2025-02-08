@@ -4,6 +4,7 @@
     import type { Fixation } from "../types/Fixation.js";
 	import type { Snippet } from "svelte";
     import XAxis from "./RunningRQAPlotXAxis.svelte";
+	import RunningRqaPlotLegend from "./RunningRQAPlotLegend.svelte";
   
     let { width = 500, height = 100, lineColor = "black", backgroundColor = "white", gridColor = "#CCCCCC", showGrid = false, displayType = "line", tooltipSnippet = null, aoiColors = [], plotData = [] } = $props<{
         width?: number;
@@ -49,6 +50,10 @@
 
     // Add a constant for the x-axis label height
     const X_AXIS_HEIGHT = 30;  // Height reserved for x-axis labels
+
+    const legendHeight = $derived(() => {
+        return barHeight() + 100;
+    });
 
     function handleMouseMove(event: MouseEvent) {
         const rect = (event.currentTarget as SVGSVGElement).getBoundingClientRect();
@@ -109,7 +114,7 @@
 <div class="plot-container" bind:this={plotContainer}>
     <svg 
         width={width} 
-        height={height + X_AXIS_HEIGHT}
+        height={height + X_AXIS_HEIGHT + legendHeight()}
         style="background: {backgroundColor};"
         onmousemove={handleMouseMove}
         onmouseleave={handleMouseLeave}
@@ -193,6 +198,7 @@
             labelWidth={labelWidth()}
             maxFixations={maxFixations()}
         />
+        <RunningRqaPlotLegend width={width} y={height + X_AXIS_HEIGHT} height={legendHeight()} lineColor={lineColor} barHeight={barHeight()} />
         {/key}
     </svg>
 

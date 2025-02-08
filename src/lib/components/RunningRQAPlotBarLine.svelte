@@ -1,5 +1,5 @@
 <script lang="ts">
-    let { values, width = 500, height = 100, lineColor = "black", backgroundColor = "transparent", margin = 0, colorFilling = [], enableColorFilling = true, colorFillingOpacity = 0.15 } = $props<{
+    let { values, width = 500, height = 100, lineColor = "black", backgroundColor = "transparent", margin = 0, colorFilling = [], enableColorFilling = true, colorFillingOpacity = 0.15, x = 0, y = 0 } = $props<{
       values: (number | null)[]; // Updated to allow null values
       width?: number;
       height?: number;
@@ -9,6 +9,8 @@
       colorFilling?: string[]; // New prop for segment colors
       enableColorFilling?: boolean; // New type definition
       colorFillingOpacity?: number; // New type definition
+      x?: number;
+      y?: number;
     }>();
   
     // Compute the X-step for spacing the values equally
@@ -92,7 +94,7 @@
     });
 </script>
   
-<svg width={width} height={height} style="background: {backgroundColor};">
+<svg x={x} y={y} width={width} height={height} style="background: {backgroundColor};" >
     <!-- Background rectangle -->
     <rect x="0" y="0" width={width} height={height} fill={backgroundColor} />
     
