@@ -119,7 +119,7 @@
           width={size + Y_AXIS_WIDTH}
           height={size + X_AXIS_HEIGHT}
           style="background: transparent;"
-          viewBox={`-${Y_AXIS_WIDTH} -${X_AXIS_HEIGHT} ${size + 2 * Y_AXIS_WIDTH} ${size + 2 * X_AXIS_HEIGHT}`}
+          viewBox={`-${Y_AXIS_WIDTH} 5 ${size + 2 * Y_AXIS_WIDTH} ${size + X_AXIS_HEIGHT}`}
         >
           <defs>
             {#if showGrid}

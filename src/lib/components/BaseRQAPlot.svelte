@@ -116,6 +116,7 @@
         aria-label="Running RQA Plot"
         role="img"
     >
+        {#key groupValues()}
         {#if showGrid}
             <pattern 
                 id="grid-{uid}" 
@@ -192,6 +193,7 @@
             labelWidth={labelWidth()}
             maxFixations={maxFixations()}
         />
+        {/key}
     </svg>
 
     {#snippet tooltipSnippetDefault(tooltipData: { x: number; y: number; value: number | null; label: string; fixationIndex: number })}
