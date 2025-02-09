@@ -5,9 +5,9 @@
     import XAxis from "./RunningRQAPlotXAxis.svelte";
 	import RunningRqaPlotLegend from "./RunningRQAPlotLegend.svelte";
   
-    let { width = 500, height = 100, lineColor = "black", backgroundColor = "white", gridColor = "#CCCCCC", showGrid = false, tooltipSnippet = null, aoiColors = [], plotData = [] } = $props<{
+    let { width = 500, height = "auto", lineColor = "black", backgroundColor = "white", gridColor = "#CCCCCC", showGrid = false, tooltipSnippet = null, aoiColors = [], plotData = [] } = $props<{
         width?: number;
-        height?: number;
+        height?: number | "auto";
         lineColor?: string;
         backgroundColor?: string;
         gridColor?: string;
@@ -102,88 +102,98 @@
         tooltipData = null;
     }
 
-    /**
-   * Computes layout dimensions when the total height is fixed.
-   *
-   * The overall structure is:
-   *   totalHeight = plotAreaHeight + legendHeight
-   *
-   * where:
-   *   - plotAreaHeight = (number of groups) * barHeight
-   *   - legendHeight = barHeight (legend bar) + fixed vertical offset
-   *
-   * The fixed vertical offset accounts for spacing above the AOI legend items,
-   * the height for each row of AOI items, and an additional bottom margin.
-   *
-   * @param totalHeight - The provided overall height (plot + legend).
-   * @param width - The available width used to compute AOI legend item layout.
-   * @param plotData - Data for the main plot groups.
-   * @param aoiColors - Array defining AOI legend items.
-   * @returns An object with:
-   *    - plotAreaHeight: Height allocated to the plot area.
-   *    - legendHeight: Height allocated to the legend.
-   *    - barHeight: Height for each individual bar (used in both plot and legend).
-   */
-  function computeDimensions(
-    totalHeight: number,
-    width: number,
-    plotData: Array<{ label: string; values: (number | null)[]; fixations: any[] }>,
-    aoiColors: Array<{ aoi: string; color: string }>
-  ): { plotAreaHeight: number; legendHeight: number; barHeight: number } {
-    // Ensure that at least one group exists to avoid division by zero.
-    const numberOfGroups = plotData.length || 1;
+    // alternative to computeDimensions, used when height is "auto", returns the total height of the plot
+    // compute with the legend as well, do not use computeDimensions when height is "auto"
+    function computeAutoDimensions(
+        width: number,
+        plotData: Array<{ label: string; values: (number | null)[]; fixations: any[] }>,
+        aoiColors: Array<{ aoi: string; color: string }>
+    ) {
+        const FIXED_BAR_HEIGHT = 40;
+        const plotAreaHeight = (plotData.length * FIXED_BAR_HEIGHT);
+        const legendHeight = calculateLegendHeight(width, aoiColors, FIXED_BAR_HEIGHT).legendHeight;
+        const totalHeight = plotAreaHeight + legendHeight + X_AXIS_HEIGHT;
 
-    // === AOI Legend Calculations ===
-    // These calculations determine how many legend items fit per row based on the available width.
-
-    const BASE_ITEM_WIDTH = 25;   // Base space for the circle and padding.
-    const CHAR_WIDTH = 7;         // Estimated width per character.
-    let maxLabelLength = 0;
-    for (const item of aoiColors) {
-      maxLabelLength = Math.max(maxLabelLength, item.aoi.length);
+        return {
+            plotAreaHeight,
+            legendHeight,
+            totalHeight,
+            barHeight: FIXED_BAR_HEIGHT
+        }
     }
-    const estimatedItemWidth = BASE_ITEM_WIDTH + (maxLabelLength * CHAR_WIDTH);
-    // Cap the width to avoid excessively wide items.
-    const ITEM_WIDTH = Math.min(estimatedItemWidth, 150);
-    
-    // Available width for legend items (with some padding).
-    const AOI_LEGEND_MAX_WIDTH = width - 20;
-    const ITEMS_PER_ROW = Math.max(Math.floor(AOI_LEGEND_MAX_WIDTH / ITEM_WIDTH), 1);
-    const numRows = aoiColors.length > 0 ? Math.ceil(aoiColors.length / ITEMS_PER_ROW) : 0;
-    
-    // Increase the vertical offset to provide more space for the legend elements
-    const legendFixedOffset = 65 + 10;  // Increased from 45 to 65
-    
-    // Add additional space per AOI row
-    const AOI_LEGEND_LINE_HEIGHT = 25;  // Increased from 20 to 25 for better spacing
-    
-    // Calculate total legend height needed
-    const legendConstant = (numRows * AOI_LEGEND_LINE_HEIGHT) + legendFixedOffset;
 
-    // Ensure minimum bar height
-    const MIN_BAR_HEIGHT = 20;
-    const barHeight = Math.max(
-        MIN_BAR_HEIGHT,
-        (totalHeight - legendConstant) / (numberOfGroups + 1)
-    );
+    function calculateLegendHeight(
+        width: number,
+        aoiColors: Array<{ aoi: string; color: string }>,
+        barHeight: number
+    ): { legendHeight: number; legendConstant: number } {
+        const BASE_ITEM_WIDTH = 25;   // Base space for the circle and padding
+        const CHAR_WIDTH = 7;         // Estimated width per character
+        
+        // Calculate max label length
+        const maxLabelLength = Math.max(...aoiColors.map(item => item.aoi.length), 0);
+        const estimatedItemWidth = BASE_ITEM_WIDTH + (maxLabelLength * CHAR_WIDTH);
+        const ITEM_WIDTH = Math.min(estimatedItemWidth, 150);
+        
+        // Calculate rows needed for legend items
+        const AOI_LEGEND_MAX_WIDTH = width - 20;
+        const ITEMS_PER_ROW = Math.max(Math.floor(AOI_LEGEND_MAX_WIDTH / ITEM_WIDTH), 1);
+        const numRows = aoiColors.length > 0 ? Math.ceil(aoiColors.length / ITEMS_PER_ROW) : 0;
+        
+        const legendFixedOffset = 75;  // Base offset for legend elements
+        const AOI_LEGEND_LINE_HEIGHT = 25;  // Height per legend row
+        
+        const legendConstant = (numRows * AOI_LEGEND_LINE_HEIGHT) + legendFixedOffset;
+        const legendHeight = barHeight + legendConstant;
+        
+        return { legendHeight, legendConstant };
+    }
 
-    // Compute the plot area height based on the number of groups
-    const plotAreaHeight = numberOfGroups * barHeight;
-    // The legend height includes the legend bar (barHeight) plus the fixed offset
-    const legendHeight = barHeight + legendConstant;
+    function computeDimensions(
+        totalHeight: number | "auto",
+        width: number,
+        plotData: Array<{ label: string; values: (number | null)[]; fixations: any[] }>,
+        aoiColors: Array<{ aoi: string; color: string }>
+    ): { plotAreaHeight: number; legendHeight: number; barHeight: number; totalHeight: number } {
 
-    return { plotAreaHeight, legendHeight, barHeight };
-  }
+        if (totalHeight === "auto") {
+            return computeAutoDimensions(width, plotData, aoiColors);
+        }
 
-  // Calculate the layout dimensions using the provided props.
-  const { plotAreaHeight, legendHeight, barHeight } = computeDimensions(height, width, plotData, aoiColors);
+        const numberOfGroups = plotData.length || 1;
+        
+        // Ensure minimum bar height
+        const MIN_BAR_HEIGHT = 20;
+        
+        // First calculate initial bar height without legend consideration
+
+        const initialBarHeight = Math.max(MIN_BAR_HEIGHT, totalHeight / (numberOfGroups + 1));
+
+        
+        // Calculate legend dimensions
+        const { legendHeight, legendConstant } = calculateLegendHeight(width, aoiColors, initialBarHeight);
+        
+        // Recalculate bar height considering legend space
+        const barHeight = Math.max(
+            MIN_BAR_HEIGHT,
+            (totalHeight - legendConstant) / (numberOfGroups + 1)
+        );
+        
+        // Compute the plot area height
+        const plotAreaHeight = numberOfGroups * barHeight;
+        
+        return { plotAreaHeight, legendHeight, barHeight, totalHeight };
+    }
+
+    // Calculate the layout dimensions using the provided props.
+    const { plotAreaHeight, legendHeight, barHeight, totalHeight } = height === "auto" ? computeAutoDimensions(width, plotData, aoiColors) : computeDimensions(height, width, plotData, aoiColors);
 </script>
 
 
 <div class="plot-container" bind:this={plotContainer}>
     <svg 
         width={width} 
-        height={height}
+        height={totalHeight}
         style="background: {backgroundColor};"
         onmousemove={handleMouseMove}
         onmouseleave={handleMouseLeave}
@@ -230,7 +240,7 @@
                         width={plotWidth()} 
                         height={barHeight}
                         backgroundColor="transparent"
-                        margin={2}
+                        margin={1}
                         lineColor={lineColor}
 
                         colorFilling={group.fixations.map((f: { aoi?: string[] }) => {

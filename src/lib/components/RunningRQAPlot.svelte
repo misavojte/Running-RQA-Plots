@@ -10,11 +10,11 @@
         fixations: Fixation[];
     }
   
-    let { fixationGroups, metric = "recurrenceRate", width = 500, height = 100, lineColor = "black", backgroundColor = "white", gridColor = "#CCCCCC", showGrid = false, tooltipSnippet = null, aoiColors = [] } = $props<{
+    let { fixationGroups, metric = "recurrenceRate", width = 500, height = "auto", lineColor = "black", backgroundColor = "white", gridColor = "#CCCCCC", showGrid = false, tooltipSnippet = null, aoiColors = [] } = $props<{
         fixationGroups: FixationGroup[];
         metric: "determinism" | "determinism2" | "recurrenceRate" | "laminarity" | "laminarity2" | "horizontalLaminarity" | "verticalLaminarity" | "horizontalLaminarity2" | "verticalLaminarity2";
         width?: number;
-        height?: number;
+        height?: number | "auto";
         lineColor?: string;
         backgroundColor?: string;
         gridColor?: string;

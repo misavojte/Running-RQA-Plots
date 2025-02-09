@@ -22,15 +22,14 @@
         { id: "verticalLaminarity2", label: "Vertical Laminarity 2" }
     ] as const;
   
-    let { fixationGroup, width = 500, height = 400, lineColor = "black", backgroundColor = "white", gridColor = "#CCCCCC", showGrid = false, displayType = "line", tooltipSnippet = null, aoiColors = [] } = $props<{
+    let { fixationGroup, width = 500, height = "auto", lineColor = "black", backgroundColor = "white", gridColor = "#CCCCCC", showGrid = false, tooltipSnippet = null, aoiColors = [] } = $props<{
         fixationGroup: FixationGroup;
         width?: number;
-        height?: number;
+        height?: number | "auto";
         lineColor?: string;
         backgroundColor?: string;
         gridColor?: string;
         showGrid?: boolean;
-        displayType?: "line" | "bars";
         tooltipSnippet?: Snippet<[{ x: number; y: number; value: number | null; label: string; fixationIndex: number; metric: string }]> | null;
         aoiColors?: Array<{ aoi: string; color: string }>;
     }>();
@@ -77,4 +76,4 @@
     });
 </script>
 
-<BaseRqaPlot {width} {height} {lineColor} {backgroundColor} {gridColor} {showGrid} {displayType} {tooltipSnippet} {aoiColors} plotData={metricValues()} />
+<BaseRqaPlot {width} {height} {lineColor} {backgroundColor} {gridColor} {showGrid} {tooltipSnippet} {aoiColors} plotData={metricValues()} />
