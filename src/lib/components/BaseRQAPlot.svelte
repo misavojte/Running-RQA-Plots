@@ -52,7 +52,7 @@
     const X_AXIS_HEIGHT = 30;  // Height reserved for x-axis labels
 
     const legendHeight = $derived(() => {
-        return barHeight() + 100;
+        return barHeight() + 300;
     });
 
     function handleMouseMove(event: MouseEvent) {
@@ -198,7 +198,7 @@
             labelWidth={labelWidth()}
             maxFixations={maxFixations()}
         />
-        <RunningRqaPlotLegend width={width} y={height + X_AXIS_HEIGHT} height={legendHeight()} lineColor={lineColor} barHeight={barHeight()} />
+        <RunningRqaPlotLegend width={width} y={height + X_AXIS_HEIGHT} height={legendHeight()} lineColor={lineColor} barHeight={barHeight()} aoiColors={aoiColors} />
         {/key}
     </svg>
 
