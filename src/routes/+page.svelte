@@ -105,7 +105,7 @@
         </select>
 
         <div class="flex flex-col items-center justify-center border-gray-300 my-4">
-            <RunningRqaPlot metric={metric} fixationGroups={arrayOfRandomFixationSetsWithLabels} width={500} height={200} lineColor="#006FAD" showGrid={true} aoiColors={aoiColors} />
+            <RunningRqaPlot metric={metric} fixationGroups={arrayOfRandomFixationSetsWithLabels} width={500} height={500} lineColor="#006FAD" showGrid={true} aoiColors={aoiColors} />
         </div>
 
         <div class="flex flex-col items-center justify-center border-gray-300 my-4">
@@ -118,10 +118,11 @@
             <FocusedRqaPlot
                 fixationGroup={arrayOfRandomFixationSetsWithLabels[selectedParticipantIndex2]}
                 width={500}
-                height={400}
+                height={500}
                 lineColor="#006FAD"
                 showGrid={true}
             aoiColors={aoiColors}
+
         />
     </div>
     <footer class="text-center text-sm text-gray-500 mt-8">
