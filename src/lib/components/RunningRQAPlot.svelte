@@ -10,7 +10,7 @@
         fixations: Fixation[];
     }
   
-    let { fixationGroups, metric = "recurrenceRate", width = 500, height = 100, lineColor = "black", backgroundColor = "white", gridColor = "#CCCCCC", showGrid = false, displayType = "line", tooltipSnippet = null, aoiColors = [] } = $props<{
+    let { fixationGroups, metric = "recurrenceRate", width = 500, height = 100, lineColor = "black", backgroundColor = "white", gridColor = "#CCCCCC", showGrid = false, tooltipSnippet = null, aoiColors = [] } = $props<{
         fixationGroups: FixationGroup[];
         metric: "determinism" | "determinism2" | "recurrenceRate" | "laminarity" | "laminarity2" | "horizontalLaminarity" | "verticalLaminarity" | "horizontalLaminarity2" | "verticalLaminarity2";
         width?: number;
@@ -19,7 +19,6 @@
         backgroundColor?: string;
         gridColor?: string;
         showGrid?: boolean;
-        displayType?: "line" | "bars";
         tooltipSnippet?: Snippet<[{ x: number; y: number; value: number | null; label: string; fixationIndex: number }]> | null;
         aoiColors?: Array<{ aoi: string; color: string }>;
     }>();
@@ -76,4 +75,4 @@
 
 </script>
 
-<BaseRqaPlot {width} {height} {lineColor} {backgroundColor} {gridColor} {showGrid} {displayType} {tooltipSnippet} {aoiColors} plotData={groupValues()} />
+<BaseRqaPlot {width} {height} {lineColor} {backgroundColor} {gridColor} {showGrid} {tooltipSnippet} {aoiColors} plotData={groupValues()} />

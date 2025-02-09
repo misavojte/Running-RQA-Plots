@@ -1,19 +1,17 @@
 <script lang="ts">
     import RunningRQAPlotBarGeneric from "./RunningRQAPlotBarLine.svelte";
-    import RunningRQAPlotBarBars from "./RunningRQAPlotBarBars.svelte";
     import type { Fixation } from "../types/Fixation.js";
 	import type { Snippet } from "svelte";
     import XAxis from "./RunningRQAPlotXAxis.svelte";
 	import RunningRqaPlotLegend from "./RunningRQAPlotLegend.svelte";
   
-    let { width = 500, height = 100, lineColor = "black", backgroundColor = "white", gridColor = "#CCCCCC", showGrid = false, displayType = "line", tooltipSnippet = null, aoiColors = [], plotData = [] } = $props<{
+    let { width = 500, height = 100, lineColor = "black", backgroundColor = "white", gridColor = "#CCCCCC", showGrid = false, tooltipSnippet = null, aoiColors = [], plotData = [] } = $props<{
         width?: number;
         height?: number;
         lineColor?: string;
         backgroundColor?: string;
         gridColor?: string;
         showGrid?: boolean;
-        displayType?: "line" | "bars";
         tooltipSnippet?: Snippet<[{ x: number; y: number; value: number | null; label: string; fixationIndex: number }]> | null;
         aoiColors?: Array<{ aoi: string; color: string }>;
         plotData?: Array<{ label: string; values: (number | null)[]; fixations: Fixation[] }>;
@@ -153,29 +151,18 @@
 
                 <!-- Plot content -->
                 <g transform="translate({labelWidth()}, 0)">
-                    {#if displayType === "line"}
-                        <RunningRQAPlotBarGeneric 
-                            values={group.values} 
-                            width={plotWidth()} 
-                            height={barHeight()}
-                            backgroundColor="transparent"
-                            margin={2}
-                            lineColor={lineColor}
-                            colorFilling={group.fixations.map((f: { aoi?: string[] }) => {
-                                const aoiMapping = aoiColors.find((ac: { aoi: string; color: string }) => ac.aoi === f.aoi?.[0]);
-                                return aoiMapping?.color ?? 'gray';
-                            })}
-                        />
-                    {:else}
-                        <RunningRQAPlotBarBars
-                            values={group.values} 
-                            width={plotWidth()} 
-                            height={barHeight()} 
-                            barColor={lineColor} 
-                            backgroundColor="transparent"
-                            margin={1}
-                        />
-                    {/if}
+                    <RunningRQAPlotBarGeneric 
+                        values={group.values} 
+                        width={plotWidth()} 
+                        height={barHeight()}
+                        backgroundColor="transparent"
+                        margin={2}
+                        lineColor={lineColor}
+                        colorFilling={group.fixations.map((f: { aoi?: string[] }) => {
+                            const aoiMapping = aoiColors.find((ac: { aoi: string; color: string }) => ac.aoi === f.aoi?.[0]);
+                            return aoiMapping?.color ?? 'gray';
+                        })}
+                    />
                 </g>
 
                 <!-- Right value label -->
