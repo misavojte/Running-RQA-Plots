@@ -64,7 +64,7 @@
             highlight.setAttribute("x", (labelWidth() + index * segmentWidth).toString());
             highlight.setAttribute("y", "0");
             highlight.setAttribute("width", segmentWidth.toString());
-            highlight.setAttribute("height", height.toString());
+            highlight.setAttribute("height", plotAreaHeight.toString());
             highlight.setAttribute("fill", "rgba(0, 0, 0, 0.1)");
             highlight.setAttribute("pointer-events", "none");
             highlight.setAttribute("class", "highlight-rect");
