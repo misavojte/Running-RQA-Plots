@@ -13,13 +13,14 @@
     const metrics = [
         { id: "recurrenceRate", label: "Recurrence Rate" },
         { id: "determinism", label: "Determinism" },
-        { id: "determinism2", label: "Determinism 2" },
+        { id: "determinism2", label: "Determinism'" },
         { id: "laminarity", label: "Laminarity" },
-        { id: "laminarity2", label: "Laminarity 2" },
+        { id: "laminarity2", label: "Laminarity'" },
         { id: "horizontalLaminarity", label: "Horizontal Laminarity" },
-        { id: "horizontalLaminarity2", label: "Horizontal Laminarity 2" },
+        { id: "horizontalLaminarity2", label: "Horizontal Laminarity'" },
         { id: "verticalLaminarity", label: "Vertical Laminarity" },
-        { id: "verticalLaminarity2", label: "Vertical Laminarity 2" }
+        { id: "verticalLaminarity2", label: "Vertical Laminarity'" }
+
     ] as const;
   
     let { fixationGroup, width = 500, height = "auto", lineColor = "black", backgroundColor = "white", gridColor = "#CCCCCC", showGrid = false, tooltipSnippet = null, aoiColors = [] } = $props<{

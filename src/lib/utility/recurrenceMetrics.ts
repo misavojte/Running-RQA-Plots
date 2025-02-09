@@ -84,8 +84,14 @@ export const computeDeterminism2 = (matrix: number[][], minLength = 2): number =
     if (numberOfPointsInDiagonalLines === 0) return 0;
     if (recurrentFixations === 0) return 0;
     console.log(`${numberOfPointsInDiagonalLines} / ${recurrentFixations}`);
-    return (100 * numberOfPointsInDiagonalLines) / N;
+    return (100 * numberOfPointsInDiagonalLines) / computeMaxPossibleDeterministicFixations(matrix);
 };
+
+export const computeMaxPossibleDeterministicFixations = (matrix: number[][]): number => {
+    const N = matrix.length;
+    return N * (N - 1) / 2;
+}
+
 
 /**
  * Computes the Determinism (DET) measure from a recurrence matrix.
@@ -220,8 +226,11 @@ export const computeLaminarity = (matrix: number[][], minLength = 2): number => 
 }
 
 export const computeLaminarity2 = (matrix: number[][], minLength = 2): number => {
-    return 100 * (computeNumberOfPointsInHorizontalLines(matrix, minLength) + computeNumberOfPointsInVerticalLines(matrix, minLength)) / ( 2 * matrix.length);
+    const N = matrix.length;
+    if (N < minLength) return 0;
+    return 100 * (computeNumberOfPointsInHorizontalLines(matrix, minLength) + computeNumberOfPointsInVerticalLines(matrix, minLength)) / ( 2 * computeMaxPossibleDeterministicFixations(matrix));
 }
+
 
 export const computeHorizontalLaminarity = (matrix: number[][], minLength = 2): number => {
     const numberOfRecurrencePoints = computeReccurencePointCount(matrix);
@@ -236,9 +245,15 @@ export const computeVerticalLaminarity = (matrix: number[][], minLength = 2): nu
 }
 
 export const computeHorizontalLaminarity2 = (matrix: number[][], minLength = 2): number => {
-    return 100 * computeNumberOfPointsInHorizontalLines(matrix, minLength) / ( matrix.length);
+    const N = matrix.length;
+    if (N < minLength) return 0;
+    return 100 * computeNumberOfPointsInHorizontalLines(matrix, minLength) / ( computeMaxPossibleDeterministicFixations(matrix));
 }
 
+
 export const computeVerticalLaminarity2 = (matrix: number[][], minLength = 2): number => {
-    return 100 * computeNumberOfPointsInVerticalLines(matrix, minLength) / ( matrix.length);
+    const N = matrix.length;
+    if (N < minLength) return 0;
+    return 100 * computeNumberOfPointsInVerticalLines(matrix, minLength) / ( computeMaxPossibleDeterministicFixations(matrix));
+
 }
