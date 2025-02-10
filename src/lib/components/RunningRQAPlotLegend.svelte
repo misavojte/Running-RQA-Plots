@@ -30,7 +30,7 @@
     let line3EndX = $derived(() => line3StartX() + 10);
 
     // Add new constants for AOI legend
-    const AOI_LEGEND_START_Y = $derived(() => line2EndY() + 35);
+    const AOI_LEGEND_START_Y = $derived(() => line2EndY() + 28);
     const AOI_LEGEND_CIRCLE_RADIUS = 4;
     const AOI_LEGEND_TEXT_OFFSET = 10;
     const AOI_LEGEND_LINE_HEIGHT = 20;
