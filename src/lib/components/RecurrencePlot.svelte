@@ -2,15 +2,17 @@
   import { computeRecurrenceMatrix } from "../utility/recurrenceMatrix.js";
   import type { Fixation } from "../types/Fixation.js";
 	import type { Snippet } from "svelte";
+  import RecurrencePlotLegend from "./RecurrencePlotLegend.svelte";
 
   // SVG layout constants
-  const Y_AXIS_WIDTH = 40;       // Total width reserved for y-axis label
-  const X_AXIS_HEIGHT = 40;      // Total height reserved for x-axis label
-  const LABEL_OFFSET = 40;       // Distance of axis labels from plot
+  const MARGIN = 45;            // Equal margin on both sides
+  const X_AXIS_HEIGHT = 40;     // Total height reserved for x-axis label
+  const LABEL_OFFSET = 32;      // Distance of axis labels from plot
 
   let { 
     fixations, 
-    size = 500, 
+    height = 600, 
+    width = 500,
     pointSize = 4, 
     highlightColor = "#006FAD",
     showGrid = false, 
@@ -23,13 +25,14 @@
     tooltipSnippet = []
   } = $props<{
     fixations: Fixation[];
-    size?: number;
+    height?: number;
     pointSize?: number;
     highlightColor?: string;
     showGrid?: boolean;
     gridColor?: string;
     xLabel?: string;
     yLabel?: string;
+
     labelStep?: number;
     showMainGrid?: boolean;
     aoiColors?: Array<{ aoi: string; color: string }>;  // New type for AOI colors
@@ -55,12 +58,23 @@
     recurrenceMatrix = computeRecurrenceMatrix(fixations);
   });
 
-  // Compute recurrence points reactively
+  // Compute the actual plot size based on available space
+  const plotSize = $derived(() => {
+    const availableWidth = width - (2 * MARGIN);  // Equal margins on both sides
+    const availableHeight = height - X_AXIS_HEIGHT - LEGEND_HEIGHT;
+    return Math.min(availableWidth, availableHeight);
+  });
+
+  // Compute the centering offsets
+  const xOffset = $derived(() => MARGIN + (width - 2 * MARGIN - plotSize()) / 2);
+  const yOffset = $derived(() => (height - X_AXIS_HEIGHT - LEGEND_HEIGHT - plotSize()) / 2);
+
+  // Update points calculation to use plotSize
   const points = $derived((): RecurrencePoint[] => {
     const n = recurrenceMatrix.length;
     if (n === 0) return [];
 
-    const cellSize = size / (n + 1);
+    const cellSize = plotSize() / (n + 1);
     return recurrenceMatrix.flatMap((row: number[], i: number) =>
       row.map((value: number, j: number) => {
         if (value !== 1) return null;
@@ -70,8 +84,8 @@
         const pointColor = colorMapping?.color ?? '#000000';
         
         return { 
-          x: (j + 1) * cellSize,
-          y: size - (i + 1) * cellSize,
+          x: xOffset() + (j + 1) * cellSize,
+          y: yOffset() + plotSize() - (i + 1) * cellSize,
           i, 
           j,
           color: pointColor
@@ -101,6 +115,9 @@
   let hoverCircle: SVGElement | null = $state(null);
 
   let plotContainer: HTMLDivElement | null = $state(null);
+
+  // Add computed height for the legend
+  const LEGEND_HEIGHT = 40;  // Base height for one row of legend items
 </script>
 
 <div class="plot-container" bind:this={plotContainer}>
@@ -116,21 +133,22 @@
         </div>
         {/if}
         <svg 
-          width={size + Y_AXIS_WIDTH}
-          height={size + X_AXIS_HEIGHT}
+          {width}
+          {height}
           style="background: transparent;"
-          viewBox={`-${Y_AXIS_WIDTH} 5 ${size + 2 * Y_AXIS_WIDTH} ${size + X_AXIS_HEIGHT}`}
+          viewBox="0 0 {width} {height}"
         >
           <defs>
             {#if showGrid}
               <pattern 
                 id="grid" 
-                width={size / (recurrenceMatrix.length + 1)} 
-                height={size / (recurrenceMatrix.length + 1)} 
+                width={plotSize() / (recurrenceMatrix.length + 1)} 
+                height={plotSize() / (recurrenceMatrix.length + 1)} 
                 patternUnits="userSpaceOnUse"
+                patternTransform="translate({xOffset()} {yOffset()})"
               >
                 <path 
-                  d={`M ${size / (recurrenceMatrix.length + 1)} 0 L 0 0 0 ${size / (recurrenceMatrix.length + 1)}`}
+                  d={`M ${plotSize() / (recurrenceMatrix.length + 1)} 0 L 0 0 0 ${plotSize() / (recurrenceMatrix.length + 1)}`}
                   fill="none" 
                   stroke={gridColor} 
                   stroke-width="1"
@@ -141,12 +159,13 @@
             {#if showMainGrid}
               <pattern 
                 id="mainGrid" 
-                width={size * labelStep / (recurrenceMatrix.length + 1)} 
-                height={size * labelStep / (recurrenceMatrix.length + 1)} 
+                width={plotSize() * labelStep / (recurrenceMatrix.length + 1)} 
+                height={plotSize() * labelStep / (recurrenceMatrix.length + 1)} 
                 patternUnits="userSpaceOnUse"
+                patternTransform="translate({xOffset()} {yOffset()})"
               >
                 <path 
-                  d={`M ${size * labelStep / (recurrenceMatrix.length + 1)} 0 L 0 0 0 ${size * labelStep / (recurrenceMatrix.length + 1)}`}
+                  d={`M ${plotSize() * labelStep / (recurrenceMatrix.length + 1)} 0 L 0 0 0 ${plotSize() * labelStep / (recurrenceMatrix.length + 1)}`}
                   fill="none" 
                   stroke={gridColor} 
                   stroke-width="2"
@@ -155,11 +174,12 @@
             {/if}
           </defs>
 
+          <!-- Main plot rectangle -->
           <rect
-            x="0"
-            y="0"
-            width={size}
-            height={size}
+            x={xOffset()}
+            y={yOffset()}
+            width={plotSize()}
+            height={plotSize()}
             fill="none"
             stroke="black"
             stroke-width="1"
@@ -167,110 +187,116 @@
 
           <!-- Y-axis label -->
           <text
-            x={-LABEL_OFFSET}
-            y={size / 2}
+            x={xOffset() - LABEL_OFFSET}
+            y={yOffset() + plotSize() / 2}
             text-anchor="middle"
-            transform={`rotate(-90 -${LABEL_OFFSET} ${size / 2}) translate(0, 15)`}
+            font-size="12"
+            transform={`rotate(-90 ${xOffset() - LABEL_OFFSET} ${yOffset() + plotSize() / 2}) translate(0, ${LABEL_OFFSET/3})`}
           >
             {yLabel}
           </text>
 
+
           <!-- X-axis label -->
           <text
-            x={size / 2}
-            y={size + LABEL_OFFSET}
+            x={xOffset() + plotSize() / 2}
+            y={yOffset() + plotSize() + LABEL_OFFSET}
             text-anchor="middle"
+            font-size="12"
           >
             {xLabel}
           </text>
 
-          <!-- Translate the main plot content to accommodate labels -->
-          <g transform="translate(0, 0)">
-            <!-- Grid layers -->
-            <!-- Base grid is always visible -->
+          <!-- Grid layers -->
+          <rect
+            x={xOffset()}
+            y={yOffset()}
+            width={plotSize()}
+            height={plotSize()}
+            fill="url(#grid)"
+          />
+          {#if showMainGrid}
             <rect
-              x="0"
-              y="0"
-              width={size}
-              height={size}
-              fill="url(#grid)"
+              x={xOffset()}
+              y={yOffset()}
+              width={plotSize()}
+              height={plotSize()}
+              fill="url(#mainGrid)"
             />
-            {#if showMainGrid}
-              <rect
-                x="0"
-                y="0"
-                width={size}
-                height={size}
-                fill="url(#mainGrid)"
-              />
-            {/if}
+          {/if}
 
-            <!-- Draw recurrence points -->
-            {#each points() as point}
-              <!-- Hover outline circle -->
-              {#if hoverPoint && hoverPoint.i === point.i && hoverPoint.j === point.j}
-                <circle
-                  bind:this={hoverCircle}
-                  cx={point.x}
-                  cy={point.y}
-                  r={pointSize + 3}
-                  fill="none"
-                  stroke={highlightColor}
-                  stroke-width="2"
-                />
-              {/if}
-              <!-- Main point circle -->
+          <!-- Draw recurrence points -->
+          {#each points() as point}
+            <!-- Hover outline circle -->
+            {#if hoverPoint && hoverPoint.i === point.i && hoverPoint.j === point.j}
               <circle
-                role="button"
-                aria-label="Recurrence point"
-                tabindex="-1"
+                bind:this={hoverCircle}
                 cx={point.x}
                 cy={point.y}
-                r={pointSize}
-                fill={point.color}
-                onmouseover={() => handleHover(point)}
-                onfocus={() => handleHover(point)}
-                onmouseleave={clearHover}
-                onblur={clearHover}
+                r={pointSize + 3}
+                fill="none"
+                stroke={highlightColor}
+                stroke-width="2"
               />
-            {/each}
+            {/if}
+            <!-- Main point circle -->
+            <circle
+              role="button"
+              aria-label="Recurrence point"
+              tabindex="-1"
+              cx={point.x}
+              cy={point.y}
+              r={pointSize}
+              fill={point.color}
+              onmouseover={() => handleHover(point)}
+              onfocus={() => handleHover(point)}
+              onmouseleave={clearHover}
+              onblur={clearHover}
+            />
+          {/each}
 
-            <!-- Y-axis labels -->
-            {#each axisLabels() as label}
-              <text
-                x="-6"
-                y={size - (label * (size / (recurrenceMatrix.length + 1)))}
-                text-anchor="end"
-                dominant-baseline="middle"
-                font-size="12"
-              >
-                {label}
-              </text>
-            {/each}
-
-            <!-- X-axis labels -->
-            {#each axisLabels() as label}
-              <text
-                x={label * (size / (recurrenceMatrix.length + 1))}
-                y={size + 16}
-                text-anchor="middle"
-                font-size="12"
-              >
-                {label}
-              </text>
-            {/each}
-
-            <!-- Single origin label (0) -->
+          <!-- Axis labels -->
+          {#each axisLabels() as label}
             <text
-              x="-6"
-              y={size + 16}
+              x={xOffset() - 6}
+              y={yOffset() + plotSize() - (label * (plotSize() / (recurrenceMatrix.length + 1)))}
+              text-anchor="end"
+              dominant-baseline="middle"
+              font-size="12"
+            >
+              {label}
+            </text>
+            <text
+              x={xOffset() + label * (plotSize() / (recurrenceMatrix.length + 1))}
+              y={yOffset() + plotSize() + 16}
               text-anchor="middle"
               font-size="12"
             >
-              0
+              {label}
             </text>
-          </g>
+          {/each}
+
+          <!-- Origin label -->
+          <text
+            x={xOffset() - 6}
+            y={yOffset() + plotSize() + 16}
+            text-anchor="middle"
+            font-size="12"
+          >
+            0
+          </text>
+
+          <!-- Legend -->
+          <RecurrencePlotLegend
+            width={width}
+            aoiColors={aoiColors}
+            aoiColorsOpacity={1}
+            height={LEGEND_HEIGHT}
+            y={yOffset() + plotSize() + 40}
+          />
         </svg>
+
+
       </div>
 
 <style>
