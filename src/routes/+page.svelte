@@ -5,6 +5,8 @@
 	import RecurrencePlot from "$lib/components/RecurrencePlot.svelte";
 	import RunningRqaPlot from "$lib/components/RunningRQAPlot.svelte";
 
+    import { assignRandomColorToAoi, getUniqueAois } from '$lib/utility/colorUtils';
+
     const fixations = [
         { id: 1, timestamp: 100, aoi: ["AOI1"] },
         { id: 2, timestamp: 200, aoi: ["AOI2"] },
@@ -45,21 +47,14 @@
 
     let metric: "recurrenceRate" | "determinism" | "determinism2" | "laminarity" | "laminarity2" | "verticalLaminarity" | "verticalLaminarity2" | "horizontalLaminarity" | "horizontalLaminarity2" = "recurrenceRate";
     
-    let selectedParticipantIndex: number = 0;
-    let selectedParticipantIndex2: number = 0;
+    let selectedParticipantIndex: number = $state(0);
 
-    const aoiColors = [
-        { aoi: "AOI1", color: "#FF0000" },  // red
-        { aoi: "AOI2", color: "#0000FF" },  // blue
-        { aoi: "AOI3", color: "#00FF00" },  // green
-        { aoi: "AOI4", color: "#FFD700" },  // yellow
-        { aoi: "AOI5", color: "#800080" },  // purple
-        { aoi: "AOI6", color: "#FFA500" },  // orange
-    ];
-
+    let aoiColors = $state(assignRandomColorToAoi(getUniqueAois(arrayOfRandomFixationSetsWithLabels)));
 </script>
 
 {#snippet tooltipSnippet(aoiLabel: string, fixationLabel: string)}
+
+
     <div class="bg-white p-2 rounded-md border-gray-300 border text-sm w-32">
         <p>{aoiLabel}</p>
         <p>{fixationLabel}</p>
@@ -88,7 +83,6 @@
             showGrid={true} 
             aoiColors={aoiColors} 
             tooltipSnippet={tooltipSnippet} 
-
         />
         <br>
         </div>
@@ -112,17 +106,17 @@
 
         <div class="flex flex-col items-center justify-center border-gray-300 my-4">
             <h2 class="text-lg font-bold">RRQA Prism Plot</h2>
-            <select bind:value={selectedParticipantIndex2} class="bg-gray-200 p-1 rounded-md border-gray-300 border mb-4 text-sm">
+            <select bind:value={selectedParticipantIndex} class="bg-gray-200 p-1 rounded-md border-gray-300 border mb-4 text-sm">
                 {#each arrayOfRandomFixationSetsWithLabels as participant, index}
                     <option value={index}>{participant.label}</option>
                 {/each}
             </select>
             <FocusedRqaPlot
-                fixationGroup={arrayOfRandomFixationSetsWithLabels[selectedParticipantIndex2]}
+                fixationGroup={arrayOfRandomFixationSetsWithLabels[selectedParticipantIndex]}
                 width={500}
                 lineColor="#006FAD"
                 showGrid={true}
-            aoiColors={aoiColors}
+                aoiColors={aoiColors}
 
         />
     </div>
