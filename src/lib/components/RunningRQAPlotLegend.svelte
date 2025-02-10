@@ -1,13 +1,14 @@
 <script lang="ts">
     import RunningRQAPlotBarGeneric from "./RunningRQAPlotBarLine.svelte";
 
-    let { width, y, height, barHeight, lineColor="black", aoiColors = [] } = $props<{
+    let { width, y, height, barHeight, lineColor="black", aoiColors = [], aoiColorsOpacity = 0.2 } = $props<{
         width: number;
         y: number;
         height: number;
         barHeight: number;
         lineColor?: string;
         aoiColors?: Array<{ aoi: string; color: string }>;
+        aoiColorsOpacity?: number;
     }>();
 
     const BAR_WIDTH = 50;
@@ -174,6 +175,7 @@
                 cy={item.y}
                 r={AOI_LEGEND_CIRCLE_RADIUS}
                 fill={item.color}
+                fill-opacity={aoiColorsOpacity}
             />
             <text
                 x={item.x + AOI_LEGEND_TEXT_OFFSET}
