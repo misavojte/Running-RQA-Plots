@@ -52,7 +52,7 @@
         const y = event.clientY - rect.top;
         const segmentWidth = plotWidth() / maxFixations();
         const index = Math.floor(x / segmentWidth);
-        const rowIndex = Math.floor(y / barHeight);
+        const rowIndex = Math.floor(y / barHeight());
         
         // Remove any existing highlights
         document.querySelector('.highlight-rect')?.remove();
@@ -72,11 +72,12 @@
             // Create row-specific highlight rectangle
             const rowHighlight = document.createElementNS("http://www.w3.org/2000/svg", "rect");
             rowHighlight.setAttribute("x", (labelWidth() + index * segmentWidth).toString());
-            rowHighlight.setAttribute("y", (rowIndex * barHeight).toString());
+            rowHighlight.setAttribute("y", (rowIndex * barHeight()).toString());
             rowHighlight.setAttribute("width", segmentWidth.toString());
-            rowHighlight.setAttribute("height", barHeight.toString());
+            rowHighlight.setAttribute("height", barHeight().toString());
             rowHighlight.setAttribute("fill", "rgba(0, 0, 0, 0.1)");
             rowHighlight.setAttribute("pointer-events", "none");
+
 
             rowHighlight.setAttribute("class", "highlight-rect-row");
             
@@ -185,15 +186,28 @@
         return { plotAreaHeight, legendHeight, barHeight, totalHeight };
     }
 
-    // Calculate the layout dimensions using the provided props.
-    const { plotAreaHeight, legendHeight, barHeight, totalHeight } = height === "auto" ? computeAutoDimensions(width, plotData, aoiColors) : computeDimensions(height, width, plotData, aoiColors);
+    // Make dimensions reactive using $derived
+    const dimensions = $derived(() => {
+        if (height === "auto") {
+            return computeAutoDimensions(width, plotData, aoiColors);
+        } else {
+            return computeDimensions(height, width, plotData, aoiColors);
+        }
+    });
+
+    // Replace individual dimension variables with derived properties
+    const plotAreaHeight = $derived(() => dimensions().plotAreaHeight);
+    const legendHeight = $derived(() => dimensions().legendHeight);
+    const barHeight = $derived(() => dimensions().barHeight);
+    const totalHeight = $derived(() => dimensions().totalHeight);
+
 </script>
 
 
 <div class="plot-container" bind:this={plotContainer}>
     <svg 
         width={width} 
-        height={totalHeight}
+        height={totalHeight()}
         style="background: {backgroundColor};"
         onmousemove={handleMouseMove}
         onmouseleave={handleMouseLeave}
@@ -206,8 +220,9 @@
             <pattern 
                 id="grid-{uid}" 
                 width={plotWidth()} 
-                height={barHeight} 
+                height={barHeight()} 
                 patternUnits="userSpaceOnUse"
+
             >
                 <path 
                     d={`M 0 ${barHeight} L ${plotWidth} ${barHeight}`}
@@ -221,13 +236,14 @@
             <rect x={labelWidth()} width={plotWidth()} height={height} fill={`url(#grid-${uid})`} />
         {/if}
         {#each groupValues() as group, i}
-            <g transform="translate(0, {i * barHeight})">
+            <g transform="translate(0, {i * barHeight()})">
                 <!-- Left label -->
                 <text 
                     x={labelWidth() - 5}
-                    y={barHeight / 2}
+                    y={barHeight() / 2}
                     text-anchor="end"
                     dominant-baseline="middle"
+
 
                     font-size="12px"
                     fill="black"
@@ -238,10 +254,11 @@
                     <RunningRQAPlotBarGeneric 
                         values={group.values} 
                         width={plotWidth()} 
-                        height={barHeight}
+                        height={barHeight()}
                         backgroundColor="transparent"
                         margin={1}
                         lineColor={lineColor}
+
 
                         colorFilling={group.fixations.map((f: { aoi?: string[] }) => {
                             const aoiMapping = aoiColors.find((ac: { aoi: string; color: string }) => ac.aoi === f.aoi?.[0]);
@@ -253,11 +270,12 @@
                 <!-- Right value label -->
                 <text 
                     x={labelWidth() + plotWidth() + 5}
-                    y={barHeight / 2}
+                    y={barHeight() / 2}
                     text-anchor="start"
                     dominant-baseline="middle"
                     font-size="12px"
                     fill="black"
+
 
                 >{(() => {
                     const lastValidValue = group.values.filter((v: number | null) => v !== null).pop();
@@ -267,11 +285,12 @@
         {/each}
         <XAxis 
             width={plotWidth()}
-            height={plotAreaHeight}
+            height={plotAreaHeight()}
             labelWidth={labelWidth()}
             maxFixations={maxFixations()}
+
         />
-        <RunningRqaPlotLegend width={width} y={plotAreaHeight + X_AXIS_HEIGHT} height={legendHeight} lineColor={lineColor} barHeight={barHeight} aoiColors={aoiColors} />
+        <RunningRqaPlotLegend width={width} y={plotAreaHeight() + X_AXIS_HEIGHT} height={legendHeight()} lineColor={lineColor} barHeight={barHeight()} aoiColors={aoiColors} />
         {/key}
     </svg>
 
