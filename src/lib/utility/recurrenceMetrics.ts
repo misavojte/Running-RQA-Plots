@@ -56,7 +56,6 @@ export const computeDeterminism2 = (matrix: number[][], minLength = 2): number =
     const N = matrix.length;
     if (N < minLength) return 0; // Avoid invalid calculations
 
-    let recurrentFixations = computeReccurencePointCount(matrix);
     let numberOfPointsInDiagonalLines = 0;
     let copiedMatrix = matrix.map(row => row.slice());
 
@@ -81,10 +80,12 @@ export const computeDeterminism2 = (matrix: number[][], minLength = 2): number =
         }
     });
 
+    let maxPossibleDeterministicFixations = computeMaxPossibleDeterministicFixations(matrix);
+
     if (numberOfPointsInDiagonalLines === 0) return 0;
-    if (recurrentFixations === 0) return 0;
-    console.log(`${numberOfPointsInDiagonalLines} / ${recurrentFixations}`);
-    return (100 * numberOfPointsInDiagonalLines) / computeMaxPossibleDeterministicFixations(matrix);
+    if (maxPossibleDeterministicFixations === 0) return 0;
+    return (100 * numberOfPointsInDiagonalLines) / ( maxPossibleDeterministicFixations);
+
 };
 
 export const computeMaxPossibleDeterministicFixations = (matrix: number[][]): number => {
@@ -163,7 +164,7 @@ export const computeNumberOfPointsInHorizontalLines = (matrix: number[][], minLe
             x + currentHorizontalLength < N &&
             matrix[x + currentHorizontalLength][y] === 1 &&
             !visited.has(`${x + currentHorizontalLength},${y}`) &&
-            x + currentHorizontalLength !== y
+            x + currentHorizontalLength < y
         ) {
             visited.add(`${x},${y}`);
             x++;
@@ -247,6 +248,7 @@ export const computeVerticalLaminarity = (matrix: number[][], minLength = 2): nu
 export const computeHorizontalLaminarity2 = (matrix: number[][], minLength = 2): number => {
     const N = matrix.length;
     if (N < minLength) return 0;
+    console.log(`HL2 ${computeNumberOfPointsInHorizontalLines(matrix, minLength)} / ${computeMaxPossibleDeterministicFixations(matrix)}`);
     return 100 * computeNumberOfPointsInHorizontalLines(matrix, minLength) / ( computeMaxPossibleDeterministicFixations(matrix));
 }
 
@@ -254,6 +256,7 @@ export const computeHorizontalLaminarity2 = (matrix: number[][], minLength = 2):
 export const computeVerticalLaminarity2 = (matrix: number[][], minLength = 2): number => {
     const N = matrix.length;
     if (N < minLength) return 0;
+    console.log(`VL2 ${computeNumberOfPointsInVerticalLines(matrix, minLength)} / ${computeMaxPossibleDeterministicFixations(matrix)}`);
     return 100 * computeNumberOfPointsInVerticalLines(matrix, minLength) / ( computeMaxPossibleDeterministicFixations(matrix));
 
 }
