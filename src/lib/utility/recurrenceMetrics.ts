@@ -88,9 +88,19 @@ export const computeDeterminism2 = (matrix: number[][], minLength = 2): number =
 
 };
 
+/**
+ * Computes the maximum possible number of deterministic fixations in a recurrence matrix.
+ * This is the total number of points in the upper triangle
+ * Can be computed as N * (N - 1) / 2. If we subtract 1, we get the maximum possible number of deterministic fixations that can be in a diagonal line.
+ * 
+ * @param matrix - Binary recurrence matrix (NxN)
+ * @returns Maximum possible number of deterministic fixations
+
+*/
 export const computeMaxPossibleDeterministicFixations = (matrix: number[][]): number => {
     const N = matrix.length;
-    return N * (N - 1) / 2;
+    // return (N * (N - 1) / 2) - 1;
+    return (N * (N - 1) / 2);
 }
 
 
@@ -141,80 +151,82 @@ export const computeDeterminism = (matrix: number[][], minLength = 2): number =>
 
 /**
  * Computes the number of points in horizontal lines from a recurrence matrix.
- * Horizontal lines look like in i,j coordinates:
- * i,j
- * i+1,j
- * i+2,j
- * ...
- * @param matrix - Binary recurrence matrix (NxN)
- * @param minLength - Minimum horizontal line length (L)
- * @returns Number of points in horizontal lines
+ * A horizontal chain is defined along a fixed column (j) with increasing row indices,
+ * and it is valid only if each new row still satisfies i < j.
+ *
+ * @param matrix - Binary recurrence matrix (NxN).
+ * @param minLength - Minimum horizontal line length (L).
+ * @returns The total number of recurrence points that belong to horizontal chains.
  */
-export const computeNumberOfPointsInHorizontalLines = (matrix: number[][], minLength = 2): number => {
-    const N = matrix.length;
-    if (N < minLength) return 0;
-    let numberOfPointsInHorizontalLines = 0;
-    const visited = new Set<string>();
+export const computeNumberOfPointsInHorizontalLines = (
+  matrix: number[][],
+  minLength = 2
+): number => {
+  const N = matrix.length;
+  if (N < minLength) return 0;
+  let total = 0;
+  const visited = new Set<string>();
 
-    forEachUpperTriangle(matrix, (i, j, value) => {
-        if (value !== 1 || visited.has(`${i},${j}`)) return;
-        let x = i, y = j;
-        let currentHorizontalLength = 1;
-        while (
-            x + currentHorizontalLength < N &&
-            matrix[x + currentHorizontalLength][y] === 1 &&
-            !visited.has(`${x + currentHorizontalLength},${y}`) &&
-            x + currentHorizontalLength < y
-        ) {
-            visited.add(`${x},${y}`);
-            x++;
-            currentHorizontalLength++;
-        }
-        visited.add(`${x},${y}`);
-        if (currentHorizontalLength >= minLength) {
-            numberOfPointsInHorizontalLines += currentHorizontalLength;
-        }
-    });
-    console.log(`Metric: horizontal points, value: ${numberOfPointsInHorizontalLines} in matrix of size ${N}`);
-    return numberOfPointsInHorizontalLines;
-}
+  forEachUpperTriangle(matrix, (i, j, value) => {
+    const key = `${i},${j}`;
+    if (value !== 1 || visited.has(key)) return;
+
+    // Begin a horizontal chain from (i,j)
+    let chainLength = 1;
+    visited.add(key);
+    let nextRow = i + 1;
+    // For a horizontal chain, we require that nextRow < j so the point stays in the upper triangle.
+    while (nextRow < j && matrix[nextRow][j] === 1 && !visited.has(`${nextRow},${j}`)) {
+      visited.add(`${nextRow},${j}`);
+      chainLength++;
+      nextRow++;
+    }
+    if (chainLength >= minLength) {
+      total += chainLength;
+    }
+  });
+  return total;
+};
 
 /**
  * Computes the number of points in vertical lines from a recurrence matrix.
- * Vertical lines look like in i,j coordinates:
- * i,j
- * i,j+1
- * i,j+2
- * ...
- * i,j+L-1
+ * A vertical chain is defined along a fixed row (i) with increasing column indices.
+ * Since (i,j) with i < j is the starting condition, vertical expansion automatically
+ * remains within the upper triangle.
+ *
+ * @param matrix - Binary recurrence matrix (NxN).
+ * @param minLength - Minimum vertical line length (L).
+ * @returns The total number of recurrence points that belong to vertical chains.
  */
-export const computeNumberOfPointsInVerticalLines = (matrix: number[][], minLength = 2): number => {
-    const N = matrix.length;
-    if (N < minLength) return 0;
-    let numberOfPointsInVerticalLines = 0;
-    const visited = new Set<string>();
+export const computeNumberOfPointsInVerticalLines = (
+  matrix: number[][],
+  minLength = 2
+): number => {
+  const N = matrix.length;
+  if (N < minLength) return 0;
+  let total = 0;
+  const visited = new Set<string>();
 
-    forEachUpperTriangle(matrix, (i, j, value) => {
-        if (value !== 1 || visited.has(`${i},${j}`)) return;
-        let x = i, y = j;
-        let currentVerticalLength = 1;
-        while (
-            y + currentVerticalLength < N &&
-            matrix[x][y + currentVerticalLength] === 1 &&
-            !visited.has(`${x},${y + currentVerticalLength}`)
-        ) {
-            visited.add(`${x},${y}`);
-            y++;
-            currentVerticalLength++;
-        }
-        visited.add(`${x},${y}`);
-        if (currentVerticalLength >= minLength) {
-            numberOfPointsInVerticalLines += currentVerticalLength;
-        }
-    });
-    console.log(`Metric: vertical laminarity, value: ${numberOfPointsInVerticalLines} in matrix of size ${N}`);
-    return numberOfPointsInVerticalLines;
-}
+  forEachUpperTriangle(matrix, (i, j, value) => {
+    const key = `${i},${j}`;
+    if (value !== 1 || visited.has(key)) return;
+
+    // Begin a vertical chain from (i,j)
+    let chainLength = 1;
+    visited.add(key);
+    let nextCol = j + 1;
+    // For vertical chains, simply ensure that nextCol is within bounds.
+    while (nextCol < N && matrix[i][nextCol] === 1 && !visited.has(`${i},${nextCol}`)) {
+      visited.add(`${i},${nextCol}`);
+      chainLength++;
+      nextCol++;
+    }
+    if (chainLength >= minLength) {
+      total += chainLength;
+    }
+  });
+  return total;
+};
 
 /**
  * Computes laminarity (LAM) from a recurrence matrix.
@@ -229,7 +241,9 @@ export const computeLaminarity = (matrix: number[][], minLength = 2): number => 
 export const computeLaminarity2 = (matrix: number[][], minLength = 2): number => {
     const N = matrix.length;
     if (N < minLength) return 0;
-    return 100 * (computeNumberOfPointsInHorizontalLines(matrix, minLength) + computeNumberOfPointsInVerticalLines(matrix, minLength)) / ( 2 * computeMaxPossibleDeterministicFixations(matrix));
+    const numberOfMaxPossibleDeterministicFixations = computeMaxPossibleDeterministicFixations(matrix);
+    if (numberOfMaxPossibleDeterministicFixations === 0) return 0;
+    return 100 * (computeNumberOfPointsInHorizontalLines(matrix, minLength) + computeNumberOfPointsInVerticalLines(matrix, minLength)) / ( 2 * numberOfMaxPossibleDeterministicFixations);
 }
 
 
@@ -248,15 +262,18 @@ export const computeVerticalLaminarity = (matrix: number[][], minLength = 2): nu
 export const computeHorizontalLaminarity2 = (matrix: number[][], minLength = 2): number => {
     const N = matrix.length;
     if (N < minLength) return 0;
-    console.log(`HL2 ${computeNumberOfPointsInHorizontalLines(matrix, minLength)} / ${computeMaxPossibleDeterministicFixations(matrix)}`);
-    return 100 * computeNumberOfPointsInHorizontalLines(matrix, minLength) / ( computeMaxPossibleDeterministicFixations(matrix));
+    const maxPossibleDeterministicFixations = computeMaxPossibleDeterministicFixations(matrix);
+    if (maxPossibleDeterministicFixations === 0) return 0;
+    return 100 * computeNumberOfPointsInHorizontalLines(matrix, minLength) / ( maxPossibleDeterministicFixations);
 }
+
+
 
 
 export const computeVerticalLaminarity2 = (matrix: number[][], minLength = 2): number => {
     const N = matrix.length;
     if (N < minLength) return 0;
-    console.log(`VL2 ${computeNumberOfPointsInVerticalLines(matrix, minLength)} / ${computeMaxPossibleDeterministicFixations(matrix)}`);
-    return 100 * computeNumberOfPointsInVerticalLines(matrix, minLength) / ( computeMaxPossibleDeterministicFixations(matrix));
-
+    const maxPossibleDeterministicFixations = computeMaxPossibleDeterministicFixations(matrix);
+    if (maxPossibleDeterministicFixations === 0) return 0;
+    return 100 * computeNumberOfPointsInVerticalLines(matrix, minLength) / ( maxPossibleDeterministicFixations);
 }
