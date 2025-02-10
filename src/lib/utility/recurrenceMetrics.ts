@@ -91,17 +91,20 @@ export const computeDeterminism2 = (matrix: number[][], minLength = 2): number =
 /**
  * Computes the maximum possible number of deterministic fixations in a recurrence matrix.
  * This is the total number of points in the upper triangle
- * Can be computed as N * (N - 1) / 2. If we subtract 1, we get the maximum possible number of deterministic fixations that can be in a diagonal line.
+ * MaxDet(N,L)= ((N−1+L)(N−L)) / 2
  * 
  * @param matrix - Binary recurrence matrix (NxN)
  * @returns Maximum possible number of deterministic fixations
 
+
 */
-export const computeMaxPossibleDeterministicFixations = (matrix: number[][]): number => {
+export const computeMaxPossibleDeterministicFixations = (matrix: number[][], minLength = 2): number => {
     const N = matrix.length;
     // return (N * (N - 1) / 2) - 1;
-    return (N * (N - 1) / 2);
+    // return (N * (N - 1) / 2);
+    return (N - 1 + minLength) * (N - minLength) / 2;
 }
+
 
 
 /**
@@ -241,7 +244,7 @@ export const computeLaminarity = (matrix: number[][], minLength = 2): number => 
 export const computeLaminarity2 = (matrix: number[][], minLength = 2): number => {
     const N = matrix.length;
     if (N < minLength) return 0;
-    const numberOfMaxPossibleDeterministicFixations = computeMaxPossibleDeterministicFixations(matrix);
+    const numberOfMaxPossibleDeterministicFixations = computeMaxPossibleDeterministicFixations(matrix, minLength);
     if (numberOfMaxPossibleDeterministicFixations === 0) return 0;
     return 100 * (computeNumberOfPointsInHorizontalLines(matrix, minLength) + computeNumberOfPointsInVerticalLines(matrix, minLength)) / ( 2 * numberOfMaxPossibleDeterministicFixations);
 }
@@ -262,7 +265,7 @@ export const computeVerticalLaminarity = (matrix: number[][], minLength = 2): nu
 export const computeHorizontalLaminarity2 = (matrix: number[][], minLength = 2): number => {
     const N = matrix.length;
     if (N < minLength) return 0;
-    const maxPossibleDeterministicFixations = computeMaxPossibleDeterministicFixations(matrix);
+    const maxPossibleDeterministicFixations = computeMaxPossibleDeterministicFixations(matrix, minLength);
     if (maxPossibleDeterministicFixations === 0) return 0;
     return 100 * computeNumberOfPointsInHorizontalLines(matrix, minLength) / ( maxPossibleDeterministicFixations);
 }
@@ -273,7 +276,7 @@ export const computeHorizontalLaminarity2 = (matrix: number[][], minLength = 2):
 export const computeVerticalLaminarity2 = (matrix: number[][], minLength = 2): number => {
     const N = matrix.length;
     if (N < minLength) return 0;
-    const maxPossibleDeterministicFixations = computeMaxPossibleDeterministicFixations(matrix);
+    const maxPossibleDeterministicFixations = computeMaxPossibleDeterministicFixations(matrix, minLength);
     if (maxPossibleDeterministicFixations === 0) return 0;
     return 100 * computeNumberOfPointsInVerticalLines(matrix, minLength) / ( maxPossibleDeterministicFixations);
 }
