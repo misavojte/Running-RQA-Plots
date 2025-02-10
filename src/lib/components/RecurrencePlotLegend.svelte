@@ -9,7 +9,7 @@
     }>();
 
     // Add new constants for AOI legend
-    const AOI_LEGEND_START_Y = 28;
+    const AOI_LEGEND_START_Y = 30;
     const AOI_LEGEND_CIRCLE_RADIUS = 4;
     const AOI_LEGEND_TEXT_OFFSET = 10;
     const AOI_LEGEND_LINE_HEIGHT = 20;
