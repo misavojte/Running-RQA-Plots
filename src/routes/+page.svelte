@@ -81,12 +81,14 @@
         
         <RecurrencePlot 
             fixations={arrayOfRandomFixationSetsWithLabels[selectedParticipantIndex].fixations} 
-            size={500} 
+            height={500} 
+            width={500}
             pointSize={4} 
             highlightColor="#006FAD" 
             showGrid={true} 
             aoiColors={aoiColors} 
             tooltipSnippet={tooltipSnippet} 
+
         />
         <br>
         </div>
