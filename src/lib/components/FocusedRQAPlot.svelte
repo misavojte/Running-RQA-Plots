@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { computeDeterminism, computeDeterminism2, computeDetLamDifference, computeHorizontalLaminarity, computeHorizontalLaminarity2, computeLaminarity, computeLaminarity2, computeRecurrenceRate, computeVerticalLaminarity, computeVerticalLaminarity2 } from "../utility/recurrenceMetrics.js";
+    import { computeDeterminism, computeDetLamDifference, computeHorizontalLaminarity, computeLaminarity, computeRecurrenceRate, computeVerticalLaminarity } from "../utility/recurrenceMetrics.js";
     import { computeRecurrenceMatrix } from "../utility/recurrenceMatrix.js";
     import type { Fixation } from "../types/Fixation.js";
     import type { Snippet } from "svelte";
@@ -13,14 +13,9 @@
     const metrics = [
         { id: "recurrenceRate", label: "Recurrence Rate" },
         { id: "determinism", label: "Determinism" },
-        { id: "determinism2", label: "Determinism'" },
         { id: "laminarity", label: "Laminarity" },
-        { id: "laminarity2", label: "Laminarity'" },
         { id: "horizontalLaminarity", label: "Horizontal Laminarity" },
-        { id: "horizontalLaminarity2", label: "Horizontal Laminarity'" },
-        { id: "verticalLaminarity", label: "Vertical Laminarity" },
-        { id: "verticalLaminarity2", label: "Vertical Laminarity'" },
-        { id: "detLamDifference", label: "Determinism - Laminarity" }
+        { id: "verticalLaminarity", label: "Vertical Laminarity" }
 
     ] as const;
   
@@ -52,22 +47,12 @@
                     result.push(computeRecurrenceRate(matrix));
                 } else if (metric.id === "determinism") {
                     result.push(computeDeterminism(matrix));
-                } else if (metric.id === "determinism2") {
-                    result.push(computeDeterminism2(matrix));
                 } else if (metric.id === "laminarity") {
                     result.push(computeLaminarity(matrix));
-                } else if (metric.id === "laminarity2") {
-                    result.push(computeLaminarity2(matrix));
                 } else if (metric.id === "horizontalLaminarity") {
                     result.push(computeHorizontalLaminarity(matrix));
                 } else if (metric.id === "verticalLaminarity") {
                     result.push(computeVerticalLaminarity(matrix));
-                } else if (metric.id === "horizontalLaminarity2") {
-                    result.push(computeHorizontalLaminarity2(matrix));
-                } else if (metric.id === "verticalLaminarity2") {
-                    result.push(computeVerticalLaminarity2(matrix));
-                } else if (metric.id === "detLamDifference") {
-                    result.push(computeDetLamDifference(matrix));
                 }
             }
             

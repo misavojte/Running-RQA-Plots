@@ -4,6 +4,7 @@
 
 	import RecurrencePlot from "$lib/components/RecurrencePlot.svelte";
 	import RunningRqaPlot from "$lib/components/RunningRQAPlot.svelte";
+	import RunningRqaPlotColor from "$lib/components/RunningRQAPlotColor.svelte";
 
     import { assignRandomColorToAoi, getUniqueAois } from '$lib/utility/colorUtils.js';
     import { handleFileUpload } from '$lib/utility/csvUtils.js';
@@ -183,6 +184,15 @@
                     showGrid={true}
                     aoiColors={aoiColors}
                 />
+            {/if}
+        </div>
+    </section>
+
+    <section class="mb-10">
+        <h2 class="text-lg font-bold text-center">RRQA Prism Plot</h2>
+        <div class="flex flex-col items-center justify-center">
+            {#if arrayOfRandomFixationSetsWithLabels.length > 0}
+                <RunningRqaPlotColor fixationGroups={arrayOfRandomFixationSetsWithLabels} width={500} lineColor="#006FAD" showGrid={true} showRisingPoints={false} aoiColors={aoiColors} />
             {/if}
         </div>
     </section>
