@@ -19,32 +19,56 @@
       y?: number;
     }>();
   
+    // Modified: If current value is 0, always return 0 (zero/decrease)
+    function getTrendValue(current: number | null, previous: number | null): number {
+      if (current === 0) return 0;
+      if (current === null || previous === null) return 50;
+      const diff = current - previous;
+      if (diff > 0) return 100;  // increase
+      if (diff < 0) return 0;    // decrease
+      return 50;                 // steady
+    }
+  
+    // Transform series2 and series3 into trend-based values
+    let transformedSeries = $derived(() => {
+      const series2Trend = series2.map((val, i) =>
+        i === 0 ? (val === 0 ? 0 : 50) : getTrendValue(val, series2[i - 1])
+      );
+      const series3Trend = series3.map((val, i) =>
+        i === 0 ? (val === 0 ? 0 : 50) : getTrendValue(val, series3[i - 1])
+      );
+      return {
+        series2: series2Trend,
+        series3: series3Trend
+      };
+    });
+  
     // Compute horizontal spacing based on the number of data points
     const stepX = width / series1.length;
-
-    // Define start and end colors for each gradient
-    const gradient1 = {
-      start: '#f7fbff',
-      end: '#3182bd'
-    };
-    const gradient2 = {
-      start: '#fff5f0',
-      end: '#cb181d'
-    };
+  
+    // Define gradients for color interpolation
+    const gradient1 = { start: '#f7fbff', end: '#3182bd' };
+    const gradient2 = { start: '#fff5f0', end: '#cb181d' };
+  
+    // Get color based on trend value (0, 50, or 100)
+    function getColorForTrend(gradient: { start: string, end: string }, trendValue: number) {
+      switch (trendValue) {
+        case 0:  return gradient.start;
+        case 50: return interpolateColor(gradient.start, gradient.end, 0.5);
+        case 100: return gradient.end;
+        default: return gradient.start;
+      }
+    }
   
     let segments = $derived(() => {
       let segments = [];
       for (let i = 0; i < series1.length; i++) {
         if (series1[i] === null || series2[i] === null || series3[i] === null) continue;
+        // Use series1 for height, transformed series2/series3 for color trends
         const rectHeight = (series1[i]! / 100) * height;
-        
-        // Calculate colors using linear interpolation based on normalized values
-        const color1 = interpolateColor(gradient1.start, gradient1.end, series2[i]! / 100);
-        const color2 = interpolateColor(gradient2.start, gradient2.end, series3[i]! / 100);
-        
-        // Blend the two colors
+        const color1 = getColorForTrend(gradient1, transformedSeries().series2[i]);
+        const color2 = getColorForTrend(gradient2, transformedSeries().series3[i]);
         const blendedColor = blendColors(color1, color2);
-        
         segments.push({
           x: i * stepX,
           y: (height - rectHeight) / 2,
@@ -55,36 +79,40 @@
       }
       return segments;
     });
-
-    // Function to interpolate between two colors
+  
+    // Interpolate between two colors
     function interpolateColor(startColor: string, endColor: string, ratio: number) {
       const start = hexToRgb(startColor);
       const end = hexToRgb(endColor);
-      
-      return `rgb(${
-        Math.round(start.r + (end.r - start.r) * ratio)
-      }, ${
+      return `rgb(${Math.round(start.r + (end.r - start.r) * ratio)}, ${
         Math.round(start.g + (end.g - start.g) * ratio)
-      }, ${
-        Math.round(start.b + (end.b - start.b) * ratio)
-      })`;
+      }, ${Math.round(start.b + (end.b - start.b) * ratio)})`;
     }
-
-    // Function to blend two colors
+  
+    // Blend two colors by averaging their RGB values
     function blendColors(color1: string, color2: string) {
-      // Since we're now working with rgb strings, we need to parse them
-      const rgb1 = parseRgb(color1);
-      const rgb2 = parseRgb(color2);
+      // Convert hex to rgb if color starts with #
+      const rgb1 = color1.startsWith('#') ? hexToRgbString(color1) : color1;
+      const rgb2 = color2.startsWith('#') ? hexToRgbString(color2) : color2;
+      
+      const parsed1 = parseRgb(rgb1);
+      const parsed2 = parseRgb(rgb2);
       
       const blended = {
-        r: Math.round((rgb1.r + rgb2.r) / 2),
-        g: Math.round((rgb1.g + rgb2.g) / 2),
-        b: Math.round((rgb1.b + rgb2.b) / 2)
+        r: Math.round((parsed1.r + parsed2.r) / 2),
+        g: Math.round((parsed1.g + parsed2.g) / 2),
+        b: Math.round((parsed1.b + parsed2.b) / 2)
       };
       return `rgb(${blended.r}, ${blended.g}, ${blended.b})`;
     }
-
-    // Helper function to parse RGB string
+  
+    // Helper function to convert hex to RGB string
+    function hexToRgbString(hex: string) {
+      const rgb = hexToRgb(hex);
+      return `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+    }
+  
+    // Helper function to parse an rgb() string
     function parseRgb(color: string) {
       const matches = color.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
       if (!matches) throw new Error('Invalid RGB color format');
@@ -94,8 +122,8 @@
         b: parseInt(matches[3])
       };
     }
-
-    // Helper function to convert hex to RGB (keep this for the initial gradient colors)
+  
+    // Helper function to convert hex to RGB
     function hexToRgb(hex: string) {
       const bigint = parseInt(hex.slice(1), 16);
       return {
@@ -119,42 +147,36 @@
         height={segment.height}
         fill={segment.color} />
     {/each}
-
+  
     <!-- Legend -->
     <g transform="translate({width - 80}, {height - 80})">
-      <!-- Min-Min -->
       <rect x="0" y="0" width="20" height="20" 
             fill={blendColors(
-              interpolateColor(gradient1.start, gradient1.end, 0),
-              interpolateColor(gradient2.start, gradient2.end, 0)
+              getColorForTrend(gradient1, 0),
+              getColorForTrend(gradient2, 0)
             )} />
-      <text x="25" y="15" font-size="10">Min,Min</text>
-
-      <!-- Max-Min -->
+      <text x="25" y="15" font-size="10">Dec,Dec</text>
+  
       <rect x="0" y="25" width="20" height="20" 
             fill={blendColors(
-              interpolateColor(gradient1.start, gradient1.end, 1),
-              interpolateColor(gradient2.start, gradient2.end, 0)
+              getColorForTrend(gradient1, 100),
+              getColorForTrend(gradient2, 0)
             )} />
-      <text x="25" y="40" font-size="10">Max,Min</text>
-
-      <!-- Min-Max -->
+      <text x="25" y="40" font-size="10">Inc,Dec</text>
+  
       <rect x="0" y="50" width="20" height="20" 
             fill={blendColors(
-              interpolateColor(gradient1.start, gradient1.end, 0),
-              interpolateColor(gradient2.start, gradient2.end, 1)
+              getColorForTrend(gradient1, 0),
+              getColorForTrend(gradient2, 100)
             )} />
-      <text x="25" y="65" font-size="10">Min,Max</text>
-
-      <!-- Max-Max -->
+      <text x="25" y="65" font-size="10">Dec,Inc</text>
+  
       <rect x="0" y="75" width="20" height="20" 
             fill={blendColors(
-              interpolateColor(gradient1.start, gradient1.end, 1),
-              interpolateColor(gradient2.start, gradient2.end, 1)
+              getColorForTrend(gradient1, 100),
+              getColorForTrend(gradient2, 100)
             )} />
-      <text x="25" y="90" font-size="10">Max,Max</text>
+      <text x="25" y="90" font-size="10">Inc,Inc</text>
     </g>
   </svg>
-
-
   

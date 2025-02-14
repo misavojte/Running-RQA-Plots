@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { computeDeterminism, computeDetLamDifference, computeHorizontalLaminarity, computeLaminarity, computeRecurrenceRate, computeVerticalLaminarity } from "../utility/recurrenceMetrics.js";
+    import { computeDeterminism, computeDeterminism2, computeHorizontalLaminarity, computeHorizontalLaminarity2, computeLaminarity, computeLaminarity2, computeRecurrenceRate, computeVerticalLaminarity, computeVerticalLaminarity2 } from "../utility/recurrenceMetrics.js";
     import { computeRecurrenceMatrix } from "../utility/recurrenceMatrix.js";
     import type { Fixation } from "../types/Fixation.js";
     import type { Snippet } from "svelte";
@@ -15,7 +15,11 @@
         { id: "determinism", label: "Determinism" },
         { id: "laminarity", label: "Laminarity" },
         { id: "horizontalLaminarity", label: "Horizontal Laminarity" },
-        { id: "verticalLaminarity", label: "Vertical Laminarity" }
+        { id: "verticalLaminarity", label: "Vertical Laminarity" },
+        { id: "determinism2", label: "Determinism'" },
+        { id: "laminarity2", label: "Laminarity'" },
+        { id: "horizontalLaminarity2", label: "Horizontal Laminarity'" },
+        { id: "verticalLaminarity2", label: "Vertical Laminarity'" }
 
     ] as const;
   
@@ -30,9 +34,6 @@
         tooltipSnippet?: Snippet<[{ x: number; y: number; value: number | null; label: string; fixationIndex: number; metric: string }]> | null;
         aoiColors?: Array<{ aoi: string; color: string }>;
     }>();
-
-    // Calculate individual bar heights based on number of metrics
-    const barHeight = $derived(() => height / metrics.length);
 
     // Calculate metrics for each fixation length
     let metricValues = $derived(() => {
@@ -53,6 +54,14 @@
                     result.push(computeHorizontalLaminarity(matrix));
                 } else if (metric.id === "verticalLaminarity") {
                     result.push(computeVerticalLaminarity(matrix));
+                } else if (metric.id === "determinism2") {
+                    result.push(computeDeterminism2(matrix));
+                } else if (metric.id === "laminarity2") {
+                    result.push(computeLaminarity2(matrix));
+                } else if (metric.id === "horizontalLaminarity2") {
+                    result.push(computeHorizontalLaminarity2(matrix));
+                } else if (metric.id === "verticalLaminarity2") {
+                    result.push(computeVerticalLaminarity2(matrix));
                 }
             }
             

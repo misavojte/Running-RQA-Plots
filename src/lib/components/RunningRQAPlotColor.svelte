@@ -41,8 +41,8 @@
                 matrices.push(matrix);
 
                 series1.push(computeRecurrenceRate(matrix));
-                series2.push(computeDeterminism(matrix));
-                series3.push(computeLaminarity(matrix));
+                series2.push(computeHorizontalLaminarity2(matrix));
+                series3.push(computeVerticalLaminarity2(matrix));
             }
                 
             
