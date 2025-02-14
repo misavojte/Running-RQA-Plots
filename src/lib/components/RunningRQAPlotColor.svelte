@@ -28,6 +28,16 @@
         return Math.max(...fixationGroups.map((group: FixationGroup) => group.fixations.length));
     });
 
+    const calculateTrendValue = (currentValue: number, previousValue: number) => {
+        if (currentValue === null || previousValue === null || currentValue === 0) {
+            return 0;
+        }
+        if (currentValue === previousValue || currentValue > previousValue) {
+            return 1;
+        }
+        return 0;
+    }
+
     // Modify groupValues to pad shorter sequences with null values
     let groupValues = $derived(() => {
         return fixationGroups.map((group: FixationGroup) => {
@@ -35,14 +45,23 @@
             const series1 = [];
             const series2 = [];
             const series3 = [];
+
+            let previousSeries2 = 0;
+            let previousSeries3 = 0;
             
             for (let i = 0; i < group.fixations.length; i++) {
                 const matrix = computeRecurrenceMatrix(group.fixations.slice(0, i + 1));
                 matrices.push(matrix);
 
+                const currentSeries2 = computeHorizontalLaminarity2(matrix);
+                const currentSeries3 = computeVerticalLaminarity2(matrix);
+
                 series1.push(computeRecurrenceRate(matrix));
-                series2.push(computeHorizontalLaminarity2(matrix));
-                series3.push(computeVerticalLaminarity2(matrix));
+                series2.push(calculateTrendValue(currentSeries2, previousSeries2));
+                series3.push(calculateTrendValue(currentSeries3, previousSeries3));
+
+                previousSeries2 = currentSeries2;
+                previousSeries3 = currentSeries3;
             }
                 
             
@@ -67,6 +86,6 @@
 
 {#key groupValues()}
     {#each groupValues() as group, index}
-        <RunningRqaPlotBarColor series1={group.series1} series2={group.series2} series3={group.series3} width={width} height={100} {backgroundColor} y={index * 100} />
+        <RunningRqaPlotBarColor series1={group.series1} series2={group.series2} series3={group.series3} width={width} height={40} {backgroundColor} y={index * 40} />
     {/each}
 {/key}
