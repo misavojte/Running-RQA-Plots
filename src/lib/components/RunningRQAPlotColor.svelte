@@ -4,7 +4,7 @@
     import type { Fixation } from "../types/Fixation.js";
 	import type { Snippet } from "svelte";
 	import RunningRqaPlotBarColor from "./RunningRQAPlotBarColor.svelte";
-	import RunningRqaPlotXAxis from "./RunningRQAPlotXAxis.svelte";
+	import RunningRqaPlotXAxis from "./RunningRqaPlotXAxis.svelte";
 
     interface FixationGroup {
         label: string;
@@ -34,8 +34,9 @@
     });
 
     const calculateTrendValue = (currentValue: number, previousValue: number) => {
-        if (previousValue !== null && currentValue !== null && currentValue > previousValue) return 1;
-        return 0;
+        if (previousValue === null || currentValue === null) return 0;
+        if (currentValue < previousValue) return 0;
+        return 1;
     }
 
     const calculateValue = (matrix: number[][], type: SeriesHighlightType) => {
@@ -83,7 +84,6 @@
                 previousSeries3 = currentSeries3;
             }
                 
-            
             // Pad with null values if this group has fewer fixations
             while (series1.length < maxFixations()) {
                 series1.push(null);
@@ -105,11 +105,47 @@
         console.log(groupValues());
     });
 
+    // --- NEW: compute proper plot dimensions (inspired by BaseRQAPlot.svelte) ---
+    const LABEL_WIDTH = 100;
+    const RIGHT_LABEL_WIDTH = 50;
+    const plotWidth = width - LABEL_WIDTH - RIGHT_LABEL_WIDTH;
+    const BAR_HEIGHT = 100; // each group's bar height
+    // Total height for all the bars
+    const plotAreaHeight = $derived(() => fixationGroups.length * BAR_HEIGHT);
+    // Extra space for the x-axis texts (as in BaseRQAPlot.svelte, the x-axis texts use y={height + 16})
+    const X_AXIS_EXTRA = 30;
+    // Overall SVG height
+    const svgHeight = $derived(() => plotAreaHeight() + X_AXIS_EXTRA);
 </script>
 
-{#key groupValues()}
-    {#each groupValues() as group, index}
-        <RunningRqaPlotBarColor series1={group.series1} series2={group.series2} series3={group.series3} hideDoubleIncrease={false} width={width} height={100} {backgroundColor} y={index * 100} />
-    {/each}
-{/key}
-<RunningRqaPlotXAxis {width} height={height} labelWidth={100} maxFixations={maxFixations()} />
+<!-- Wrap everything in a single SVG so the bars and x-axis share the same coordinate system -->
+<div class="plot-container">
+    <svg width={width} height={svgHeight()} style="background: {backgroundColor};">
+        {#key groupValues()}
+            {#each groupValues() as group, index}
+                <RunningRqaPlotBarColor 
+                    series1={group.series1} 
+                    series2={group.series2} 
+                    series3={group.series3} 
+                    hideDoubleIncrease={false} 
+                    width={plotWidth} 
+                    height={BAR_HEIGHT} 
+                    backgroundColor={backgroundColor} 
+                    y={index * BAR_HEIGHT}
+                    x={LABEL_WIDTH}
+                />
+            {/each}
+        {/key}
+        
+        <!--
+            IMPORTANT: Pass plotAreaHeight as the "height" prop, so the x-axis texts
+            render starting at y = plotAreaHeight + (their offset), which mimics BaseRQAPlot.
+            This avoids using any transform.
+        -->
+        <RunningRqaPlotXAxis 
+            width={plotWidth} 
+            height={plotAreaHeight()} 
+            labelWidth={LABEL_WIDTH} 
+            maxFixations={maxFixations()} />
+    </svg>
+</div> 
