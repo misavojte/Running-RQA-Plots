@@ -1,5 +1,5 @@
 <script lang="ts">
-    let { values, width = 500, height = 100, lineColor = "black", backgroundColor = "transparent", margin = 0, colorFilling = [], enableColorFilling = true, colorFillingOpacity = 0.15, x = 0, y = 0 } = $props<{
+    let { values, width = 500, height = 100, lineColor = "black", backgroundColor = "transparent", margin = 0, colorFilling = [], showRisingPoints = false, enableColorFilling = true, colorFillingOpacity = 0.15, x = 0, y = 0 } = $props<{
       values: (number | null)[]; // Updated to allow null values
       width?: number;
       height?: number;
@@ -9,6 +9,7 @@
       colorFilling?: string[]; // New prop for segment colors
       enableColorFilling?: boolean; // New type definition
       colorFillingOpacity?: number; // New type definition
+      showRisingPoints?: boolean;
       x?: number;
       y?: number;
     }>();
@@ -114,24 +115,26 @@
     <!-- RQA Value Line -->
     <polyline points={polylinePoints().points} fill="none" stroke={lineColor} stroke-width="2" />
     
-    {#each polylinePoints().risePoints as point}
-        <circle 
-            cx={point.x} 
+    {#if showRisingPoints}
+        {#each polylinePoints().risePoints as point}
+            <circle 
+                cx={point.x} 
             cy={point.y} 
             r="3" 
             fill={lineColor} 
-        />
-    {/each}
+            />
+        {/each}
+    {/if}
     {/key}
     {#if endPoint()}
         <!-- Circle at the end of the line -->
         <rect 
-            x={endPoint()!.x - 4.5} 
-            y={endPoint()!.y - 2} 
-            width="4" 
-            height="4" 
+            x={endPoint()!.x - 3.5} 
+            y={endPoint()!.y - 1.5} 
+            width="3" 
+            height="3" 
             stroke={lineColor} 
-            stroke-width="2"
+            stroke-width="1.5"
             fill="white"
         />
     {/if}

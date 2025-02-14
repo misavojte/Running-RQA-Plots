@@ -148,6 +148,7 @@
                 <option value="verticalLaminarity2">Vertical Laminarity2</option>
                 <option value="horizontalLaminarity">Horizontal Laminarity</option>
                 <option value="horizontalLaminarity2">Horizontal Laminarity2</option>
+                <option value="detLamDifference">Determinism - Laminarity</option>
             </select>
 
             <div class="flex flex-col items-center justify-center border-gray-300 my-4">
@@ -157,7 +158,8 @@
                         fixationGroups={arrayOfRandomFixationSetsWithLabels} 
                         width={500} 
                         lineColor="#006FAD" 
-                        showGrid={true} 
+                        showGrid={true}
+                        showRisingPoints={false}
                         aoiColors={aoiColors} 
                     />
                 {/if}

@@ -1,7 +1,7 @@
 <script lang="ts">
     import RunningRQAPlotBarGeneric from "./RunningRQAPlotBarLine.svelte";
 
-    let { width, y, height, barHeight, lineColor="black", aoiColors = [], aoiColorsOpacity = 0.2 } = $props<{
+    let { width, y, height, barHeight, lineColor="black", aoiColors = [], aoiColorsOpacity = 0.2, showRisingPoints = false } = $props<{
         width: number;
         y: number;
         height: number;
@@ -9,6 +9,7 @@
         lineColor?: string;
         aoiColors?: Array<{ aoi: string; color: string }>;
         aoiColorsOpacity?: number;
+        showRisingPoints?: boolean;
     }>();
 
     const BAR_WIDTH = 50;
@@ -78,6 +79,7 @@
         y={0}
         colorFilling={["red", "red", "red"]}
     />
+    {#if showRisingPoints}
     <line
         x1={lineStartX()}
         y1={lineStartY()}
@@ -97,8 +99,9 @@
     >
         <tspan x={lineEndX() - 2} dy="0">shows</tspan>
         <tspan x={lineEndX() - 2} dy="14">metric</tspan>
-        <tspan x={lineEndX() - 2} dy="14">increase</tspan>
-    </text>
+            <tspan x={lineEndX() - 2} dy="14">increase</tspan>
+        </text>
+    {/if}
     <line
         x1={line2X()}
         y1={line2StartY()}

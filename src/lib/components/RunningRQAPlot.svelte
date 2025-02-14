@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { computeDeterminism, computeDeterminism2, computeHorizontalLaminarity, computeHorizontalLaminarity2, computeLaminarity, computeLaminarity2, computeRecurrenceRate, computeVerticalLaminarity, computeVerticalLaminarity2 } from "../utility/recurrenceMetrics.js";
+    import { computeDeterminism, computeDeterminism2, computeDetLamDifference, computeHorizontalLaminarity, computeHorizontalLaminarity2, computeLaminarity, computeLaminarity2, computeRecurrenceRate, computeVerticalLaminarity, computeVerticalLaminarity2 } from "../utility/recurrenceMetrics.js";
     import { computeRecurrenceMatrix } from "../utility/recurrenceMatrix.js";
     import type { Fixation } from "../types/Fixation.js";
 	import type { Snippet } from "svelte";
@@ -10,15 +10,16 @@
         fixations: Fixation[];
     }
   
-    let { fixationGroups, metric = "recurrenceRate", width = 500, height = "auto", lineColor = "black", backgroundColor = "white", gridColor = "#CCCCCC", showGrid = false, tooltipSnippet = null, aoiColors = [] } = $props<{
+    let { fixationGroups, metric = "recurrenceRate", width = 500, height = "auto", lineColor = "black", backgroundColor = "white", gridColor = "#CCCCCC", showGrid = false, tooltipSnippet = null, showRisingPoints = false, aoiColors = [] } = $props<{
         fixationGroups: FixationGroup[];
-        metric: "determinism" | "determinism2" | "recurrenceRate" | "laminarity" | "laminarity2" | "horizontalLaminarity" | "verticalLaminarity" | "horizontalLaminarity2" | "verticalLaminarity2";
+        metric: "determinism" | "determinism2" | "recurrenceRate" | "laminarity" | "laminarity2" | "horizontalLaminarity" | "verticalLaminarity" | "horizontalLaminarity2" | "verticalLaminarity2" | "detLamDifference";
         width?: number;
         height?: number | "auto";
         lineColor?: string;
         backgroundColor?: string;
         gridColor?: string;
         showGrid?: boolean;
+        showRisingPoints?: boolean;
         tooltipSnippet?: Snippet<[{ x: number; y: number; value: number | null; label: string; fixationIndex: number }]> | null;
         aoiColors?: Array<{ aoi: string; color: string }>;
     }>();
@@ -57,6 +58,8 @@
                     result.push(computeHorizontalLaminarity2(matrix));
                 } else if (metric === "verticalLaminarity2") {
                     result.push(computeVerticalLaminarity2(matrix));
+                } else if (metric === "detLamDifference") {
+                    result.push(computeDetLamDifference(matrix));
                 }
             }
             
@@ -75,4 +78,4 @@
 
 </script>
 
-<BaseRqaPlot {width} {height} {lineColor} {backgroundColor} {gridColor} {showGrid} {tooltipSnippet} {aoiColors} plotData={groupValues()} />
+<BaseRqaPlot {width} {height} {lineColor} {backgroundColor} {gridColor} {showGrid} {tooltipSnippet} {showRisingPoints} {aoiColors} plotData={groupValues()} />

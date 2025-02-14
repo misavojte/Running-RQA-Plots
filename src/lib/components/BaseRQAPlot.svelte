@@ -5,13 +5,14 @@
     import XAxis from "./RunningRQAPlotXAxis.svelte";
 	import RunningRqaPlotLegend from "./RunningRQAPlotLegend.svelte";
   
-    let { width = 500, height = "auto", lineColor = "black", backgroundColor = "white", gridColor = "#CCCCCC", showGrid = false, tooltipSnippet = null, aoiColors = [], plotData = [] } = $props<{
+    let { width = 500, height = "auto", lineColor = "black", backgroundColor = "white", gridColor = "#CCCCCC", showGrid = false, showRisingPoints = false, tooltipSnippet = null, aoiColors = [], plotData = [] } = $props<{
         width?: number;
         height?: number | "auto";
         lineColor?: string;
         backgroundColor?: string;
         gridColor?: string;
         showGrid?: boolean;
+        showRisingPoints?: boolean;
         tooltipSnippet?: Snippet<[{ x: number; y: number; value: number | null; label: string; fixationIndex: number }]> | null;
         aoiColors?: Array<{ aoi: string; color: string }>;
         plotData?: Array<{ label: string; values: (number | null)[]; fixations: Fixation[] }>;
@@ -110,7 +111,7 @@
         plotData: Array<{ label: string; values: (number | null)[]; fixations: any[] }>,
         aoiColors: Array<{ aoi: string; color: string }>
     ) {
-        const FIXED_BAR_HEIGHT = 60;
+        const FIXED_BAR_HEIGHT = 40;
         const plotAreaHeight = (plotData.length * FIXED_BAR_HEIGHT);
         const legendHeight = calculateLegendHeight(width, aoiColors, FIXED_BAR_HEIGHT).legendHeight;
         const totalHeight = plotAreaHeight + legendHeight + X_AXIS_HEIGHT;
@@ -258,6 +259,7 @@
                         backgroundColor="transparent"
                         margin={1}
                         lineColor={lineColor}
+                        showRisingPoints={showRisingPoints}
 
 
                         colorFilling={group.fixations.map((f: { aoi?: string[] }) => {

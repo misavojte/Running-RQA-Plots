@@ -280,3 +280,39 @@ export const computeVerticalLaminarity2 = (matrix: number[][], minLength = 2): n
     if (maxPossibleDeterministicFixations === 0) return 0;
     return 100 * computeNumberOfPointsInVerticalLines(matrix, minLength) / ( maxPossibleDeterministicFixations);
 }
+
+/**
+ * Computes a DET–LAM difference measure that remains invariant when
+ * both DET and LAM scale by the same factor. For example, if DET and LAM
+ * both rise proportionally (due to repeated refixations), this measure
+ * stays constant.
+ *
+ * @param matrix - Binary recurrence matrix (NxN).
+ * @param minLength - Minimum line length for DET and LAM measures.
+ * @returns Value in [0, 100], where 50 indicates DET ≈ LAM.
+ */
+export const computeDetLamDifference = (matrix: number[][], minLength = 2): number => {
+    const det = computeDeterminism(matrix, minLength);
+    const lam = computeLaminarity(matrix, minLength);
+  
+    // Sum used as denominator for difference. If zero, default to middle value.
+    const sum = det + lam;
+    if (sum < 1e-6) {
+      // Both DET and LAM are effectively zero, so no difference is meaningful.
+      // Return 50 as a neutral midpoint (or 0 if you prefer).
+      return 50;
+    }
+  
+    // Raw difference in range [-1, 1]
+    // This ratio remains constant if DET and LAM scale by the same factor.
+    const difference = (det - lam) / sum;
+  
+    // Shift [-1, 1] -> [0, 1] and then scale -> [0, 100]
+    // difference = -1  =>  0%
+    // difference =  0  => 50%
+    // difference =  1  => 100%
+    const normalizedDifference = (difference + 1) * 50;
+  
+    // Clamp to [0, 100]
+    return Math.max(0, Math.min(100, normalizedDifference));
+  };
