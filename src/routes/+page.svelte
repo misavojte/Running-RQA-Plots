@@ -105,7 +105,7 @@
                     />
                 </label>
                 <p class="mt-1 text-sm text-gray-500">
-                    CSV format: columns for id, timestamp, and aoi (multiple AOIs can be separated by semicolons)
+                    CSV format: columns for timestamp, and aoi (multiple AOIs can be separated by semicolons)
                 </p>
             </div>
         </div>

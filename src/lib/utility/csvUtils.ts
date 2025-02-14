@@ -17,12 +17,11 @@ export const parseCSVFile = async (file: File): Promise<FixationGroup> => {
     const header = nonEmptyLines[0].toLowerCase().split(',');
     
     // Find required column indices
-    const idIndex = header.findIndex(col => col.includes('id'));
     const timestampIndex = header.findIndex(col => col.includes('timestamp'));
-    const aoiIndex = header.findIndex(col => col.includes('aoi'));
+    const aoiIndex = header.findIndex(col => col.includes('aoi') || col.includes('aoi'));
     
-    if (idIndex === -1 || timestampIndex === -1 || aoiIndex === -1) {
-        throw new Error('CSV must contain columns for id, timestamp, and aoi');
+    if (timestampIndex === -1 || aoiIndex === -1) {
+        throw new Error('CSV must contain columns for timestamp and aoi');
     }
 
     // Parse data rows
@@ -33,7 +32,7 @@ export const parseCSVFile = async (file: File): Promise<FixationGroup> => {
         const aois = columns[aoiIndex].split(';').map(aoi => aoi.trim());
         
         return {
-            id: parseInt(columns[idIndex]) || index + 1,
+            id: index + 1, // Assign a unique id based on the index
             timestamp: parseInt(columns[timestampIndex]),
             aoi: aois
         };
