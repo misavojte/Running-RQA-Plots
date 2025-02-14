@@ -26,6 +26,7 @@
   } = $props<{
     fixations: Fixation[];
     height?: number;
+    width?: number;
     pointSize?: number;
     highlightColor?: string;
     showGrid?: boolean;

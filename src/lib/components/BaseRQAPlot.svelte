@@ -110,7 +110,7 @@
         plotData: Array<{ label: string; values: (number | null)[]; fixations: any[] }>,
         aoiColors: Array<{ aoi: string; color: string }>
     ) {
-        const FIXED_BAR_HEIGHT = 40;
+        const FIXED_BAR_HEIGHT = 60;
         const plotAreaHeight = (plotData.length * FIXED_BAR_HEIGHT);
         const legendHeight = calculateLegendHeight(width, aoiColors, FIXED_BAR_HEIGHT).legendHeight;
         const totalHeight = plotAreaHeight + legendHeight + X_AXIS_HEIGHT;
