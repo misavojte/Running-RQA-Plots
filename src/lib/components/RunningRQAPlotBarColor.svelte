@@ -10,6 +10,7 @@
         ["#d3d3d3", "#5c9cad"],
         ["#b75252", "#4e3d42"],
       ],
+      hideDoubleIncrease = true,
       x = 0,
       y = 0
     } = $props<{
@@ -20,12 +21,22 @@
       height?: number;
       backgroundColor?: string;
       colorPalette?: string[][];
+      hideDoubleIncrease?: boolean;
       x?: number;
       y?: number;
     }>();
   
     // Compute horizontal spacing based on the number of data points
     const stepX = width / series1.length;
+
+    let effectiveColorPalette = $derived(() => {
+      if (hideDoubleIncrease) {
+        const copiedColorPalette = colorPalette.map((row: string[]) => [...row]);
+        copiedColorPalette[1][1] = colorPalette[0][0];
+        return copiedColorPalette;
+      }
+      return colorPalette;
+    });
   
     let segments = $derived(() => {
       let segments = [];
@@ -38,7 +49,7 @@
           y: (height - rectHeight) / 2,
           width: stepX,
           height: rectHeight,
-          color: colorPalette[series2[i]][series3[i]]
+          color: effectiveColorPalette()[series2[i]][series3[i]]
         });
       }
       return segments;
