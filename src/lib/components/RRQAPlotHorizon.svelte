@@ -8,6 +8,7 @@
     import RunningRQAPlotXAxis from "./RunningRQAPlotXAxis.svelte";
     import RunningRqaPlotLegend from "./RunningRQAPlotLegend.svelte";
     import { fade } from "svelte/transition";
+    import RrqaPlotHorizonLegend from "./RrqaPlotHorizonLegend.svelte";
 
     interface FixationGroup {
         label: string;
@@ -166,8 +167,13 @@
 
     // Legend height calculation
     function calculateLegendHeight(barHeight: number): { legendHeight: number; legendConstant: number } {
-        const legendFixedOffset = 75;
-        const legendConstant = legendFixedOffset;
+        // Constants from RRQAPlotHorizonLegend
+        const SMALL_BAR_HEIGHT = 20;
+        const RANGE_EXAMPLES_Y = 100;
+        const TEXT_OFFSET = 12;
+        
+        // Total height needed is the range examples position + bar height + text offset
+        const legendConstant = RANGE_EXAMPLES_Y + SMALL_BAR_HEIGHT + TEXT_OFFSET;
         const legendHeight = barHeight + legendConstant;
         
         return { legendHeight, legendConstant };
@@ -263,12 +269,14 @@
                 maxFixations={maxFixations} 
             />
 
-            <RunningRqaPlotLegend 
+            <RrqaPlotHorizonLegend 
                 width={width} 
                 y={plotAreaHeight + X_AXIS_EXTRA} 
                 height={legendHeight} 
-                lineColor={lineColor} 
-                barHeight={BAR_HEIGHT} 
+                barHeight={BAR_HEIGHT}
+                lineColor={lineColor}
+                colorPalette={colorPalette}
+                horizonSlices={horizonSlices}
             />
         {/key}
     </svg>
