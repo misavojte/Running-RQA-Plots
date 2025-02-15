@@ -69,6 +69,7 @@
     let series2Type: "determinism" | "laminarity" | "determinism2" | "laminarity2" | "verticalLaminarity" | "horizontalLaminarity" | "verticalLaminarity2" | "horizontalLaminarity2" | "cfr" | "avgDiagonalLength" = $state("determinism");
     let series3Type: "determinism" | "laminarity" | "determinism2" | "laminarity2" | "verticalLaminarity" | "horizontalLaminarity" | "verticalLaminarity2" | "horizontalLaminarity2" | "cfr" | "avgDiagonalLength" = $state("laminarity");
     let selectedParticipantIndex: number = $state(0);
+    let plotMode: "rises" | "risesAndSteady" | "normalized" = $state("rises");
 </script>
 
 {#snippet tooltipSnippet(aoiLabel: string, fixationLabel: string)}
@@ -224,11 +225,16 @@
                 <option value="cfr">Consecutive Fixation Ratio</option>
                 <option value="avgDiagonalLength">Average Diagonal Length</option>
             </select>
+            <select bind:value={plotMode} class="bg-gray-200 p-1 rounded-md border-gray-300 border mb-4 text-sm">
+                <option value="rises">Rises</option>
+                <option value="risesAndSteady">Rises and Steady</option>
+                <option value="normalized">Normalized</option>
+            </select>
         </div>
 
         <div class="flex flex-col items-center justify-center">
             {#if arrayOfRandomFixationSetsWithLabels.length > 0}
-                <RunningRqaPlotColor fixationGroups={arrayOfRandomFixationSetsWithLabels} width={500} lineColor="#006FAD" showGrid={true} showRisingPoints={false} aoiColors={aoiColors} series2Type={series2Type} series3Type={series3Type} showColorFilling={true} matrixGenerator={matrixGenerator} />
+                <RunningRqaPlotColor fixationGroups={arrayOfRandomFixationSetsWithLabels} width={500} lineColor="#006FAD" showGrid={true} showRisingPoints={false} aoiColors={aoiColors} series2Type={series2Type} series3Type={series3Type} showColorFilling={true} plotMode={plotMode} matrixGenerator={matrixGenerator} />
             {/if}
         </div>
     </section>

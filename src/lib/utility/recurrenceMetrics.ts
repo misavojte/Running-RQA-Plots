@@ -407,7 +407,7 @@ export const computeConsecutiveFixationRatio = (matrix: number[][]): number => {
     }
 
     // Total possible consecutive transitions equals N-1
-    return consecutiveCount / (N - 1);
+    return consecutiveCount / (N - 1) * 100;
 };
 
 /** */

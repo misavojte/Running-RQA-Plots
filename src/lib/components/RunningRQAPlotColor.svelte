@@ -7,6 +7,7 @@
 	import type { MatrixGenerator } from "../types/MatrixGenerator.ts";
 	import RunningRQAPlotXAxis from "./RunningRQAPlotXAxis.svelte";
     import RunningRqaPlotLegend from "./RunningRQAPlotLegend.svelte";
+	import RunningRqaPlotBarColorGradient from "./RunningRQAPlotBarColorGradient.svelte";
 
     interface FixationGroup {
         label: string;
@@ -39,7 +40,7 @@
     });
 
     const calculateTrendValue = (currentValue: number, previousValue: number, mode: "rises" | "risesAndSteady") => {
-        if (previousValue === null || currentValue === null) return 0;
+        if (previousValue === null || currentValue === null || previousValue === undefined || currentValue === undefined ||currentValue === 0) return 0;
         if (mode === "rises") {
             return currentValue > previousValue ? 1 : 0;
         } else { // risesAndSteady
@@ -273,13 +274,13 @@
                 <RunningRQAPlotBarColor 
                     series1={group.series1} 
                     series2={group.series2} 
-                    series3={group.series3} 
-                    hideDoubleIncrease={false} 
+                    series3={group.series3}
                     width={plotWidth} 
                     height={BAR_HEIGHT} 
                     backgroundColor={backgroundColor} 
                     y={index * (BAR_HEIGHT + BAR_GAP)}
                     x={LABEL_WIDTH}
+                    hideDoubleIncrease={false}
                     colorFilling={
                         showColorFilling ? group.fixations.map((f: { aoi?: string[] }) => {
                             const aoiMapping = aoiColors.find((ac: { aoi: string; color: string }) => ac.aoi === f.aoi?.[0]);
@@ -288,11 +289,11 @@
                     }
                 />
                 {:else if plotMode === "normalized"}
-                <RunningRQAPlotBarColor 
+                AAAAA
+                <RunningRqaPlotBarColorGradient 
                     series1={group.series1} 
                     series2={group.series2} 
                     series3={group.series3} 
-                    hideDoubleIncrease={false} 
                     width={plotWidth} 
                     height={BAR_HEIGHT} 
                     backgroundColor={backgroundColor} 

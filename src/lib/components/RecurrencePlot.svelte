@@ -9,6 +9,7 @@
   const MARGIN = 45;            // Equal margin on both sides
   const X_AXIS_HEIGHT = 40;     // Total height reserved for x-axis label
   const LABEL_OFFSET = 32;      // Distance of axis labels from plot
+  const LEGEND_HEIGHT = 40;     // Base height for one row of legend items
 
   let { 
     fixations, 
@@ -119,9 +120,6 @@
   let hoverCircle: SVGElement | null = $state(null);
 
   let plotContainer: HTMLDivElement | null = $state(null);
-
-  // Add computed height for the legend
-  const LEGEND_HEIGHT = 40;  // Base height for one row of legend items
 </script>
 
 <div class="plot-container" bind:this={plotContainer}>
