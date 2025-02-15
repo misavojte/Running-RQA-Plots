@@ -49,39 +49,114 @@
       return PADDING + ((value / 100) * (totalHeight - (2 * PADDING)));
     }
 
-    let segments = $derived(() => {
-      let segments = [];
+    interface Point {
+      x: number;
+      y: number;
+      height: number;
+    }
+
+    let segments = $derived.by(() => {
+      let optimizedSegments = [];
+      let currentGroup = null;
+      let backgroundPath = '';
+      
       for (let i = 0; i < series1.length; i++) {
-        if (series1[i] === null || series2[i] === null || series3[i] === null) continue;
+        if (series1[i] === null || series2[i] === null || series3[i] === null) {
+          if (currentGroup) {
+            optimizedSegments.push(currentGroup);
+            currentGroup = null;
+          }
+          continue;
+        }
         
         const rectHeight = scaleHeight(series1[i]!, height);
+        const color = effectiveColorPalette()[series2[i]][series3[i]];
+        const xPos = i * stepX;
+        const yPos = (height - rectHeight) / 2;
         
-        segments.push({
-          x: i * stepX,
-          y: ((height - rectHeight) / 2),
-          width: stepX,
-          height: rectHeight,
-          color: effectiveColorPalette()[series2[i]][series3[i]]
-        });
+        // Add to background path
+        backgroundPath += backgroundPath ? ' M' : 'M';
+        backgroundPath += ` ${xPos - PADDING/8} ${yPos - PADDING/8}`;
+        backgroundPath += ` L ${xPos + stepX + PADDING/4} ${yPos - PADDING/8}`;
+        backgroundPath += ` L ${xPos + stepX + PADDING/4} ${yPos + rectHeight + PADDING/8}`;
+        backgroundPath += ` L ${xPos - PADDING/8} ${yPos + rectHeight + PADDING/8}`;
+        backgroundPath += ' Z';
+        
+        if (!currentGroup || currentGroup.color !== color) {
+          if (currentGroup) {
+            optimizedSegments.push(currentGroup);
+          }
+          currentGroup = {
+            color,
+            x: xPos,
+            y: yPos,
+            width: stepX,
+            height: rectHeight,
+            innerPath: '',
+            points: [] as Point[]
+          };
+        }
+        
+        // Inner colored rectangle - precise positioning
+        currentGroup.innerPath += currentGroup.innerPath ? ' M' : 'M';
+        currentGroup.innerPath += ` ${xPos} ${yPos}`;
+        currentGroup.innerPath += ` L ${xPos + stepX} ${yPos}`;
+        currentGroup.innerPath += ` L ${xPos + stepX} ${yPos + rectHeight}`;
+        currentGroup.innerPath += ` L ${xPos} ${yPos + rectHeight}`;
+        currentGroup.innerPath += ' Z';
+        
+        currentGroup.points.push({ x: xPos, y: yPos, height: rectHeight });
       }
-      return segments;
+      
+      if (currentGroup) {
+        optimizedSegments.push(currentGroup);
+      }
+      
+      return {
+        segments: optimizedSegments,
+        backgroundPath
+      };
     });
 
-    // Add new derived store for background segments
-    let backgroundSegments = $derived(() => {
-      let segmentData = [];
+    // Replace backgroundSegments with backgroundPaths
+    let backgroundPaths = $derived.by(() => {
+      let currentPath = null;
+      let optimizedPaths = [];
+      
       for (let i = 0; i < series1.length; i++) {
-        if (series1[i] !== null) {
-          segmentData.push({
-            x: i * stepX,
-            y: 0,
-            width: stepX,
-            height: height,
-            color: colorFilling[i] || 'gray'
-          });
+        if (series1[i] === null) {
+          if (currentPath) {
+            optimizedPaths.push(currentPath);
+            currentPath = null;
+          }
+          continue;
         }
+        
+        const color = colorFilling[i] || 'gray';
+        
+        if (!currentPath || currentPath.color !== color) {
+          if (currentPath) {
+            optimizedPaths.push(currentPath);
+          }
+          currentPath = {
+            color,
+            path: `M ${i * stepX} 0`,
+            opacity: colorFillingOpacity
+          };
+        }
+        
+        // Add rectangle to path
+        currentPath.path += ` L ${(i + 1) * stepX} 0`;
+        currentPath.path += ` L ${(i + 1) * stepX} ${height}`;
+        currentPath.path += ` L ${i * stepX} ${height}`;
+        currentPath.path += ' Z';
       }
-      return segmentData;
+      
+      if (currentPath) {
+        optimizedPaths.push(currentPath);
+      }
+      
+      return optimizedPaths;
     });
   </script>
   
@@ -89,39 +164,23 @@
     <!-- Backdrop rectangle -->
     <rect x="0" y="0" width={width} height={height} fill={backgroundColor} />
   
-    <!-- Background color segments -->
+    <!-- Background color paths -->
     {#if colorFilling}
-      {#each backgroundSegments() as segment}
-        <rect 
-          x={segment.x}
-          y={segment.y}
-          width={segment.width}
-          height={segment.height}
-          fill={segment.color}
-          opacity={colorFillingOpacity}
+      {#each backgroundPaths as bgPath}
+        <path 
+          d={bgPath.path}
+          fill={bgPath.color}
+          opacity={bgPath.opacity}
         />
-
       {/each}
     {/if}
     
-    {#each segments() as segment (segment.x)}
-        <rect 
-        x={segment.x - PADDING / 8}
-        y={segment.y - PADDING / 8}
-        width={segment.width + PADDING / 4}
-        height={segment.height + PADDING / 4}
-        fill={"white"}
-      />
-    {/each}
-
-    <!-- Render rectangles with blended colors -->
-    {#each segments() as segment (segment.x)}
-      <rect 
-        x={segment.x}
-        y={segment.y + PADDING / 8}
-        width={segment.width}
-        height={segment.height - PADDING / 4}
-        fill={segment.color} />
+    <!-- Single white background path -->
+    <path d={segments.backgroundPath} fill="white" />
+    
+    <!-- Colored paths -->
+    {#each segments.segments as segment}
+      <path d={segment.innerPath} fill={segment.color} />
     {/each}
   </svg>
   

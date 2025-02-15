@@ -15,7 +15,7 @@
 
     type SeriesHighlightType = "determinism" | "laminarity" | "determinism2" | "laminarity2" | "horizontalLaminarity" | "verticalLaminarity" | "horizontalLaminarity2" | "verticalLaminarity2" | "recurrenceRate" | "cfr" | "avgDiagonalLength"
   
-    let { fixationGroups, width = 500, height = "auto", lineColor = "black", backgroundColor = "white", gridColor = "#CCCCCC", showGrid = false, tooltipSnippet = null, showRisingPoints = false, aoiColors = [], series2Type = "determinism2", series3Type = "laminarity2", showColorFilling = false, matrixGenerator = computeRecurrenceMatrix } = $props<{
+    let { fixationGroups, width = 500, height = "auto", lineColor = "black", backgroundColor = "white", gridColor = "#CCCCCC", showGrid = false, tooltipSnippet = null, showRisingPoints = false, aoiColors = [], series2Type = "determinism2", series3Type = "laminarity2", showColorFilling = false, plotMode = "rises", matrixGenerator = computeRecurrenceMatrix } = $props<{
         fixationGroups: FixationGroup[];
         width?: number;
         height?: number | "auto";
@@ -29,6 +29,7 @@
         tooltipSnippet?: Snippet<[{ x: number; y: number; value: number | null; label: string; fixationIndex: number }]> | null;
         aoiColors?: Array<{ aoi: string; color: string }>;
         showColorFilling?: boolean;
+        plotMode?: "rises" | "risesAndSteady" | "normalized";
         matrixGenerator?: MatrixGenerator;
     }>();
 
@@ -37,9 +38,13 @@
         return Math.max(...fixationGroups.map((group: FixationGroup) => group.fixations.length));
     });
 
-    const calculateTrendValue = (currentValue: number, previousValue: number) => {
-        if (previousValue === null || currentValue === null || currentValue <= previousValue) return 0;
-        return 1;
+    const calculateTrendValue = (currentValue: number, previousValue: number, mode: "rises" | "risesAndSteady") => {
+        if (previousValue === null || currentValue === null) return 0;
+        if (mode === "rises") {
+            return currentValue > previousValue ? 1 : 0;
+        } else { // risesAndSteady
+            return currentValue >= previousValue ? 1 : 0;
+        }
     }
 
     const calculateValue = (matrix: number[][], type: SeriesHighlightType) => {
@@ -69,15 +74,21 @@
         }
     }
 
-    // Modify groupValues to pad shorter sequences with null values
+    const normalizeValues = (values: number[]) => {
+        const maxValue = Math.max(...values.filter(v => v !== null));
+        return values.map(v => v !== null ? (v / maxValue) * 100 : null);
+    }
+
+    // Modify groupValues calculation
     let groupValues = $derived.by(() => {
+
         return fixationGroups.map((group: FixationGroup) => {
             const matrices = [];
             const series1 = [];
             const series2 = [];
             const series3 = [];
-            const series2original = [];
-            const series3original = [];
+            let series2original: number[] = [];
+            let series3original: number[] = [];
             
 
             let previousSeries2 = 0;
@@ -88,8 +99,13 @@
                 const currentSeries2 = calculateValue(matrix, series2Type);
                 const currentSeries3 = calculateValue(matrix, series3Type);
                 series1.push(computeRecurrenceRate(matrix));
-                series2.push(calculateTrendValue(currentSeries2, previousSeries2));
-                series3.push(calculateTrendValue(currentSeries3, previousSeries3));
+                if (plotMode === "normalized") {
+                    series2.push(currentSeries2);
+                    series3.push(currentSeries3);
+                } else {
+                    series2.push(calculateTrendValue(currentSeries2, previousSeries2, plotMode));
+                    series3.push(calculateTrendValue(currentSeries3, previousSeries3, plotMode));
+                }
                 series2original.push(currentSeries2);
                 series3original.push(currentSeries3);
                 previousSeries2 = currentSeries2;
@@ -253,7 +269,7 @@
                     font-size="12px"
                     fill="black"
                 >{group.label}</text>
-
+                {#if plotMode === "rises" || plotMode === "risesAndSteady"}
                 <RunningRQAPlotBarColor 
                     series1={group.series1} 
                     series2={group.series2} 
@@ -271,6 +287,25 @@
                         }) : null
                     }
                 />
+                {:else if plotMode === "normalized"}
+                <RunningRQAPlotBarColor 
+                    series1={group.series1} 
+                    series2={group.series2} 
+                    series3={group.series3} 
+                    hideDoubleIncrease={false} 
+                    width={plotWidth} 
+                    height={BAR_HEIGHT} 
+                    backgroundColor={backgroundColor} 
+                    y={index * (BAR_HEIGHT + BAR_GAP)}
+                    x={LABEL_WIDTH}
+                    colorFilling={
+                        showColorFilling ? group.fixations.map((f: { aoi?: string[] }) => {
+                            const aoiMapping = aoiColors.find((ac: { aoi: string; color: string }) => ac.aoi === f.aoi?.[0]);
+                            return aoiMapping?.color ?? 'gray';
+                        }) : null
+                    }
+                />
+                {/if}
             {/each}
 
             <!-- Existing highlight rects -->
