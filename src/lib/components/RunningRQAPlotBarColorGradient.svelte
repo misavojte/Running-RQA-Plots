@@ -219,7 +219,7 @@
 <!-- Template remains largely the same -->
 <svg x={x} y={y} width={width} height={height} style="background: {backgroundColor};">
     <!-- Backdrop rectangle -->
-    <rect x="0" y="0" width={width} height={height} fill={backgroundColor} stroke="gray" stroke-width="1" />
+    <rect x="0" y="0" width={width} height={height} fill={backgroundColor} stroke="lightgray" stroke-width="1" />
 
     <!-- Background color paths -->
     {#if colorFilling}

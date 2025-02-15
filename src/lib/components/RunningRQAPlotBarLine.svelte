@@ -15,7 +15,7 @@
     }>();
   
     // Compute the X-step for spacing the values equally
-    const stepX = width / values.length;
+    const stepX = (width - 2 * margin) / values.length;  // Adjust for margins
   
     // Function to map a value (0-100) to a vertical position
     const mapValueToY = (value: number): number => {
@@ -29,6 +29,7 @@
         let lastValidIndex = -1;
         let risePoints: Array<{x: number, y: number, angle: number}> = [];
         let lastValue: number | null = null;
+        const strokeOffset = 1; // Half of stroke-width to prevent boundary collision
 
         // Find last valid point to know where to place the circle
         for (let i = values.length - 1; i >= 0; i--) {
@@ -42,18 +43,22 @@
         for (let i = 0; i <= lastValidIndex; i++) {
             const value = values[i];
             if (value !== null) {
-                const x = i * stepX;
-                const nextX = (i + 1) * stepX;
-                const y = mapValueToY(value);
-                points.push(`${x},${y}`);
-                points.push(`${nextX},${y}`);
+                const x = i * stepX + margin;
+                const y = Math.min(Math.max(mapValueToY(value), margin + strokeOffset), height - margin - strokeOffset);
+                
+                // Add stroke offset only for first and last points
+                const adjustedX = i === 0 ? x + strokeOffset : 
+                                i === lastValidIndex ? x - strokeOffset : x;
+                
+                points.push(`${adjustedX},${y}`);
+                points.push(`${x + stepX},${y}`);
 
                 // Check for rise
                 if (lastValue !== null && value > lastValue) {
                     risePoints.push({
-                        x: x,
+                        x: x - margin,
                         y: y,
-                        angle: 0  // Changed from 90 to 0 to point upward
+                        angle: 0
                     });
                 }
                 lastValue = value;
@@ -97,46 +102,46 @@
   
 <svg x={x} y={y} width={width} height={height} style="background: {backgroundColor};" >
     <!-- Background rectangle -->
-    <rect x="0" y="0" width={width} height={height} fill={backgroundColor} />
+    <rect x="0" y="0" width={width} height={height} fill={backgroundColor} stroke="lightgray" stroke-width="1" />
     
-    <!-- Color-filled segments with configurable opacity -->
-    {#each segments() as segment}
-        <rect   
-            x={segment.x}
-            y={segment.y}
-            width={segment.width}
-            height={segment.height}
-            fill={segment.color}
-            opacity={colorFillingOpacity}
-        />
-    {/each}
-
-    {#key polylinePoints}
-    <!-- RQA Value Line -->
-    <polyline points={polylinePoints().points} fill="none" stroke={lineColor} stroke-width="2" />
-    
-    {#if showRisingPoints}
-        {#each polylinePoints().risePoints as point}
-            <circle 
-                cx={point.x} 
-            cy={point.y} 
-            r="3" 
-            fill={lineColor} 
+        <!-- Color-filled segments with configurable opacity -->
+        {#each segments() as segment}
+            <rect   
+                x={segment.x + margin}
+                y={segment.y}
+                width={segment.width}
+                height={segment.height}
+                fill={segment.color}
+                opacity={colorFillingOpacity}
             />
         {/each}
-    {/if}
-    {/key}
-    {#if endPoint()}
-        <!-- Circle at the end of the line -->
-        <rect 
-            x={endPoint()!.x - 3.5} 
-            y={endPoint()!.y - 1.5} 
-            width="3" 
-            height="3" 
-            stroke={lineColor} 
-            stroke-width="1.5"
-            fill="white"
-        />
-    {/if}
+
+        {#key polylinePoints}
+            <!-- RQA Value Line -->
+            <polyline points={polylinePoints().points} fill="none" stroke={lineColor} stroke-width="2" />
+            
+            {#if showRisingPoints}
+                {#each polylinePoints().risePoints as point}
+                    <circle 
+                        cx={point.x + margin} 
+                        cy={point.y} 
+                        r="3" 
+                        fill={lineColor} 
+                    />
+                {/each}
+            {/if}
+        {/key}
+        {#if endPoint()}
+            <!-- Circle at the end of the line -->
+            <rect 
+                x={endPoint()!.x + margin - 3.5} 
+                y={endPoint()!.y - 1.5} 
+                width="3" 
+                height="3" 
+                stroke={lineColor} 
+                stroke-width="1.5"
+                fill="white"
+            />
+        {/if}
 </svg>
   
