@@ -106,10 +106,10 @@
     
     {#each segments() as segment (segment.x)}
         <rect 
-        x={segment.x - PADDING / 4}
-        y={segment.y - PADDING / 4}
-        width={segment.width + PADDING / 2}
-        height={segment.height + PADDING / 2}
+        x={segment.x - PADDING / 8}
+        y={segment.y - PADDING / 8}
+        width={segment.width + PADDING / 4}
+        height={segment.height + PADDING / 4}
         fill={"white"}
       />
     {/each}
@@ -118,9 +118,9 @@
     {#each segments() as segment (segment.x)}
       <rect 
         x={segment.x}
-        y={segment.y + PADDING / 4}
+        y={segment.y + PADDING / 8}
         width={segment.width}
-        height={segment.height - PADDING / 2}
+        height={segment.height - PADDING / 4}
         fill={segment.color} />
     {/each}
   </svg>
