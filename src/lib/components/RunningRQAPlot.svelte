@@ -4,13 +4,14 @@
     import type { Fixation } from "../types/Fixation.js";
 	import type { Snippet } from "svelte";
 	import BaseRqaPlot from "./BaseRQAPlot.svelte";
+    import type { MatrixGenerator } from "../types/MatrixGenerator.ts";
 
     interface FixationGroup {
         label: string;
         fixations: Fixation[];
     }
   
-    let { fixationGroups, metric = "recurrenceRate", width = 500, height = "auto", lineColor = "black", backgroundColor = "white", gridColor = "#CCCCCC", showGrid = false, tooltipSnippet = null, showRisingPoints = false, aoiColors = [] } = $props<{
+    let { fixationGroups, metric = "recurrenceRate", width = 500, height = "auto", lineColor = "black", backgroundColor = "white", gridColor = "#CCCCCC", showGrid = false, tooltipSnippet = null, showRisingPoints = false, aoiColors = [], matrixGenerator = computeRecurrenceMatrix } = $props<{
         fixationGroups: FixationGroup[];
         metric: "determinism" | "determinism2" | "recurrenceRate" | "laminarity" | "laminarity2" | "horizontalLaminarity" | "verticalLaminarity" | "horizontalLaminarity2" | "verticalLaminarity2" | "detLamDifference";
         width?: number;
@@ -22,6 +23,7 @@
         showRisingPoints?: boolean;
         tooltipSnippet?: Snippet<[{ x: number; y: number; value: number | null; label: string; fixationIndex: number }]> | null;
         aoiColors?: Array<{ aoi: string; color: string }>;
+        matrixGenerator?: MatrixGenerator;
     }>();
 
     // Calculate the maximum number of fixations across all groups
@@ -36,10 +38,10 @@
             const result = [];
             
             for (let i = 0; i < group.fixations.length; i++) {
-                const matrix = computeRecurrenceMatrix(group.fixations.slice(0, i + 1));
+                const matrix = matrixGenerator(group.fixations.slice(0, i + 1));
                 matrices.push(matrix);
                 
-                // Calculate the requested metric directly
+                // Calculate the requested metric using the generated matrix
                 if (metric === "recurrenceRate") {
                     result.push(computeRecurrenceRate(matrix));
                 } else if (metric === "determinism") {

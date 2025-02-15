@@ -4,6 +4,7 @@
     import type { Fixation } from "../types/Fixation.js";
     import type { Snippet } from "svelte";
 	import BaseRqaPlot from "./BaseRQAPlot.svelte";
+    import type { MatrixGenerator } from "../types/MatrixGenerator.ts";
 
     interface FixationGroup {
         label: string;
@@ -23,7 +24,7 @@
 
     ] as const;
   
-    let { fixationGroup, width = 500, height = "auto", lineColor = "black", backgroundColor = "white", gridColor = "#CCCCCC", showGrid = false, tooltipSnippet = null, aoiColors = [] } = $props<{
+    let { fixationGroup, width = 500, height = "auto", lineColor = "black", backgroundColor = "white", gridColor = "#CCCCCC", showGrid = false, tooltipSnippet = null, aoiColors = [], matrixGenerator = computeRecurrenceMatrix } = $props<{
         fixationGroup: FixationGroup;
         width?: number;
         height?: number | "auto";
@@ -33,6 +34,7 @@
         showGrid?: boolean;
         tooltipSnippet?: Snippet<[{ x: number; y: number; value: number | null; label: string; fixationIndex: number; metric: string }]> | null;
         aoiColors?: Array<{ aoi: string; color: string }>;
+        matrixGenerator?: MatrixGenerator;
     }>();
 
     // Calculate metrics for each fixation length
@@ -41,7 +43,7 @@
             const result = [];
             
             for (let i = 0; i < fixationGroup.fixations.length; i++) {
-                const matrix = computeRecurrenceMatrix(fixationGroup.fixations.slice(0, i + 1));
+                const matrix = matrixGenerator(fixationGroup.fixations.slice(0, i + 1));
                 
                 // Calculate the requested metric
                 if (metric.id === "recurrenceRate") {

@@ -16,9 +16,11 @@ export const parseCSVFile = async (file: File): Promise<FixationGroup> => {
     // Assuming first line is header
     const header = nonEmptyLines[0].toLowerCase().split(',');
     
-    // Find required column indices
+    // Find column indices (x and y are optional)
     const timestampIndex = header.findIndex(col => col.includes('timestamp'));
-    const aoiIndex = header.findIndex(col => col.includes('aoi') || col.includes('aoi'));
+    const aoiIndex = header.findIndex(col => col.includes('aoi'));
+    const xIndex = header.findIndex(col => col.includes('x'));
+    const yIndex = header.findIndex(col => col.includes('y'));
     
     if (timestampIndex === -1 || aoiIndex === -1) {
         throw new Error('CSV must contain columns for timestamp and aoi');
@@ -31,11 +33,24 @@ export const parseCSVFile = async (file: File): Promise<FixationGroup> => {
         // Handle multiple AOIs separated by semicolon
         const aois = columns[aoiIndex].split(';').map(aoi => aoi.trim());
         
-        return {
+        // Create base fixation object
+        const fixation: Fixation = {
             id: index + 1, // Assign a unique id based on the index
             timestamp: parseInt(columns[timestampIndex]),
             aoi: aois
         };
+
+        // Add x and y coordinates if they exist in the CSV
+        if (xIndex !== -1 && yIndex !== -1) {
+            const x = parseFloat(columns[xIndex]);
+            const y = parseFloat(columns[yIndex]);
+            if (!isNaN(x) && !isNaN(y)) {
+                fixation.x = x;
+                fixation.y = y;
+            }
+        }
+
+        return fixation;
     });
 
     // Use filename without extension as label

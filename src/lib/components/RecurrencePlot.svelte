@@ -3,6 +3,7 @@
   import type { Fixation } from "../types/Fixation.js";
 	import type { Snippet } from "svelte";
   import RecurrencePlotLegend from "./RecurrencePlotLegend.svelte";
+  import type { MatrixGenerator } from "../types/MatrixGenerator.ts";
 
   // SVG layout constants
   const MARGIN = 45;            // Equal margin on both sides
@@ -22,7 +23,8 @@
     labelStep = 5,  // Controls both labels and main grid
     showMainGrid = true,  // New prop for showing main grid lines
     aoiColors = [],  // Changed to array of objects
-    tooltipSnippet = []
+    tooltipSnippet = [],
+    matrixGenerator = computeRecurrenceMatrix
   } = $props<{
     fixations: Fixation[];
     height?: number;
@@ -38,6 +40,7 @@
     showMainGrid?: boolean;
     aoiColors?: Array<{ aoi: string; color: string }>;  // New type for AOI colors
     tooltipSnippet?: Snippet<[aoi: string, fixationLabel: string]>;
+    matrixGenerator?: MatrixGenerator;
   }>();
 
   interface RecurrencePoint {
@@ -52,11 +55,11 @@
   let hoverPoint: RecurrencePoint | null = $state(null);
 
   // Reactive recurrence matrix
-  let recurrenceMatrix: number[][] = $state(computeRecurrenceMatrix(fixations));
+  let recurrenceMatrix: number[][] = $state(matrixGenerator(fixations));
 
   // Update recurrence matrix whenever fixations change
   $effect(() => {
-    recurrenceMatrix = computeRecurrenceMatrix(fixations);
+    recurrenceMatrix = matrixGenerator(fixations);
   });
 
   // Compute the actual plot size based on available space

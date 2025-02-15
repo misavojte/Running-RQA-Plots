@@ -5,6 +5,7 @@
 	import type { Snippet } from "svelte";
 	import RunningRqaPlotBarColor from "./RunningRQAPlotBarColor.svelte";
 	import RunningRqaPlotXAxis from "./RunningRqaPlotXAxis.svelte";
+	import type { MatrixGenerator } from "../types/MatrixGenerator.ts";
 
     interface FixationGroup {
         label: string;
@@ -13,7 +14,7 @@
 
     type SeriesHighlightType = "determinism" | "laminarity" | "determinism2" | "laminarity2" | "horizontalLaminarity" | "verticalLaminarity" | "horizontalLaminarity2" | "verticalLaminarity2" | "recurrenceRate" | "cfr"
   
-    let { fixationGroups, width = 500, height = "auto", lineColor = "black", backgroundColor = "white", gridColor = "#CCCCCC", showGrid = false, tooltipSnippet = null, showRisingPoints = false, aoiColors = [], series2Type = "determinism2", series3Type = "laminarity2", showColorFilling = false } = $props<{
+    let { fixationGroups, width = 500, height = "auto", lineColor = "black", backgroundColor = "white", gridColor = "#CCCCCC", showGrid = false, tooltipSnippet = null, showRisingPoints = false, aoiColors = [], series2Type = "determinism2", series3Type = "laminarity2", showColorFilling = false, matrixGenerator = computeRecurrenceMatrix } = $props<{
         fixationGroups: FixationGroup[];
         width?: number;
         height?: number | "auto";
@@ -27,6 +28,7 @@
         tooltipSnippet?: Snippet<[{ x: number; y: number; value: number | null; label: string; fixationIndex: number }]> | null;
         aoiColors?: Array<{ aoi: string; color: string }>;
         showColorFilling?: boolean;
+        matrixGenerator?: MatrixGenerator;
     }>();
 
     // Calculate the maximum number of fixations across all groups
@@ -78,7 +80,7 @@
             let previousSeries2 = 0;
             let previousSeries3 = 0;
             for (let i = 0; i < group.fixations.length; i++) {
-                const matrix = computeRecurrenceMatrix(group.fixations.slice(0, i + 1));
+                const matrix = matrixGenerator(group.fixations.slice(0, i + 1));
                 matrices.push(matrix);
                 const currentSeries2 = calculateValue(matrix, series2Type);
                 const currentSeries3 = calculateValue(matrix, series3Type);
