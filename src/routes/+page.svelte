@@ -4,6 +4,8 @@
 
 
 	import RecurrencePlot from "$lib/components/RecurrencePlot.svelte";
+	import RrqaPlotBarHorizon from "$lib/components/RRQAPlotBarHorizon.svelte";
+	import RrqaPlotHorizon from "$lib/components/RRQAPlotHorizon.svelte";
 	import RunningRqaPlot from "$lib/components/RunningRQAPlot.svelte";
 	import RunningRqaPlotColor from "$lib/components/RunningRQAPlotColor.svelte";
 	import type { MatrixGenerator } from "$lib/types/MatrixGenerator.js";
@@ -11,6 +13,7 @@
     import { assignRandomColorToAoi, getUniqueAois } from '$lib/utility/colorUtils.js';
     import { handleFileUpload } from '$lib/utility/csvUtils.js';
 	import { computeEuclideanRecurrenceMatrix, computeRecurrenceMatrix } from "$lib/utility/recurrenceMatrix.js";
+	import { computeDeterminism } from "$lib/utility/recurrenceMetrics.js";
 
 
     const fixations = [
@@ -71,6 +74,21 @@
     let series3Type: "determinism" | "laminarity" | "determinism2" | "laminarity2" | "verticalLaminarity" | "horizontalLaminarity" | "verticalLaminarity2" | "horizontalLaminarity2" | "cfr" | "avgDiagonalLength" = $state("laminarity");
     let selectedParticipantIndex: number = $state(0);
     let plotMode: "rises" | "normalized" = $state("rises");
+
+    let calculateSeriesOfDeterminismForEachParticipant = $derived.by(() => {
+        return arrayOfRandomFixationSetsWithLabels.map((group) => {
+            return group.fixations.map((fixation, i) => {
+                const matrix = matrixGenerator(group.fixations.slice(0, i + 1));
+                return computeDeterminism(matrix);
+            });
+        });
+    });
+
+    $effect(() => {
+        console.log(calculateSeriesOfDeterminismForEachParticipant);
+    });
+
+
 </script>
 
 {#snippet tooltipSnippet(aoiLabel: string, fixationLabel: string)}
@@ -236,6 +254,8 @@
             <RunningRqaPlotColor fixationGroups={arrayOfRandomFixationSetsWithLabels} width={500} lineColor="#006FAD" showGrid={true} showRisingPoints={false} aoiColors={aoiColors} series2Type={series2Type} series3Type={series3Type} showColorFilling={true} plotMode={plotMode} matrixGenerator={matrixGenerator} />
             
         </DemoPlotFrame>
+        <br>
+        <RrqaPlotHorizon fixationGroups={arrayOfRandomFixationSetsWithLabels} width={500} backgroundColor="transparent" colorPalette="#006FAD" aoiColors={aoiColors} horizonSlices={5} seriesType={series2Type} />
 
     <footer class="text-center text-sm text-gray-500 mt-8">
         <p>Created by <a href="https://vojtechovska.com" class="text-gray-500 hover:text-gray-700">Michaela Vojtechovska</a> and <a href="https://muczkova.com" class="text-gray-500 hover:text-gray-700">Marketa Muczkova</a></p>
