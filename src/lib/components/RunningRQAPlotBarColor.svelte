@@ -11,6 +11,8 @@
         ["#b75252", "#4e3d42"],
       ],
       hideDoubleIncrease = true,
+      colorFilling = [],
+      colorFillingOpacity = 0.15,
       x = 0,
       y = 0
     } = $props<{
@@ -22,6 +24,8 @@
       backgroundColor?: string;
       colorPalette?: string[][];
       hideDoubleIncrease?: boolean;
+      colorFilling?: string[] | null;
+      colorFillingOpacity?: number;
       x?: number;
       y?: number;
     }>();
@@ -54,11 +58,42 @@
       }
       return segments;
     });
+
+    // Add new derived store for background segments
+    let backgroundSegments = $derived(() => {
+      let segmentData = [];
+      for (let i = 0; i < series1.length; i++) {
+        if (series1[i] !== null) {
+          segmentData.push({
+            x: i * stepX,
+            y: 0,
+            width: stepX,
+            height: height,
+            color: colorFilling[i] || 'gray'
+          });
+        }
+      }
+      return segmentData;
+    });
   </script>
   
   <svg x={x} y={y} width={width} height={height} style="background: {backgroundColor};">
     <!-- Backdrop rectangle -->
     <rect x="0" y="0" width={width} height={height} fill={backgroundColor} />
+  
+    <!-- Background color segments -->
+    {#if colorFilling}
+      {#each backgroundSegments() as segment}
+        <rect 
+          x={segment.x}
+          y={segment.y}
+          width={segment.width}
+          height={segment.height}
+          fill={segment.color}
+          opacity={colorFillingOpacity}
+        />
+      {/each}
+    {/if}
   
     <!-- Render rectangles with blended colors -->
     {#each segments() as segment (segment.x)}

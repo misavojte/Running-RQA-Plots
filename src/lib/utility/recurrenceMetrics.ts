@@ -1,3 +1,5 @@
+import type { Fixation } from "$lib/types/Fixation.js";
+
 /**
  * Iterates through the upper triangle of a matrix and executes a callback for each position.
  * 
@@ -316,3 +318,28 @@ export const computeDetLamDifference = (matrix: number[][], minLength = 2): numb
     // Clamp to [0, 100]
     return Math.max(0, Math.min(100, normalizedDifference));
   };
+
+
+  /**
+ * Computes the Consecutive Fixation Ratio (CFR) from a recurrence matrix.
+ * CFR is the ratio of consecutive recurrent points along the first diagonal above the main diagonal.
+ *
+ * @param matrix - Binary recurrence matrix (NxN)
+ * @returns CFR as a number between 0 and 1 (0% to 100% if multiplied by 100)
+ */
+export const computeConsecutiveFixationRatio = (matrix: number[][]): number => {
+    const N = matrix.length;
+    if (N < 2) return 0; // Not enough data for consecutive analysis
+
+    let consecutiveCount = 0;
+    
+    // Check the first diagonal above the main diagonal (i.e., consecutive fixations)
+    for (let i = 0; i < N - 1; i++) {
+        if (matrix[i][i + 1] === 1) {
+            consecutiveCount++;
+        }
+    }
+
+    // Total possible consecutive transitions equals N-1
+    return consecutiveCount / (N - 1);
+};

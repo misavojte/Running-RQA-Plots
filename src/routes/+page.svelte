@@ -65,7 +65,8 @@
     };
 
     let metric: "recurrenceRate" | "determinism" | "determinism2" | "laminarity" | "laminarity2" | "verticalLaminarity" | "verticalLaminarity2" | "horizontalLaminarity" | "horizontalLaminarity2" = $state("recurrenceRate");
-    
+    let series2Type: "determinism" | "laminarity" | "determinism2" | "laminarity2" | "verticalLaminarity" | "horizontalLaminarity" | "verticalLaminarity2" | "horizontalLaminarity2" | "cfr" = $state("determinism");
+    let series3Type: "determinism" | "laminarity" | "determinism2" | "laminarity2" | "verticalLaminarity" | "horizontalLaminarity" | "verticalLaminarity2" | "horizontalLaminarity2" | "cfr" = $state("laminarity");
     let selectedParticipantIndex: number = $state(0);
 </script>
 
@@ -191,8 +192,33 @@
     <section class="mb-10">
         <h2 class="text-lg font-bold text-center">RRQA Prism Plot</h2>
         <div class="flex flex-col items-center justify-center">
+            <select bind:value={series2Type} class="bg-gray-200 p-1 rounded-md border-gray-300 border mb-4 text-sm">
+                <option value="determinism">Determinism</option>
+                <option value="laminarity">Laminarity</option>
+                <option value="verticalLaminarity">Vertical Laminarity</option>
+                <option value="horizontalLaminarity">Horizontal Laminarity</option>
+                <option value="determinism2">Determinism2</option>
+                <option value="laminarity2">Laminarity2</option>
+                <option value="verticalLaminarity2">Vertical Laminarity2</option>
+                <option value="horizontalLaminarity2">Horizontal Laminarity2</option>
+                <option value="cfr">Consecutive Fixation Ratio</option>
+            </select>
+            <select bind:value={series3Type} class="bg-gray-200 p-1 rounded-md border-gray-300 border mb-4 text-sm">
+                <option value="determinism">Determinism</option>
+                <option value="laminarity">Laminarity</option>
+                <option value="verticalLaminarity">Vertical Laminarity</option>
+                <option value="horizontalLaminarity">Horizontal Laminarity</option>
+                <option value="determinism2">Determinism2</option>
+                <option value="laminarity2">Laminarity2</option>
+                <option value="verticalLaminarity2">Vertical Laminarity2</option>
+                <option value="horizontalLaminarity2">Horizontal Laminarity2</option>
+                <option value="cfr">Consecutive Fixation Ratio</option>
+            </select>
+        </div>
+
+        <div class="flex flex-col items-center justify-center">
             {#if arrayOfRandomFixationSetsWithLabels.length > 0}
-                <RunningRqaPlotColor fixationGroups={arrayOfRandomFixationSetsWithLabels} width={500} lineColor="#006FAD" showGrid={true} showRisingPoints={false} aoiColors={aoiColors} />
+                <RunningRqaPlotColor fixationGroups={arrayOfRandomFixationSetsWithLabels} width={500} lineColor="#006FAD" showGrid={true} showRisingPoints={false} aoiColors={aoiColors} series2Type={series2Type} series3Type={series3Type} />
             {/if}
         </div>
     </section>
