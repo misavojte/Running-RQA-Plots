@@ -1,4 +1,5 @@
 <script lang="ts">
+	import DemoPlotFrame from "$lib/components/DemoPlotFrame.svelte";
 	import FocusedRqaPlot from "$lib/components/FocusedRQAPlot.svelte";
 
 
@@ -199,9 +200,8 @@
         </div>
     </section>
 
-    <section class="mb-10">
-        <h2 class="text-lg font-bold text-center">RRQA Prism Plot</h2>
-        <div class="flex flex-row items-center justify-center gap-4">
+        <DemoPlotFrame title="RRQA Prism Plot">
+            <div class="flex flex-row items-center justify-center gap-4">
             <select bind:value={series2Type} class="bg-gray-200 p-1 rounded-md border-gray-300 border mb-4 text-sm">
                 <option value="determinism">Determinism</option>
                 <option value="laminarity">Laminarity</option>
@@ -233,13 +233,9 @@
                 <option value="normalized">Normalized</option>
             </select>
         </div>
-
-        <div class="flex flex-col items-center justify-center">
-            {#if arrayOfRandomFixationSetsWithLabels.length > 0}
-                <RunningRqaPlotColor fixationGroups={arrayOfRandomFixationSetsWithLabels} width={500} lineColor="#006FAD" showGrid={true} showRisingPoints={false} aoiColors={aoiColors} series2Type={series2Type} series3Type={series3Type} showColorFilling={true} plotMode={plotMode} matrixGenerator={matrixGenerator} />
-            {/if}
-        </div>
-    </section>
+            <RunningRqaPlotColor fixationGroups={arrayOfRandomFixationSetsWithLabels} width={500} lineColor="#006FAD" showGrid={true} showRisingPoints={false} aoiColors={aoiColors} series2Type={series2Type} series3Type={series3Type} showColorFilling={true} plotMode={plotMode} matrixGenerator={matrixGenerator} />
+            
+        </DemoPlotFrame>
 
     <footer class="text-center text-sm text-gray-500 mt-8">
         <p>Created by <a href="https://vojtechovska.com" class="text-gray-500 hover:text-gray-700">Michaela Vojtechovska</a> and <a href="https://muczkova.com" class="text-gray-500 hover:text-gray-700">Marketa Muczkova</a></p>

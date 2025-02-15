@@ -253,6 +253,25 @@
     const plotAreaHeight = $derived.by(() => dimensions.plotAreaHeight);
     const legendHeight = $derived.by(() => dimensions.legendHeight);
     const totalHeight = $derived.by(() => dimensions.totalHeight);
+
+    $effect(() => {
+        // Create structured data objects for both series
+        const series2Data = {
+            metricType: series2Type,
+            participants: groupValues.map((group: any) => ({
+                participant: group.label,
+                values: group.series2original
+            }))
+        };
+
+        const series3Data = {
+            metricType: series3Type,
+            participants: groupValues.map((group: any) => ({
+                participant: group.label,
+                values: group.series3original
+            }))
+        };
+    });
 </script>
 
 <!-- Wrap everything in a single SVG so the bars and x-axis share the same coordinate system -->
