@@ -128,15 +128,12 @@
                 stroke="lightgray"
             />
             
-            <!-- Horizon bands -->
-            {#each example.slices as slice}
                 <rect 
                     width={SMALL_BAR_WIDTH} 
                     height={SMALL_BAR_HEIGHT} 
                     fill={colorPalette}
-                    opacity={slice.opacity}
+                    opacity={example.slices[i].opacity}
                 />
-            {/each}
 
             <!-- Range text -->
             <text 
