@@ -42,12 +42,20 @@
       return colorPalette;
     });
   
+    const PADDING = 6; // Configurable padding value
+
+    function scaleHeight(value: number, totalHeight: number): number {
+      if (value === 0) return 0;
+      return PADDING + ((value / 100) * (totalHeight - (2 * PADDING)));
+    }
+
     let segments = $derived(() => {
       let segments = [];
       for (let i = 0; i < series1.length; i++) {
         if (series1[i] === null || series2[i] === null || series3[i] === null) continue;
-        // Use series1 for height, transformed series2/series3 for color trends
-        const rectHeight = (series1[i]! / 100) * height;
+        
+        const rectHeight = scaleHeight(series1[i]!, height);
+        
         segments.push({
           x: i * stepX,
           y: ((height - rectHeight) / 2),
@@ -98,10 +106,10 @@
     
     {#each segments() as segment (segment.x)}
         <rect 
-        x={segment.x - 2}
-        y={segment.y - 2}
-        width={segment.width + 4}
-        height={segment.height + 4}
+        x={segment.x - PADDING / 4}
+        y={segment.y - PADDING / 4}
+        width={segment.width + PADDING / 2}
+        height={segment.height + PADDING / 2}
         fill={"white"}
       />
     {/each}
@@ -110,9 +118,9 @@
     {#each segments() as segment (segment.x)}
       <rect 
         x={segment.x}
-        y={segment.y + 2}
+        y={segment.y + PADDING / 4}
         width={segment.width}
-        height={segment.height - 4}
+        height={segment.height - PADDING / 2}
         fill={segment.color} />
     {/each}
   </svg>

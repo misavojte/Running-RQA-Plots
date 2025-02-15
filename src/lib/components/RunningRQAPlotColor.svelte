@@ -112,13 +112,12 @@
 
     // --- NEW: compute proper plot dimensions (inspired by BaseRQAPlot.svelte) ---
     const LABEL_WIDTH = 100;
+    const labelWidth = $derived.by(() => LABEL_WIDTH);
     const RIGHT_LABEL_WIDTH = 50;
     const plotWidth = width - LABEL_WIDTH - RIGHT_LABEL_WIDTH;
     const BAR_HEIGHT = 100; // each group's bar height
-    // Total height for all the bars
-    const labelWidth = $derived(() => LABEL_WIDTH);
-    const barHeight = $derived(() => BAR_HEIGHT);
-    const plotAreaHeight = $derived(() => fixationGroups.length * BAR_HEIGHT);
+    const BAR_GAP = 4; // gap between rows
+    const plotAreaHeight = $derived(() => (fixationGroups.length * BAR_HEIGHT) + ((fixationGroups.length - 1) * BAR_GAP));
     // Extra space for the x-axis texts (as in BaseRQAPlot.svelte, the x-axis texts use y={height + 16})
     const X_AXIS_EXTRA = 30;
     // Overall SVG height
@@ -158,7 +157,7 @@
         const index = Math.floor(x / segmentWidth);
         const rowIndex = Math.floor(y / BAR_HEIGHT);
         const postionX = index * segmentWidth + LABEL_WIDTH;
-        const postionY = rowIndex * BAR_HEIGHT + BAR_HEIGHT;
+        const postionY = rowIndex * (BAR_HEIGHT + BAR_GAP);
 
         if (x >= 0 && index >= 0 && index < maxFixations && rowIndex >= 0 && rowIndex < groupValues.length) {
             highlightIndex = index;
@@ -198,7 +197,7 @@
                     width={plotWidth} 
                     height={BAR_HEIGHT} 
                     backgroundColor={backgroundColor} 
-                    y={index * BAR_HEIGHT}
+                    y={index * (BAR_HEIGHT + BAR_GAP)}
                     x={LABEL_WIDTH}
                     colorFilling={
                         showColorFilling ? group.fixations.map((f: { aoi?: string[] }) => {
@@ -214,7 +213,7 @@
         {#if highlightIndex !== null && highlightRowIndex !== null}
             <rect
                 class="highlight-rect transition-all"
-                x={labelWidth() + highlightIndex * (plotWidth / maxFixations)}
+                x={labelWidth + highlightIndex * (plotWidth / maxFixations)}
                 y="0"
                 width={plotWidth / maxFixations}
                 height={plotAreaHeight()}
@@ -223,10 +222,10 @@
 
             <rect
                 class="highlight-rect-row transition-all"
-                x={labelWidth() + highlightIndex * (plotWidth / maxFixations)}
-                y={highlightRowIndex * barHeight()}
+                x={labelWidth + highlightIndex * (plotWidth / maxFixations)}
+                y={highlightRowIndex * (BAR_HEIGHT + BAR_GAP)}
                 width={plotWidth / maxFixations}
-                height={barHeight()}
+                height={BAR_HEIGHT}
                 fill="rgba(0, 0, 0, 0.1)"
                 pointer-events="none" />
         {/if}
