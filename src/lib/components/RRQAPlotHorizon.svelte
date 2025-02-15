@@ -27,7 +27,6 @@
         seriesType = "determinism",
         matrixGenerator = computeRecurrenceMatrix,
         horizonSlices = 3,
-        aoiColors = [],
         lineColor = "black"
     } = $props<{
         fixationGroups: FixationGroup[];
@@ -40,7 +39,6 @@
         tooltipSnippet?: Snippet<[{ x: number; y: number; value: number | null; label: string; fixationIndex: number }]> | null;
         matrixGenerator?: MatrixGenerator;
         horizonSlices?: number;
-        aoiColors?: Array<{ aoi: string; color: string }>;
         lineColor?: string;
     }>();
 
@@ -167,26 +165,9 @@
     }
 
     // Legend height calculation
-    function calculateLegendHeight(
-        width: number,
-        aoiColors: Array<{ aoi: string; color: string }>,
-        barHeight: number
-    ): { legendHeight: number; legendConstant: number } {
-        const BASE_ITEM_WIDTH = 25;
-        const CHAR_WIDTH = 7;
-        
-        const maxLabelLength = Math.max(...aoiColors.map(item => item.aoi.length), 0);
-        const estimatedItemWidth = BASE_ITEM_WIDTH + (maxLabelLength * CHAR_WIDTH);
-        const ITEM_WIDTH = Math.min(estimatedItemWidth, 150);
-        
-        const AOI_LEGEND_MAX_WIDTH = width - 20;
-        const ITEMS_PER_ROW = Math.max(Math.floor(AOI_LEGEND_MAX_WIDTH / ITEM_WIDTH), 1);
-        const numRows = aoiColors.length > 0 ? Math.ceil(aoiColors.length / ITEMS_PER_ROW) : 0;
-        
+    function calculateLegendHeight(barHeight: number): { legendHeight: number; legendConstant: number } {
         const legendFixedOffset = 75;
-        const AOI_LEGEND_LINE_HEIGHT = 25;
-        
-        const legendConstant = (numRows * AOI_LEGEND_LINE_HEIGHT) + legendFixedOffset;
+        const legendConstant = legendFixedOffset;
         const legendHeight = barHeight + legendConstant;
         
         return { legendHeight, legendConstant };
@@ -195,7 +176,7 @@
     // Compute dimensions
     function computeAutoDimensions() {
         const plotAreaHeight = (fixationGroups.length * BAR_HEIGHT) + ((fixationGroups.length - 1) * BAR_GAP);
-        const { legendHeight } = calculateLegendHeight(width, aoiColors, BAR_HEIGHT);
+        const { legendHeight } = calculateLegendHeight(BAR_HEIGHT);
         const totalHeight = plotAreaHeight + legendHeight + X_AXIS_EXTRA;
         return { plotAreaHeight, legendHeight, totalHeight };
     }
@@ -204,7 +185,7 @@
         if (height === "auto") {
             return computeAutoDimensions();
         }
-        const { legendHeight } = calculateLegendHeight(width, aoiColors, BAR_HEIGHT);
+        const { legendHeight } = calculateLegendHeight(BAR_HEIGHT);
         const plotAreaHeight = (fixationGroups.length * BAR_HEIGHT) + ((fixationGroups.length - 1) * BAR_GAP);
         return {
             plotAreaHeight,
@@ -288,7 +269,6 @@
                 height={legendHeight} 
                 lineColor={lineColor} 
                 barHeight={BAR_HEIGHT} 
-                aoiColors={aoiColors} 
             />
         {/key}
     </svg>

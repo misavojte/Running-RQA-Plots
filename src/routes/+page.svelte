@@ -255,7 +255,7 @@
             
         </DemoPlotFrame>
         <br>
-        <RrqaPlotHorizon fixationGroups={arrayOfRandomFixationSetsWithLabels} width={500} backgroundColor="transparent" colorPalette="#006FAD" aoiColors={aoiColors} horizonSlices={5} seriesType={series2Type} />
+        <RrqaPlotHorizon fixationGroups={arrayOfRandomFixationSetsWithLabels} width={500} backgroundColor="transparent" colorPalette="#006FAD" aoiColors={aoiColors} horizonSlices={3} seriesType={series2Type} />
 
     <footer class="text-center text-sm text-gray-500 mt-8">
         <p>Created by <a href="https://vojtechovska.com" class="text-gray-500 hover:text-gray-700">Michaela Vojtechovska</a> and <a href="https://muczkova.com" class="text-gray-500 hover:text-gray-700">Marketa Muczkova</a></p>

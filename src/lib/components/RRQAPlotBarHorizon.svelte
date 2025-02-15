@@ -5,8 +5,6 @@
       height = 100,
       backgroundColor = "transparent",
       colorPalette = "#5c9cad",
-      colorFilling = [],
-      colorFillingOpacity = 0.15,
       x = 0,
       y = 0,
       horizonSlices = 4
@@ -16,8 +14,6 @@
       height?: number;
       backgroundColor?: string;
       colorPalette?: string;
-      colorFilling?: string[] | null;
-      colorFillingOpacity?: number;
       x?: number;
       y?: number;
       horizonSlices?: number;
@@ -82,63 +78,11 @@
       }
       return optimizedSlices;
     });
-
-    // Background paths for color filling
-    let backgroundPaths = $derived.by(() => {
-      let currentPath = null;
-      let optimizedPaths = [];
-      
-      for (let i = 0; i < series1.length; i++) {
-        if (series1[i] === null) {
-          if (currentPath) {
-            optimizedPaths.push(currentPath);
-            currentPath = null;
-          }
-          continue;
-        }
-        
-        const color = colorFilling[i] || 'gray';
-        
-        if (!currentPath || currentPath.color !== color) {
-          if (currentPath) {
-            optimizedPaths.push(currentPath);
-          }
-          currentPath = {
-            color,
-            path: `M ${i * stepX} 0`,
-            opacity: colorFillingOpacity
-          };
-        }
-        
-        // Add rectangle to path
-        currentPath.path += ` L ${(i + 1) * stepX} 0`;
-        currentPath.path += ` L ${(i + 1) * stepX} ${height}`;
-        currentPath.path += ` L ${i * stepX} ${height}`;
-        currentPath.path += ' Z';
-      }
-      
-      if (currentPath) {
-        optimizedPaths.push(currentPath);
-      }
-      
-      return optimizedPaths;
-    });
 </script>
 
 <svg x={x} y={y} width={width} height={height} style="background: {backgroundColor};">
   <!-- Backdrop rectangle -->
-  <rect x="0" y="0" width={width} height={height} fill={backgroundColor} />
-
-  <!-- Background color paths -->
-  {#if colorFilling}
-    {#each backgroundPaths as bgPath}
-      <path 
-        d={bgPath.path}
-        fill={bgPath.color}
-        opacity={bgPath.opacity}
-      />
-    {/each}
-  {/if}
+  <rect x="0" y="0" width={width} height={height} fill={backgroundColor} stroke="gray" stroke-width="1" />
   
   <!-- Colored paths -->
   {#each segments as slice}
