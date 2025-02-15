@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { computeDeterminism, computeDeterminism2, computeHorizontalLaminarity, computeHorizontalLaminarity2, computeLaminarity, computeLaminarity2, computeRecurrenceRate, computeVerticalLaminarity, computeVerticalLaminarity2 } from "../utility/recurrenceMetrics.js";
+    import { computeCenterOfRecurrenceMass, computeDeterminism, computeDeterminism2, computeHorizontalLaminarity, computeHorizontalLaminarity2, computeLaminarity, computeLaminarity2, computeRecurrenceRate, computeVerticalLaminarity, computeVerticalLaminarity2 } from "../utility/recurrenceMetrics.js";
     import { computeRecurrenceMatrix } from "../utility/recurrenceMatrix.js";
     import type { Fixation } from "../types/Fixation.js";
     import type { Snippet } from "svelte";
@@ -20,7 +20,8 @@
         { id: "determinism2", label: "Determinism'" },
         { id: "laminarity2", label: "Laminarity'" },
         { id: "horizontalLaminarity2", label: "Horizontal Laminarity'" },
-        { id: "verticalLaminarity2", label: "Vertical Laminarity'" }
+        { id: "verticalLaminarity2", label: "Vertical Laminarity'" },
+        { id: "corm", label: "Center of Recurrence Mass" }
 
     ] as const;
   
@@ -64,6 +65,8 @@
                     result.push(computeHorizontalLaminarity2(matrix));
                 } else if (metric.id === "verticalLaminarity2") {
                     result.push(computeVerticalLaminarity2(matrix));
+                } else if (metric.id === "corm") {
+                    result.push(computeCenterOfRecurrenceMass(matrix));
                 }
             }
             

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { computeDeterminism, computeDeterminism2, computeDetLamDifference, computeDiagonalLineMetrics, computeHorizontalLaminarity, computeHorizontalLaminarity2, computeLaminarity, computeLaminarity2, computeRecurrenceRate, computeVerticalLaminarity, computeVerticalLaminarity2 } from "../utility/recurrenceMetrics.js";
+    import { computeCenterOfRecurrenceMass, computeDeterminism, computeDeterminism2, computeDetLamDifference, computeDiagonalLineMetrics, computeHorizontalLaminarity, computeHorizontalLaminarity2, computeLaminarity, computeLaminarity2, computeRecurrenceRate, computeVerticalLaminarity, computeVerticalLaminarity2 } from "../utility/recurrenceMetrics.js";
     import { computeRecurrenceMatrix } from "../utility/recurrenceMatrix.js";
     import type { Fixation } from "../types/Fixation.js";
 	import type { Snippet } from "svelte";
@@ -13,7 +13,7 @@
   
     let { fixationGroups, metric = "recurrenceRate", width = 500, height = "auto", lineColor = "black", backgroundColor = "white", gridColor = "#CCCCCC", showGrid = false, tooltipSnippet = null, showRisingPoints = false, aoiColors = [], matrixGenerator = computeRecurrenceMatrix } = $props<{
         fixationGroups: FixationGroup[];
-        metric: "determinism" | "determinism2" | "recurrenceRate" | "laminarity" | "laminarity2" | "horizontalLaminarity" | "verticalLaminarity" | "horizontalLaminarity2" | "verticalLaminarity2" | "detLamDifference" | "avgDiagonalLength";
+        metric: "determinism" | "determinism2" | "recurrenceRate" | "laminarity" | "laminarity2" | "horizontalLaminarity" | "verticalLaminarity" | "horizontalLaminarity2" | "verticalLaminarity2" | "detLamDifference" | "avgDiagonalLength" | "corm";
         width?: number;
         height?: number | "auto";
         lineColor?: string;
@@ -64,6 +64,8 @@
                     result.push(computeDetLamDifference(matrix));
                 } else if (metric === "avgDiagonalLength") {
                     result.push(computeDiagonalLineMetrics(matrix).averageLength);
+                } else if (metric === "corm") {
+                    result.push(computeCenterOfRecurrenceMass(matrix));
                 }
             }
             

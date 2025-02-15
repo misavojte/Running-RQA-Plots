@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { computeConsecutiveFixationRatio, computeDeterminism, computeDeterminism2, computeDetLamDifference, computeDiagonalLineMetrics, computeHorizontalLaminarity, computeHorizontalLaminarity2, computeLaminarity, computeLaminarity2, computeRecurrenceRate, computeVerticalLaminarity, computeVerticalLaminarity2 } from "../utility/recurrenceMetrics.js";
+    import { computeCenterOfRecurrenceMass, computeConsecutiveFixationRatio, computeDeterminism, computeDeterminism2, computeDetLamDifference, computeDiagonalLineMetrics, computeHorizontalLaminarity, computeHorizontalLaminarity2, computeLaminarity, computeLaminarity2, computeRecurrenceRate, computeVerticalLaminarity, computeVerticalLaminarity2 } from "../utility/recurrenceMetrics.js";
     import { computeRecurrenceMatrix } from "../utility/recurrenceMatrix.js";
     import type { Fixation } from "../types/Fixation.js";
 	import type { Snippet } from "svelte";
@@ -14,7 +14,7 @@
         fixations: Fixation[];
     }
 
-    type SeriesHighlightType = "determinism" | "laminarity" | "determinism2" | "laminarity2" | "horizontalLaminarity" | "verticalLaminarity" | "horizontalLaminarity2" | "verticalLaminarity2" | "recurrenceRate" | "cfr" | "avgDiagonalLength"
+    type SeriesHighlightType = "determinism" | "laminarity" | "determinism2" | "laminarity2" | "horizontalLaminarity" | "verticalLaminarity" | "horizontalLaminarity2" | "verticalLaminarity2" | "recurrenceRate" | "cfr" | "avgDiagonalLength" | "corm"
   
     let { fixationGroups, width = 500, height = "auto", lineColor = "black", backgroundColor = "white", gridColor = "#CCCCCC", showGrid = false, tooltipSnippet = null, showRisingPoints = false, aoiColors = [], series2Type = "determinism2", series3Type = "laminarity2", showColorFilling = false, plotMode = "rises", matrixGenerator = computeRecurrenceMatrix } = $props<{
         fixationGroups: FixationGroup[];
@@ -66,6 +66,8 @@
                 return computeConsecutiveFixationRatio(matrix);
             case "avgDiagonalLength":
                 return computeDiagonalLineMetrics(matrix).averageLength;
+            case "corm":
+                return computeCenterOfRecurrenceMass(matrix);
             default:
                 return 0;
         }
@@ -285,7 +287,6 @@
                     }
                 />
                 {:else if plotMode === "normalized"}
-                AAAAA
                 <RunningRqaPlotBarColorGradient 
                     series1={group.series1} 
                     series2={group.series2} 

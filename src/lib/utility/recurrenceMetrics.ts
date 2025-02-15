@@ -410,4 +410,39 @@ export const computeConsecutiveFixationRatio = (matrix: number[][]): number => {
     return consecutiveCount / (N - 1) * 100;
 };
 
-/** */
+/**
+ * Computes the Center of Recurrence Mass (CORM) from a binary recurrence matrix.
+ * 
+ * Formula:
+ *   CORM = 100 * ( sum_{i<j} (j - i) * r_ij ) / ( (N - 1) * R )
+ * 
+ * where:
+ *   - i < j indicates summation over the upper triangle of the matrix
+ *   - r_ij is 1 if points i and j are recurrent, 0 otherwise
+ *   - R is the total number of recurrent points in the upper triangle
+ *   - (N - 1) normalizes the maximum possible distance from the diagonal
+ * 
+ * @param matrix - Binary recurrence matrix (NxN)
+ * @returns CORM in the range [0, 100]. Returns 0 if no recurrences are found.
+ */
+export const computeCenterOfRecurrenceMass = (matrix: number[][]): number => {
+  const N = matrix.length;
+  if (N < 2) return 0; // Not enough data for meaningful CORM
+
+  // Total number of recurrence points in the upper triangle
+  const R = computeReccurencePointCount(matrix);
+  if (R === 0) return 0; // Avoid division by zero
+
+  let sumDistances = 0;
+
+  // Iterate over upper triangle and accumulate (j - i) for each recurrent point
+  forEachUpperTriangle(matrix, (i, j, value) => {
+      if (value === 1) {
+          sumDistances += (j - i);
+      }
+  });
+
+  // Normalize by (N - 1)*R and scale by 100
+  const corm = (100 * sumDistances) / ((N - 1) * R);
+  return corm;
+};
