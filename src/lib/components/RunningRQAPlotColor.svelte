@@ -8,6 +8,7 @@
 	import RunningRQAPlotXAxis from "./RunningRQAPlotXAxis.svelte";
     import RunningRqaPlotLegend from "./RunningRQAPlotLegend.svelte";
 	import RunningRqaPlotBarColorGradient from "./RunningRQAPlotBarColorGradient.svelte";
+	import { fade } from "svelte/transition";
 
     interface FixationGroup {
         label: string;
@@ -315,7 +316,9 @@
                     width={plotWidth / maxFixations}
                     height={plotAreaHeight}
                     fill="rgba(0, 0, 0, 0.1)"
-                    pointer-events="none" />
+                    pointer-events="none"
+                    transition:fade
+                />
 
                 <rect
                     class="highlight-rect-row transition-all"
@@ -324,7 +327,9 @@
                     width={plotWidth / maxFixations}
                     height={BAR_HEIGHT}
                     fill="rgba(0, 0, 0, 0.1)"
-                    pointer-events="none" />
+                    pointer-events="none"
+                    transition:fade
+                />
             {/if}
             
             <RunningRQAPlotXAxis
@@ -361,6 +366,7 @@
                 left: {tooltipData.x}px;
                 top: {tooltipData.y}px;
             "
+            transition:fade
         >
             {#if tooltipSnippet}
                 {@render tooltipSnippet(tooltipData)}

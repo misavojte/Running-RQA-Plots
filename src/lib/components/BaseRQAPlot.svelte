@@ -4,6 +4,7 @@
 	import type { Snippet } from "svelte";
     import XAxis from "./RunningRQAPlotXAxis.svelte";
 	import RunningRqaPlotLegend from "./RunningRQAPlotLegend.svelte";
+	import { fade } from "svelte/transition";
   
     let { width = 500, height = "auto", lineColor = "black", backgroundColor = "white", gridColor = "#CCCCCC", showGrid = false, showRisingPoints = false, tooltipSnippet = null, aoiColors = [], plotData = [] } = $props<{
         width?: number;
@@ -47,7 +48,21 @@
     // Add a constant for the x-axis label height
     const X_AXIS_HEIGHT = 30;  // Height reserved for x-axis labels
 
+    // Replace the DOM-based highlight state with Svelte state
+    let highlightIndex = $state<number | null>(null);
+    let highlightRowIndex = $state<number | null>(null);
+
+    // Add throttle state
+    let lastMouseMoveTime = $state(0);
+    const FRAME_TIME = 1000 / 40; // Limit to ~40fps
+
     function handleMouseMove(event: MouseEvent) {
+        const currentTime = performance.now();
+        if (currentTime - lastMouseMoveTime < FRAME_TIME) {
+            return;
+        }
+        lastMouseMoveTime = currentTime;
+
         const rect = (event.currentTarget as SVGSVGElement).getBoundingClientRect();
         const x = event.clientX - rect.left - labelWidth;
         const y = event.clientY - rect.top;
@@ -55,36 +70,9 @@
         const index = Math.floor(x / segmentWidth);
         const rowIndex = Math.floor(y / barHeight);
         
-        // Remove any existing highlights
-        document.querySelector('.highlight-rect')?.remove();
-        document.querySelector('.highlight-rect-row')?.remove();
-        
         if (x >= 0 && index >= 0 && index < maxFixations && rowIndex >= 0 && rowIndex < groupValues.length) {
-            // Create full-height highlight rectangle
-            const highlight = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-            highlight.setAttribute("x", (labelWidth + index * segmentWidth).toString());
-            highlight.setAttribute("y", "0");
-            highlight.setAttribute("width", segmentWidth.toString());
-            highlight.setAttribute("height", plotAreaHeight.toString());
-            highlight.setAttribute("fill", "rgba(0, 0, 0, 0.1)");
-            highlight.setAttribute("pointer-events", "none");
-            highlight.setAttribute("class", "highlight-rect");
-            
-            // Create row-specific highlight rectangle
-            const rowHighlight = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-            rowHighlight.setAttribute("x", (labelWidth + index * segmentWidth).toString());
-            rowHighlight.setAttribute("y", (rowIndex * barHeight).toString());
-            rowHighlight.setAttribute("width", segmentWidth.toString());
-            rowHighlight.setAttribute("height", barHeight.toString());
-            rowHighlight.setAttribute("fill", "rgba(0, 0, 0, 0.1)");
-            rowHighlight.setAttribute("pointer-events", "none");
-
-
-            rowHighlight.setAttribute("class", "highlight-rect-row");
-            
-            const svg = event.currentTarget as SVGSVGElement;
-            svg.appendChild(highlight);
-            svg.appendChild(rowHighlight);
+            highlightIndex = index;
+            highlightRowIndex = rowIndex;
 
             // Update tooltip data
             const group = groupValues[rowIndex];
@@ -93,14 +81,16 @@
                 y: event.clientY - plotContainer.getBoundingClientRect().top,
                 value: group.values[index],
                 label: group.label,
-                fixationIndex: index + 1  // Adding 1 to make it 1-based instead of 0-based
+                fixationIndex: index + 1
             };
+        } else {
+            handleMouseLeave();
         }
     }
 
     function handleMouseLeave() {
-        document.querySelector('.highlight-rect')?.remove();
-        document.querySelector('.highlight-rect-row')?.remove();
+        highlightIndex = null;
+        highlightRowIndex = null;
         tooltipData = null;
     }
 
@@ -294,6 +284,31 @@
         />
         <RunningRqaPlotLegend width={width} y={plotAreaHeight + X_AXIS_HEIGHT} height={legendHeight} lineColor={lineColor} barHeight={barHeight} aoiColors={aoiColors} />
         {/key}
+
+        <!-- Add highlight rectangles using Svelte conditionals -->
+        {#if highlightIndex !== null && highlightRowIndex !== null}
+            <rect
+                class="highlight-rect transition-all"
+                x={labelWidth + highlightIndex * (plotWidth / maxFixations)}
+                y="0"
+                width={plotWidth / maxFixations}
+                height={plotAreaHeight}
+                fill="rgba(0, 0, 0, 0.1)"
+                pointer-events="none"
+                transition:fade
+            />
+
+            <rect
+                class="highlight-rect-row transition-all"
+                x={labelWidth + highlightIndex * (plotWidth / maxFixations)}
+                y={highlightRowIndex * barHeight}
+                width={plotWidth / maxFixations}
+                height={barHeight}
+                fill="rgba(0, 0, 0, 0.1)"
+                pointer-events="none"
+                transition:fade
+            />
+        {/if}
     </svg>
 
 
@@ -321,6 +336,7 @@
                 left: {tooltipData.x + 15}px;
                 top: {tooltipData.y + 15}px;
             "
+            transition:fade
         >
             {#if tooltipSnippet}
                 {@render tooltipSnippet(tooltipData)}
@@ -347,5 +363,9 @@
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         font-size: 12px;
         width: 100px;
+    }
+
+    .transition-all {
+        transition: all 0.1s ease-out;
     }
 </style>
