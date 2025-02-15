@@ -30,7 +30,7 @@
         tooltipSnippet?: Snippet<[{ x: number; y: number; value: number | null; label: string; fixationIndex: number }]> | null;
         aoiColors?: Array<{ aoi: string; color: string }>;
         showColorFilling?: boolean;
-        plotMode?: "rises" | "risesAndSteady" | "normalized";
+        plotMode?: "rises" | "normalized";
         matrixGenerator?: MatrixGenerator;
     }>();
 
@@ -39,13 +39,9 @@
         return Math.max(...fixationGroups.map((group: FixationGroup) => group.fixations.length));
     });
 
-    const calculateTrendValue = (currentValue: number, previousValue: number, mode: "rises" | "risesAndSteady") => {
+    const calculateTrendValue = (currentValue: number, previousValue: number, mode: "rises") => {
         if (previousValue === null || currentValue === null || previousValue === undefined || currentValue === undefined ||currentValue === 0) return 0;
-        if (mode === "rises") {
-            return currentValue > previousValue ? 1 : 0;
-        } else { // risesAndSteady
-            return currentValue >= previousValue ? 1 : 0;
-        }
+        return currentValue > previousValue ? 1 : 0;
     }
 
     const calculateValue = (matrix: number[][], type: SeriesHighlightType) => {

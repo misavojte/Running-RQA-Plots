@@ -69,7 +69,7 @@
     let series2Type: "determinism" | "laminarity" | "determinism2" | "laminarity2" | "verticalLaminarity" | "horizontalLaminarity" | "verticalLaminarity2" | "horizontalLaminarity2" | "cfr" | "avgDiagonalLength" = $state("determinism");
     let series3Type: "determinism" | "laminarity" | "determinism2" | "laminarity2" | "verticalLaminarity" | "horizontalLaminarity" | "verticalLaminarity2" | "horizontalLaminarity2" | "cfr" | "avgDiagonalLength" = $state("laminarity");
     let selectedParticipantIndex: number = $state(0);
-    let plotMode: "rises" | "risesAndSteady" | "normalized" = $state("rises");
+    let plotMode: "rises" | "normalized" = $state("rises");
 </script>
 
 {#snippet tooltipSnippet(aoiLabel: string, fixationLabel: string)}
@@ -227,7 +227,6 @@
             </select>
             <select bind:value={plotMode} class="bg-gray-200 p-1 rounded-md border-gray-300 border mb-4 text-sm">
                 <option value="rises">Rises</option>
-                <option value="risesAndSteady">Rises and Steady</option>
                 <option value="normalized">Normalized</option>
             </select>
         </div>
