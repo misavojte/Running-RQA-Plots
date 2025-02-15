@@ -1,18 +1,18 @@
 <script lang="ts">
-    import { computeConsecutiveFixationRatio, computeDeterminism, computeDeterminism2, computeDetLamDifference, computeHorizontalLaminarity, computeHorizontalLaminarity2, computeLaminarity, computeLaminarity2, computeRecurrenceRate, computeVerticalLaminarity, computeVerticalLaminarity2 } from "../utility/recurrenceMetrics.js";
+    import { computeConsecutiveFixationRatio, computeDeterminism, computeDeterminism2, computeDetLamDifference, computeDiagonalLineMetrics, computeHorizontalLaminarity, computeHorizontalLaminarity2, computeLaminarity, computeLaminarity2, computeRecurrenceRate, computeVerticalLaminarity, computeVerticalLaminarity2 } from "../utility/recurrenceMetrics.js";
     import { computeRecurrenceMatrix } from "../utility/recurrenceMatrix.js";
     import type { Fixation } from "../types/Fixation.js";
 	import type { Snippet } from "svelte";
-	import RunningRqaPlotBarColor from "./RunningRQAPlotBarColor.svelte";
-	import RunningRqaPlotXAxis from "./RunningRqaPlotXAxis.svelte";
+	import RunningRQAPlotBarColor from "./RunningRQAPlotBarColor.svelte";
 	import type { MatrixGenerator } from "../types/MatrixGenerator.ts";
+	import RunningRqaPlotXAxis from "./RunningRQAPlotXAxis.svelte";
 
     interface FixationGroup {
         label: string;
         fixations: Fixation[];
     }
 
-    type SeriesHighlightType = "determinism" | "laminarity" | "determinism2" | "laminarity2" | "horizontalLaminarity" | "verticalLaminarity" | "horizontalLaminarity2" | "verticalLaminarity2" | "recurrenceRate" | "cfr"
+    type SeriesHighlightType = "determinism" | "laminarity" | "determinism2" | "laminarity2" | "horizontalLaminarity" | "verticalLaminarity" | "horizontalLaminarity2" | "verticalLaminarity2" | "recurrenceRate" | "cfr" | "avgDiagonalLength"
   
     let { fixationGroups, width = 500, height = "auto", lineColor = "black", backgroundColor = "white", gridColor = "#CCCCCC", showGrid = false, tooltipSnippet = null, showRisingPoints = false, aoiColors = [], series2Type = "determinism2", series3Type = "laminarity2", showColorFilling = false, matrixGenerator = computeRecurrenceMatrix } = $props<{
         fixationGroups: FixationGroup[];
@@ -61,6 +61,8 @@
                 return computeVerticalLaminarity2(matrix);
             case "cfr":
                 return computeConsecutiveFixationRatio(matrix);
+            case "avgDiagonalLength":
+                return computeDiagonalLineMetrics(matrix).averageLength;
             default:
                 return 0;
         }
@@ -191,7 +193,7 @@
     <svg width={width} height={svgHeight()} style="background: {backgroundColor};" onmousemove={handleMouseMove} onmouseleave={handleMouseLeave} aria-label="Running RQA Plot" role="img">
         {#key groupValues}
             {#each groupValues as group, index}
-                <RunningRqaPlotBarColor 
+                <RunningRQAPlotBarColor 
                     series1={group.series1} 
                     series2={group.series2} 
                     series3={group.series3} 
@@ -232,7 +234,7 @@
                 pointer-events="none" />
         {/if}
         
-        <RunningRqaPlotXAxis 
+        <RunningRqaPlotXAxis
             width={plotWidth} 
             height={plotAreaHeight()} 
             labelWidth={LABEL_WIDTH} 

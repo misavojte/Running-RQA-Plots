@@ -194,6 +194,72 @@ export const computeNumberOfPointsInHorizontalLines = (
 };
 
 /**
+ * Computes metrics for diagonal lines in a recurrence matrix.
+ * A diagonal chain is defined along the main diagonal direction (i+1, j+1).
+ * Only points in the upper triangle (i < j) are considered so that expansion remains within bounds.
+ *
+ * @param matrix - Binary recurrence matrix (NxN).
+ * @param minLength - Minimum diagonal line length to be counted.
+ * @returns An object containing:
+ *   - count: number of diagonal lines (of at least minLength),
+ *   - averageLength: average length of these diagonal lines,
+ *   - maxLength: maximum diagonal line length found.
+ */
+export const computeDiagonalLineMetrics = (
+    matrix: number[][],
+    minLength = 2
+  ): { count: number; averageLength: number; maxLength: number; totalLength: number } => {
+    const N = matrix.length;
+    if (N < minLength) return { count: 0, averageLength: 0, maxLength: 0, totalLength: 0 };
+  
+    let count = 0;
+    let totalLength = 0;
+    let maxLength = 0;
+    const visited = new Set<string>();
+  
+    // Iterate only over the upper triangle (i < j)
+    for (let i = 0; i < N; i++) {
+      for (let j = i + 1; j < N; j++) {
+        const key = `${i},${j}`;
+        if (matrix[i][j] !== 1 || visited.has(key)) continue;
+  
+        // Begin a diagonal chain from (i, j)
+        let chainLength = 1;
+        visited.add(key);
+        let nextRow = i + 1;
+        let nextCol = j + 1;
+  
+        while (
+          nextRow < N &&
+          nextCol < N &&
+          matrix[nextRow][nextCol] === 1 &&
+          !visited.has(`${nextRow},${nextCol}`)
+        ) {
+          visited.add(`${nextRow},${nextCol}`);
+          chainLength++;
+          nextRow++;
+          nextCol++;
+        }
+  
+        if (chainLength >= minLength) {
+          count++;
+          totalLength += chainLength;
+          if (chainLength > maxLength) {
+            maxLength = chainLength;
+          }
+        }
+      }
+    }
+  
+    return {
+      count,
+      averageLength: count > 0 ? totalLength / count : 0,
+      maxLength,
+      totalLength
+    };
+  };
+
+/**
  * Computes the number of points in vertical lines from a recurrence matrix.
  * A vertical chain is defined along a fixed row (i) with increasing column indices.
  * Since (i,j) with i < j is the starting condition, vertical expansion automatically
@@ -343,3 +409,5 @@ export const computeConsecutiveFixationRatio = (matrix: number[][]): number => {
     // Total possible consecutive transitions equals N-1
     return consecutiveCount / (N - 1);
 };
+
+/** */

@@ -66,9 +66,9 @@
         }
     };
 
-    let metric: "recurrenceRate" | "determinism" | "determinism2" | "laminarity" | "laminarity2" | "verticalLaminarity" | "verticalLaminarity2" | "horizontalLaminarity" | "horizontalLaminarity2" = $state("recurrenceRate");
-    let series2Type: "determinism" | "laminarity" | "determinism2" | "laminarity2" | "verticalLaminarity" | "horizontalLaminarity" | "verticalLaminarity2" | "horizontalLaminarity2" | "cfr" = $state("determinism");
-    let series3Type: "determinism" | "laminarity" | "determinism2" | "laminarity2" | "verticalLaminarity" | "horizontalLaminarity" | "verticalLaminarity2" | "horizontalLaminarity2" | "cfr" = $state("laminarity");
+    let metric: "recurrenceRate" | "determinism" | "determinism2" | "laminarity" | "laminarity2" | "verticalLaminarity" | "verticalLaminarity2" | "horizontalLaminarity" | "horizontalLaminarity2" | "avgDiagonalLength" = $state("recurrenceRate");
+    let series2Type: "determinism" | "laminarity" | "determinism2" | "laminarity2" | "verticalLaminarity" | "horizontalLaminarity" | "verticalLaminarity2" | "horizontalLaminarity2" | "cfr" | "avgDiagonalLength" = $state("determinism");
+    let series3Type: "determinism" | "laminarity" | "determinism2" | "laminarity2" | "verticalLaminarity" | "horizontalLaminarity" | "verticalLaminarity2" | "horizontalLaminarity2" | "cfr" | "avgDiagonalLength" = $state("laminarity");
     let selectedParticipantIndex: number = $state(0);
 </script>
 
@@ -211,6 +211,7 @@
                 <option value="verticalLaminarity2">Vertical Laminarity2</option>
                 <option value="horizontalLaminarity2">Horizontal Laminarity2</option>
                 <option value="cfr">Consecutive Fixation Ratio</option>
+                <option value="avgDiagonalLength">Average Diagonal Length</option>
             </select>
             <select bind:value={series3Type} class="bg-gray-200 p-1 rounded-md border-gray-300 border mb-4 text-sm">
                 <option value="determinism">Determinism</option>
@@ -222,6 +223,7 @@
                 <option value="verticalLaminarity2">Vertical Laminarity2</option>
                 <option value="horizontalLaminarity2">Horizontal Laminarity2</option>
                 <option value="cfr">Consecutive Fixation Ratio</option>
+                <option value="avgDiagonalLength">Average Diagonal Length</option>
             </select>
         </div>
 
