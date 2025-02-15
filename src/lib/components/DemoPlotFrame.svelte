@@ -7,7 +7,7 @@
   }>();
 </script>
 
-<section class="rounded-xl border border-gray-300 p-4 shadow-xl flex flex-col gap-4 items-center justify-center">
+<section class="rounded-xl border my-10 border-gray-300 p-4 shadow-xl flex flex-col gap-4 items-center justify-center">
     <h2 class="text-lg font-bold text-center">{title}</h2>
     {@render children()}
 </section>

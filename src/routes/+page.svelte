@@ -138,8 +138,7 @@
         </div>
     </section>
 
-    <section class="mb-10">
-        <h2 class="text-lg font-bold text-center">Recurrence Plot</h2>
+    <DemoPlotFrame title="Recurrence Plot">
         <div class="flex flex-col items-center justify-center">
             {#if arrayOfRandomFixationSetsWithLabels.length > 0}
                 <select bind:value={selectedParticipantIndex} class="mb-4 bg-gray-200 p-1 rounded-md border-gray-300 border text-sm">
@@ -161,10 +160,9 @@
                 />
             {/if}
         </div>
-    </section>
+    </DemoPlotFrame>
 
-    <section class="mb-10">
-        <h2 class="text-lg font-bold text-center">RRQA Ensemble Plot</h2>
+    <DemoPlotFrame title="RRQA Ensemble Plot">
         <div class="flex flex-col items-center justify-center">
             <select bind:value={metric} class="mb-4 bg-gray-200 p-1 rounded-md border-gray-300 border text-sm">
                 <option value="recurrenceRate">Recurrence Rate</option>
@@ -195,10 +193,9 @@
                 {/if}
             </div>
         </div>
-    </section>
+    </DemoPlotFrame>
 
-    <section class="mb-10">
-        <h2 class="text-lg font-bold text-center">RRQA Prism Plot</h2>
+    <DemoPlotFrame title="RRQA Prism Plot">
         <div class="flex flex-col items-center justify-center">
             {#if arrayOfRandomFixationSetsWithLabels.length > 0}
                 <select bind:value={selectedParticipantIndex} class="bg-gray-200 p-1 rounded-md border-gray-300 border mb-4 text-sm">
@@ -216,7 +213,7 @@
                 />
             {/if}
         </div>
-    </section>
+    </DemoPlotFrame>
 
         <DemoPlotFrame title="RRQA Prism Plot">
             <div class="flex flex-row items-center justify-center gap-4">
@@ -254,8 +251,23 @@
             <RunningRqaPlotColor fixationGroups={arrayOfRandomFixationSetsWithLabels} width={500} lineColor="#006FAD" showGrid={true} showRisingPoints={false} aoiColors={aoiColors} series2Type={series2Type} series3Type={series3Type} showColorFilling={true} plotMode={plotMode} matrixGenerator={matrixGenerator} />
             
         </DemoPlotFrame>
-        <br>
+
+        <DemoPlotFrame title="RRQA Horizon Plot">
+            <select bind:value={series2Type} class="bg-gray-200 p-1 rounded-md border-gray-300 border mb-4 text-sm">
+                <option value="determinism">Determinism</option>
+                <option value="laminarity">Laminarity</option>
+                <option value="verticalLaminarity">Vertical Laminarity</option>
+                <option value="horizontalLaminarity">Horizontal Laminarity</option>
+                <option value="determinism2">Determinism2</option>
+                <option value="laminarity2">Laminarity2</option>
+                <option value="verticalLaminarity2">Vertical Laminarity2</option>
+                <option value="horizontalLaminarity2">Horizontal Laminarity2</option>
+                <option value="cfr">Consecutive Fixation Ratio</option>
+                <option value="avgDiagonalLength">Average Diagonal Length</option>
+                <option value="corm">Center of Recurrence Mass</option>
+            </select>
         <RrqaPlotHorizon fixationGroups={arrayOfRandomFixationSetsWithLabels} width={500} backgroundColor="transparent" colorPalette="#006FAD" aoiColors={aoiColors} horizonSlices={3} seriesType={series2Type} />
+        </DemoPlotFrame>
 
     <footer class="text-center text-sm text-gray-500 mt-8">
         <p>Created by <a href="https://vojtechovska.com" class="text-gray-500 hover:text-gray-700">Michaela Vojtechovska</a> and <a href="https://muczkova.com" class="text-gray-500 hover:text-gray-700">Marketa Muczkova</a></p>

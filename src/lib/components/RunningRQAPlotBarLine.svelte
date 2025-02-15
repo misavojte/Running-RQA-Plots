@@ -29,7 +29,6 @@
         let lastValidIndex = -1;
         let risePoints: Array<{x: number, y: number, angle: number}> = [];
         let lastValue: number | null = null;
-        const strokeOffset = 1; // Half of stroke-width to prevent boundary collision
 
         // Find last valid point to know where to place the circle
         for (let i = values.length - 1; i >= 0; i--) {
@@ -44,13 +43,10 @@
             const value = values[i];
             if (value !== null) {
                 const x = i * stepX + margin;
-                const y = Math.min(Math.max(mapValueToY(value), margin + strokeOffset), height - margin - strokeOffset);
+                const y = Math.min(Math.max(mapValueToY(value), margin), height - margin);
                 
-                // Add stroke offset only for first and last points
-                const adjustedX = i === 0 ? x + strokeOffset : 
-                                i === lastValidIndex ? x - strokeOffset : x;
-                
-                points.push(`${adjustedX},${y}`);
+                // Remove x adjustment - keep x coordinates consistent
+                points.push(`${x},${y}`);
                 points.push(`${x + stepX},${y}`);
 
                 // Check for rise
