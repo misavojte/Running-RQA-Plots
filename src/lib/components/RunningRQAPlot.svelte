@@ -27,12 +27,12 @@
     }>();
 
     // Calculate the maximum number of fixations across all groups
-    const maxFixations = $derived(() => {
+    const maxFixations = $derived.by(() => {
         return Math.max(...fixationGroups.map((group: FixationGroup) => group.fixations.length));
     });
 
     // Modify groupValues to pad shorter sequences with null values
-    let groupValues = $derived(() => {
+    let groupValues = $derived.by(() => {
         return fixationGroups.map((group: FixationGroup) => {
             const matrices = [];
             const result = [];
@@ -68,7 +68,7 @@
             }
             
             // Pad with null values if this group has fewer fixations
-            while (result.length < maxFixations()) {
+            while (result.length < maxFixations) {
                 result.push(null);
             }
             
@@ -82,4 +82,4 @@
 
 </script>
 
-<BaseRqaPlot {width} {height} {lineColor} {backgroundColor} {gridColor} {showGrid} {tooltipSnippet} {showRisingPoints} {aoiColors} plotData={groupValues()} />
+<BaseRqaPlot {width} {height} {lineColor} {backgroundColor} {gridColor} {showGrid} {tooltipSnippet} {showRisingPoints} {aoiColors} plotData={groupValues} />

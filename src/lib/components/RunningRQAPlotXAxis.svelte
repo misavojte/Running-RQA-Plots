@@ -14,7 +14,7 @@
     }>();
 
     // Compute x-axis labels
-    const xAxisLabels = $derived(() => {
+    const xAxisLabels = $derived.by(() => {
         return Array.from(
             { length: Math.floor(maxFixations / labelStep) }, 
             (_, i) => (i + 1) * labelStep
@@ -23,13 +23,13 @@
 </script>
 
 <!-- X-axis labels -->
-{#each xAxisLabels() as label}
-    <text
-        x={labelWidth + (label * width / maxFixations)}
-        y={height + 16}
-        text-anchor="middle"
-        font-size="12px"
-        fill="black"
+    {#each xAxisLabels as label}
+        <text
+            x={labelWidth + (label * width / maxFixations)}
+            y={height + 16}
+            text-anchor="middle"
+            font-size="12px"
+            fill="black"
     >
         {label}
     </text>

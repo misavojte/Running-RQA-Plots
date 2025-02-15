@@ -63,22 +63,22 @@
   });
 
   // Compute the actual plot size based on available space
-  const plotSize = $derived(() => {
+  const plotSize = $derived.by(() => {
     const availableWidth = width - (2 * MARGIN);  // Equal margins on both sides
     const availableHeight = height - X_AXIS_HEIGHT - LEGEND_HEIGHT;
     return Math.min(availableWidth, availableHeight);
   });
 
-  // Compute the centering offsets
-  const xOffset = $derived(() => MARGIN + (width - 2 * MARGIN - plotSize()) / 2);
-  const yOffset = $derived(() => (height - X_AXIS_HEIGHT - LEGEND_HEIGHT - plotSize()) / 2);
+  // Compute the centering offsets using plotSize value directly
+  const xOffset = $derived.by(() => MARGIN + (width - 2 * MARGIN - plotSize) / 2);
+  const yOffset = $derived.by(() => (height - X_AXIS_HEIGHT - LEGEND_HEIGHT - plotSize) / 2);
 
-  // Update points calculation to use plotSize
-  const points = $derived((): RecurrencePoint[] => {
+  // Update points calculation to use plotSize value directly
+  const points = $derived.by(() => {
     const n = recurrenceMatrix.length;
     if (n === 0) return [];
 
-    const cellSize = plotSize() / (n + 1);
+    const cellSize = plotSize / (n + 1);
     return recurrenceMatrix.flatMap((row: number[], i: number) =>
       row.map((value: number, j: number) => {
         if (value !== 1) return null;
@@ -88,8 +88,8 @@
         const pointColor = colorMapping?.color ?? '#000000';
         
         return { 
-          x: xOffset() + (j + 1) * cellSize,
-          y: yOffset() + plotSize() - (i + 1) * cellSize,
+          x: xOffset + (j + 1) * cellSize,
+          y: yOffset + plotSize - (i + 1) * cellSize,
           i, 
           j,
           color: pointColor
@@ -99,7 +99,7 @@
   });
 
   // Add new computed state for axis labels
-  const axisLabels = $state(() => {
+  const axisLabels = $derived.by(() => {
     const n = recurrenceMatrix.length;
     if (n === 0) return [];
     // Start from 1 * labelStep to skip zero (will be added separately)
@@ -146,13 +146,13 @@
             {#if showGrid}
               <pattern 
                 id="grid" 
-                width={plotSize() / (recurrenceMatrix.length + 1)} 
-                height={plotSize() / (recurrenceMatrix.length + 1)} 
+                width={plotSize / (recurrenceMatrix.length + 1)} 
+                height={plotSize / (recurrenceMatrix.length + 1)} 
                 patternUnits="userSpaceOnUse"
-                patternTransform="translate({xOffset()} {yOffset()})"
+                patternTransform="translate({xOffset} {yOffset})"
               >
                 <path 
-                  d={`M ${plotSize() / (recurrenceMatrix.length + 1)} 0 L 0 0 0 ${plotSize() / (recurrenceMatrix.length + 1)}`}
+                  d={`M ${plotSize / (recurrenceMatrix.length + 1)} 0 L 0 0 0 ${plotSize / (recurrenceMatrix.length + 1)}`}
                   fill="none" 
                   stroke={gridColor} 
                   stroke-width="1"
@@ -163,13 +163,13 @@
             {#if showMainGrid}
               <pattern 
                 id="mainGrid" 
-                width={plotSize() * labelStep / (recurrenceMatrix.length + 1)} 
-                height={plotSize() * labelStep / (recurrenceMatrix.length + 1)} 
+                width={plotSize * labelStep / (recurrenceMatrix.length + 1)} 
+                height={plotSize * labelStep / (recurrenceMatrix.length + 1)} 
                 patternUnits="userSpaceOnUse"
-                patternTransform="translate({xOffset()} {yOffset()})"
+                patternTransform="translate({xOffset} {yOffset})"
               >
                 <path 
-                  d={`M ${plotSize() * labelStep / (recurrenceMatrix.length + 1)} 0 L 0 0 0 ${plotSize() * labelStep / (recurrenceMatrix.length + 1)}`}
+                  d={`M ${plotSize * labelStep / (recurrenceMatrix.length + 1)} 0 L 0 0 0 ${plotSize * labelStep / (recurrenceMatrix.length + 1)}`}
                   fill="none" 
                   stroke={gridColor} 
                   stroke-width="2"
@@ -180,10 +180,10 @@
 
           <!-- Main plot rectangle -->
           <rect
-            x={xOffset()}
-            y={yOffset()}
-            width={plotSize()}
-            height={plotSize()}
+            x={xOffset}
+            y={yOffset}
+            width={plotSize}
+            height={plotSize}
             fill="none"
             stroke="black"
             stroke-width="1"
@@ -191,11 +191,11 @@
 
           <!-- Y-axis label -->
           <text
-            x={xOffset() - LABEL_OFFSET}
-            y={yOffset() + plotSize() / 2}
+            x={xOffset - LABEL_OFFSET}
+            y={yOffset + plotSize / 2}
             text-anchor="middle"
             font-size="12"
-            transform={`rotate(-90 ${xOffset() - LABEL_OFFSET} ${yOffset() + plotSize() / 2}) translate(0, ${LABEL_OFFSET/3})`}
+            transform={`rotate(-90 ${xOffset - LABEL_OFFSET} ${yOffset + plotSize / 2}) translate(0, ${LABEL_OFFSET/3})`}
           >
             {yLabel}
           </text>
@@ -203,8 +203,8 @@
 
           <!-- X-axis label -->
           <text
-            x={xOffset() + plotSize() / 2}
-            y={yOffset() + plotSize() + LABEL_OFFSET}
+            x={xOffset + plotSize / 2}
+            y={yOffset + plotSize + LABEL_OFFSET}
             text-anchor="middle"
             font-size="12"
           >
@@ -213,24 +213,24 @@
 
           <!-- Grid layers -->
           <rect
-            x={xOffset()}
-            y={yOffset()}
-            width={plotSize()}
-            height={plotSize()}
+            x={xOffset}
+            y={yOffset}
+            width={plotSize}
+            height={plotSize}
             fill="url(#grid)"
           />
           {#if showMainGrid}
             <rect
-              x={xOffset()}
-              y={yOffset()}
-              width={plotSize()}
-              height={plotSize()}
+              x={xOffset}
+              y={yOffset}
+              width={plotSize}
+              height={plotSize}
               fill="url(#mainGrid)"
             />
           {/if}
 
           <!-- Draw recurrence points -->
-          {#each points() as point}
+          {#each points as point}
             <!-- Hover outline circle -->
             {#if hoverPoint && hoverPoint.i === point.i && hoverPoint.j === point.j}
               <circle
@@ -260,10 +260,10 @@
           {/each}
 
           <!-- Axis labels -->
-          {#each axisLabels() as label}
+          {#each axisLabels as label}
             <text
-              x={xOffset() - 6}
-              y={yOffset() + plotSize() - (label * (plotSize() / (recurrenceMatrix.length + 1)))}
+              x={xOffset - 6}
+              y={yOffset + plotSize - (label * (plotSize / (recurrenceMatrix.length + 1)))}
               text-anchor="end"
               dominant-baseline="middle"
               font-size="12"
@@ -271,8 +271,8 @@
               {label}
             </text>
             <text
-              x={xOffset() + label * (plotSize() / (recurrenceMatrix.length + 1))}
-              y={yOffset() + plotSize() + 16}
+              x={xOffset + label * (plotSize / (recurrenceMatrix.length + 1))}
+              y={yOffset + plotSize + 16}
               text-anchor="middle"
               font-size="12"
             >
@@ -282,8 +282,8 @@
 
           <!-- Origin label -->
           <text
-            x={xOffset() - 6}
-            y={yOffset() + plotSize() + 16}
+            x={xOffset - 6}
+            y={yOffset + plotSize + 16}
             text-anchor="middle"
             font-size="12"
           >
@@ -296,7 +296,7 @@
             aoiColors={aoiColors}
             aoiColorsOpacity={1}
             height={LEGEND_HEIGHT}
-            y={yOffset() + plotSize() + 40}
+            y={yOffset + plotSize + 40}
           />
         </svg>
 

@@ -50,7 +50,7 @@
         {label: "Participant 4", fixations: fixations.slice(0, 18).sort(() => Math.random() - 0.5)},
     ]);
     let fileInput: HTMLInputElement;
-    let aoiColors = $state(assignRandomColorToAoi(getUniqueAois(arrayOfRandomFixationSetsWithLabels)));
+    let aoiColors = $derived.by(() => assignRandomColorToAoi(getUniqueAois(arrayOfRandomFixationSetsWithLabels)));
     let matrixGenerator: MatrixGenerator = $state(computeRecurrenceMatrix);
 
     const handleFiles = async () => {
@@ -59,7 +59,6 @@
         try {
             const newFixationGroups = await handleFileUpload(fileInput.files);
             arrayOfRandomFixationSetsWithLabels = newFixationGroups;
-            aoiColors = assignRandomColorToAoi(getUniqueAois(newFixationGroups));
         } catch (error) {
             console.error('Error uploading files:', error);
             alert('Error uploading files. Please check the console for details.');
@@ -200,7 +199,7 @@
 
     <section class="mb-10">
         <h2 class="text-lg font-bold text-center">RRQA Prism Plot</h2>
-        <div class="flex flex-col items-center justify-center">
+        <div class="flex flex-row items-center justify-center gap-4">
             <select bind:value={series2Type} class="bg-gray-200 p-1 rounded-md border-gray-300 border mb-4 text-sm">
                 <option value="determinism">Determinism</option>
                 <option value="laminarity">Laminarity</option>

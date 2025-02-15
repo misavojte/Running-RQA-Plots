@@ -19,19 +19,19 @@
     }>();
 
     // Calculate the maximum number of fixations across all groups
-    const maxFixations = $derived(() => {
+    const maxFixations = $derived.by(() => {
         return Math.max(...plotData.map((group: { values: (number | null)[] }) => group.values.length));
     });
 
     // Remove the old groupValues calculation and use plotData directly
-    let groupValues = $derived(() => plotData);
+    let groupValues = $derived.by(() => plotData);
 
     const uid = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 
     // Estimate label width using character count (assuming average char width of 7px for 12px font)
     // Plus add some padding for safety
-    const labelWidth = $derived(() => {
-        const maxLabelLength = Math.max(...groupValues().map((group: { label: string }) => group.label.length));
+    const labelWidth = $derived.by(() => {
+        const maxLabelLength = Math.max(...groupValues.map((group: { label: string }) => group.label.length));
         return maxLabelLength * 6;
     });
 
@@ -39,7 +39,7 @@
     const RIGHT_LABEL_WIDTH = 50; // Width reserved for value labels on the right
 
     // Adjust the plot width to account for labels on both sides
-    const plotWidth = $derived(() => width - labelWidth() - RIGHT_LABEL_WIDTH);
+    const plotWidth = $derived.by(() => width - labelWidth - RIGHT_LABEL_WIDTH);
 
     let plotContainer: HTMLDivElement;
     let tooltipData: { x: number; y: number; value: number | null; label: string; fixationIndex: number } | null = $state(null);
@@ -49,20 +49,20 @@
 
     function handleMouseMove(event: MouseEvent) {
         const rect = (event.currentTarget as SVGSVGElement).getBoundingClientRect();
-        const x = event.clientX - rect.left - labelWidth();
+        const x = event.clientX - rect.left - labelWidth;
         const y = event.clientY - rect.top;
-        const segmentWidth = plotWidth() / maxFixations();
+        const segmentWidth = plotWidth / maxFixations;
         const index = Math.floor(x / segmentWidth);
-        const rowIndex = Math.floor(y / barHeight());
+        const rowIndex = Math.floor(y / barHeight);
         
         // Remove any existing highlights
         document.querySelector('.highlight-rect')?.remove();
         document.querySelector('.highlight-rect-row')?.remove();
         
-        if (x >= 0 && index >= 0 && index < maxFixations() && rowIndex >= 0 && rowIndex < groupValues().length) {
+        if (x >= 0 && index >= 0 && index < maxFixations && rowIndex >= 0 && rowIndex < groupValues.length) {
             // Create full-height highlight rectangle
             const highlight = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-            highlight.setAttribute("x", (labelWidth() + index * segmentWidth).toString());
+            highlight.setAttribute("x", (labelWidth + index * segmentWidth).toString());
             highlight.setAttribute("y", "0");
             highlight.setAttribute("width", segmentWidth.toString());
             highlight.setAttribute("height", plotAreaHeight.toString());
@@ -72,10 +72,10 @@
             
             // Create row-specific highlight rectangle
             const rowHighlight = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-            rowHighlight.setAttribute("x", (labelWidth() + index * segmentWidth).toString());
-            rowHighlight.setAttribute("y", (rowIndex * barHeight()).toString());
+            rowHighlight.setAttribute("x", (labelWidth + index * segmentWidth).toString());
+            rowHighlight.setAttribute("y", (rowIndex * barHeight).toString());
             rowHighlight.setAttribute("width", segmentWidth.toString());
-            rowHighlight.setAttribute("height", barHeight().toString());
+            rowHighlight.setAttribute("height", barHeight.toString());
             rowHighlight.setAttribute("fill", "rgba(0, 0, 0, 0.1)");
             rowHighlight.setAttribute("pointer-events", "none");
 
@@ -87,7 +87,7 @@
             svg.appendChild(rowHighlight);
 
             // Update tooltip data
-            const group = groupValues()[rowIndex];
+            const group = groupValues[rowIndex];
             tooltipData = {
                 x: event.clientX - plotContainer.getBoundingClientRect().left,
                 y: event.clientY - plotContainer.getBoundingClientRect().top,
@@ -188,7 +188,7 @@
     }
 
     // Make dimensions reactive using $derived
-    const dimensions = $derived(() => {
+    const dimensions = $derived.by(() => {
         if (height === "auto") {
             return computeAutoDimensions(width, plotData, aoiColors);
         } else {
@@ -197,10 +197,10 @@
     });
 
     // Replace individual dimension variables with derived properties
-    const plotAreaHeight = $derived(() => dimensions().plotAreaHeight);
-    const legendHeight = $derived(() => dimensions().legendHeight);
-    const barHeight = $derived(() => dimensions().barHeight);
-    const totalHeight = $derived(() => dimensions().totalHeight);
+    const plotAreaHeight = $derived.by(() => dimensions.plotAreaHeight);
+    const legendHeight = $derived.by(() => dimensions.legendHeight);
+    const barHeight = $derived.by(() => dimensions.barHeight);
+    const totalHeight = $derived.by(() => dimensions.totalHeight);
 
 </script>
 
@@ -208,7 +208,7 @@
 <div class="plot-container" bind:this={plotContainer}>
     <svg 
         width={width} 
-        height={totalHeight()}
+        height={totalHeight}
         style="background: {backgroundColor};"
         onmousemove={handleMouseMove}
         onmouseleave={handleMouseLeave}
@@ -216,12 +216,12 @@
         role="img"
 
     >
-        {#key groupValues()}
+        {#key groupValues}
         {#if showGrid}
             <pattern 
                 id="grid-{uid}" 
-                width={plotWidth()} 
-                height={barHeight()} 
+                width={plotWidth} 
+                height={barHeight} 
                 patternUnits="userSpaceOnUse"
 
             >
@@ -234,14 +234,14 @@
 
                 />
             </pattern>
-            <rect x={labelWidth()} width={plotWidth()} height={height} fill={`url(#grid-${uid})`} />
+            <rect x={labelWidth} width={plotWidth} height={height} fill={`url(#grid-${uid})`} />
         {/if}
-        {#each groupValues() as group, i}
-            <g transform="translate(0, {i * barHeight()})">
+        {#each groupValues as group, i}
+            <g transform="translate(0, {i * barHeight})">
                 <!-- Left label -->
                 <text 
-                    x={labelWidth() - 5}
-                    y={barHeight() / 2}
+                    x={labelWidth - 5}
+                    y={barHeight / 2}
                     text-anchor="end"
                     dominant-baseline="middle"
 
@@ -251,11 +251,11 @@
                 >{group.label}</text>
 
                 <!-- Plot content -->
-                <g transform="translate({labelWidth()}, 0)">
+                <g transform="translate({labelWidth}, 0)">
                     <RunningRQAPlotBarGeneric 
                         values={group.values} 
-                        width={plotWidth()} 
-                        height={barHeight()}
+                        width={plotWidth} 
+                        height={barHeight}
                         backgroundColor="transparent"
                         margin={1}
                         lineColor={lineColor}
@@ -271,8 +271,8 @@
 
                 <!-- Right value label -->
                 <text 
-                    x={labelWidth() + plotWidth() + 5}
-                    y={barHeight() / 2}
+                    x={labelWidth + plotWidth + 5}
+                    y={barHeight / 2}
                     text-anchor="start"
                     dominant-baseline="middle"
                     font-size="12px"
@@ -286,13 +286,13 @@
             </g>
         {/each}
         <XAxis 
-            width={plotWidth()}
-            height={plotAreaHeight()}
-            labelWidth={labelWidth()}
-            maxFixations={maxFixations()}
+            width={plotWidth}
+            height={plotAreaHeight}
+            labelWidth={labelWidth}
+            maxFixations={maxFixations}
 
         />
-        <RunningRqaPlotLegend width={width} y={plotAreaHeight() + X_AXIS_HEIGHT} height={legendHeight()} lineColor={lineColor} barHeight={barHeight()} aoiColors={aoiColors} />
+        <RunningRqaPlotLegend width={width} y={plotAreaHeight + X_AXIS_HEIGHT} height={legendHeight} lineColor={lineColor} barHeight={barHeight} aoiColors={aoiColors} />
         {/key}
     </svg>
 
@@ -304,7 +304,7 @@
         {#if tooltipData.value !== null}
             <br>
             Change: {(() => {
-                const group = groupValues().find((g: { label: string }) => g.label === tooltipData.label);
+                const group = groupValues.find((g: { label: string }) => g.label === tooltipData.label);
                 if (!group || tooltipData.fixationIndex <= 1) return "+0.000";
                 const prevValue = group.values[tooltipData.fixationIndex - 2];
                 if (prevValue === null) return "N/A";

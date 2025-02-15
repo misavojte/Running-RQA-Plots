@@ -5,7 +5,8 @@
 	import type { Snippet } from "svelte";
 	import RunningRQAPlotBarColor from "./RunningRQAPlotBarColor.svelte";
 	import type { MatrixGenerator } from "../types/MatrixGenerator.ts";
-	import RunningRqaPlotXAxis from "./RunningRQAPlotXAxis.svelte";
+	import RunningRQAPlotXAxis from "./RunningRQAPlotXAxis.svelte";
+    import RunningRqaPlotLegend from "./RunningRQAPlotLegend.svelte";
 
     interface FixationGroup {
         label: string;
@@ -121,11 +122,7 @@
     const plotWidth = width - LABEL_WIDTH - RIGHT_LABEL_WIDTH;
     const BAR_HEIGHT = 100; // each group's bar height
     const BAR_GAP = 4; // gap between rows
-    const plotAreaHeight = $derived(() => (fixationGroups.length * BAR_HEIGHT) + ((fixationGroups.length - 1) * BAR_GAP));
-    // Extra space for the x-axis texts (as in BaseRQAPlot.svelte, the x-axis texts use y={height + 16})
     const X_AXIS_EXTRA = 30;
-    // Overall SVG height
-    const svgHeight = $derived(() => plotAreaHeight() + X_AXIS_EXTRA);
 
     // --- TOOLTIP STATE & HANDLERS ---
     let plotContainer: HTMLDivElement;
@@ -186,13 +183,77 @@
         highlightIndex = null;
         highlightRowIndex = null;
     }
+
+    // Add legend height calculation functions
+    function calculateLegendHeight(
+        width: number,
+        aoiColors: Array<{ aoi: string; color: string }>,
+        barHeight: number
+    ): { legendHeight: number; legendConstant: number } {
+        const BASE_ITEM_WIDTH = 25;
+        const CHAR_WIDTH = 7;
+        
+        const maxLabelLength = Math.max(...aoiColors.map(item => item.aoi.length), 0);
+        const estimatedItemWidth = BASE_ITEM_WIDTH + (maxLabelLength * CHAR_WIDTH);
+        const ITEM_WIDTH = Math.min(estimatedItemWidth, 150);
+        
+        const AOI_LEGEND_MAX_WIDTH = width - 20;
+        const ITEMS_PER_ROW = Math.max(Math.floor(AOI_LEGEND_MAX_WIDTH / ITEM_WIDTH), 1);
+        const numRows = aoiColors.length > 0 ? Math.ceil(aoiColors.length / ITEMS_PER_ROW) : 0;
+        
+        const legendFixedOffset = 75;
+        const AOI_LEGEND_LINE_HEIGHT = 25;
+        
+        const legendConstant = (numRows * AOI_LEGEND_LINE_HEIGHT) + legendFixedOffset;
+        const legendHeight = barHeight + legendConstant;
+        
+        return { legendHeight, legendConstant };
+    }
+
+    // Compute dimensions
+    function computeAutoDimensions() {
+        const plotAreaHeight = (fixationGroups.length * BAR_HEIGHT) + ((fixationGroups.length - 1) * BAR_GAP);
+        const { legendHeight } = calculateLegendHeight(width, aoiColors, BAR_HEIGHT);
+        const totalHeight = plotAreaHeight + legendHeight + X_AXIS_EXTRA;
+        return { plotAreaHeight, legendHeight, totalHeight };
+    }
+
+    // Update height calculations
+    const dimensions = $derived.by(() => {
+        if (height === "auto") {
+            return computeAutoDimensions();
+        }
+        // If height is fixed, adjust legend accordingly
+        const { legendHeight } = calculateLegendHeight(width, aoiColors, BAR_HEIGHT);
+        const plotAreaHeight = (fixationGroups.length * BAR_HEIGHT) + ((fixationGroups.length - 1) * BAR_GAP);
+        return {
+            plotAreaHeight,
+            legendHeight,
+            totalHeight: typeof height === "number" ? height : plotAreaHeight + legendHeight + X_AXIS_EXTRA
+        };
+    });
+
+    // Update derived values
+    const plotAreaHeight = $derived.by(() => dimensions.plotAreaHeight);
+    const legendHeight = $derived.by(() => dimensions.legendHeight);
+    const totalHeight = $derived.by(() => dimensions.totalHeight);
 </script>
 
 <!-- Wrap everything in a single SVG so the bars and x-axis share the same coordinate system -->
 <div class="plot-container" bind:this={plotContainer}>
-    <svg width={width} height={svgHeight()} style="background: {backgroundColor};" onmousemove={handleMouseMove} onmouseleave={handleMouseLeave} aria-label="Running RQA Plot" role="img">
+    <svg width={width} height={totalHeight} style="background: {backgroundColor};" onmousemove={handleMouseMove} onmouseleave={handleMouseLeave} aria-label="Running RQA Plot" role="img">
         {#key groupValues}
+            <!-- Add participant labels -->
             {#each groupValues as group, index}
+                <text 
+                    x={labelWidth - 5}
+                    y={index * (BAR_HEIGHT + BAR_GAP) + BAR_HEIGHT/2}
+                    text-anchor="end"
+                    dominant-baseline="middle"
+                    font-size="12px"
+                    fill="black"
+                >{group.label}</text>
+
                 <RunningRQAPlotBarColor 
                     series1={group.series1} 
                     series2={group.series2} 
@@ -211,34 +272,44 @@
                     }
                 />
             {/each}
-        {/key}
-        
-        <!-- Moved the highlight rects here to overlay on top of the bars -->
-        {#if highlightIndex !== null && highlightRowIndex !== null}
-            <rect
-                class="highlight-rect transition-all"
-                x={labelWidth + highlightIndex * (plotWidth / maxFixations)}
-                y="0"
-                width={plotWidth / maxFixations}
-                height={plotAreaHeight()}
-                fill="rgba(0, 0, 0, 0.1)"
-                pointer-events="none" />
 
-            <rect
-                class="highlight-rect-row transition-all"
-                x={labelWidth + highlightIndex * (plotWidth / maxFixations)}
-                y={highlightRowIndex * (BAR_HEIGHT + BAR_GAP)}
-                width={plotWidth / maxFixations}
-                height={BAR_HEIGHT}
-                fill="rgba(0, 0, 0, 0.1)"
-                pointer-events="none" />
-        {/if}
-        
-        <RunningRqaPlotXAxis
-            width={plotWidth} 
-            height={plotAreaHeight()} 
-            labelWidth={LABEL_WIDTH} 
-            maxFixations={maxFixations} />
+            <!-- Existing highlight rects -->
+            {#if highlightIndex !== null && highlightRowIndex !== null}
+                <rect
+                    class="highlight-rect transition-all"
+                    x={labelWidth + highlightIndex * (plotWidth / maxFixations)}
+                    y="0"
+                    width={plotWidth / maxFixations}
+                    height={plotAreaHeight}
+                    fill="rgba(0, 0, 0, 0.1)"
+                    pointer-events="none" />
+
+                <rect
+                    class="highlight-rect-row transition-all"
+                    x={labelWidth + highlightIndex * (plotWidth / maxFixations)}
+                    y={highlightRowIndex * (BAR_HEIGHT + BAR_GAP)}
+                    width={plotWidth / maxFixations}
+                    height={BAR_HEIGHT}
+                    fill="rgba(0, 0, 0, 0.1)"
+                    pointer-events="none" />
+            {/if}
+            
+            <RunningRQAPlotXAxis
+                width={plotWidth} 
+                height={plotAreaHeight} 
+                labelWidth={LABEL_WIDTH} 
+                maxFixations={maxFixations} />
+
+            <!-- Add legend -->
+            <RunningRqaPlotLegend 
+                width={width} 
+                y={plotAreaHeight + X_AXIS_EXTRA} 
+                height={legendHeight} 
+                lineColor={lineColor} 
+                barHeight={BAR_HEIGHT} 
+                aoiColors={aoiColors} 
+            />
+        {/key}
     </svg>
 
     <!-- Default tooltip snippet (you can override via the tooltipSnippet prop) -->

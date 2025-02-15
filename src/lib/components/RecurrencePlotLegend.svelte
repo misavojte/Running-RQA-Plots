@@ -18,23 +18,23 @@
     const BASE_ITEM_WIDTH = 25;  // Width needed for circle and padding
 
     // Calculate dynamic item width based on longest AOI name
-    let ITEM_WIDTH = $derived(() => {
+    let ITEM_WIDTH = $derived.by(() => {
         const maxLabelLength = Math.max(...aoiColors.map((item: { aoi: string; color: string }) => item.aoi.length));
         const estimatedWidth = BASE_ITEM_WIDTH + (maxLabelLength * CHAR_WIDTH);
         return Math.min(estimatedWidth, 150);  // Cap at 150px
     });
 
-    const ITEMS_PER_ROW = $derived(() => Math.floor(AOI_LEGEND_MAX_WIDTH / ITEM_WIDTH()));
+    const ITEMS_PER_ROW = $derived.by(() => Math.floor(AOI_LEGEND_MAX_WIDTH / ITEM_WIDTH));
 
     // Calculate positions for AOI legend items
-    let aoiLegendItems = $derived(() => {
-        const itemWidth = ITEM_WIDTH();
-        const totalWidth = Math.min(aoiColors.length, ITEMS_PER_ROW()) * itemWidth;
+    let aoiLegendItems = $derived.by(() => {
+        const itemWidth = ITEM_WIDTH;
+        const totalWidth = Math.min(aoiColors.length, ITEMS_PER_ROW) * itemWidth;
         const startX = width / 2 - totalWidth / 2;
         
         return aoiColors.map((item: { aoi: string; color: string }, index: number) => {
-            const row = Math.floor(index / ITEMS_PER_ROW());
-            const col = index % ITEMS_PER_ROW();
+            const row = Math.floor(index / ITEMS_PER_ROW);
+            const col = index % ITEMS_PER_ROW;
             
             return {
                 ...item,
@@ -52,7 +52,7 @@
     </text>
 
 
-    {#each aoiLegendItems() as item}
+    {#each aoiLegendItems as item}
         <g>
             <circle 
                 cx={item.x}
