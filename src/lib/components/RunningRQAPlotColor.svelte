@@ -136,7 +136,7 @@
     const labelWidth = $derived.by(() => LABEL_WIDTH);
     const RIGHT_LABEL_WIDTH = 50;
     const plotWidth = width - LABEL_WIDTH - RIGHT_LABEL_WIDTH;
-    const BAR_HEIGHT = 100; // each group's bar height
+    const BAR_HEIGHT = 50; // each group's bar height
     const BAR_GAP = 4; // gap between rows
     const X_AXIS_EXTRA = 30;
 
