@@ -50,7 +50,7 @@
         const rectHeight = (series1[i]! / 100) * height;
         segments.push({
           x: i * stepX,
-          y: (height - rectHeight) / 2,
+          y: ((height - rectHeight) / 2),
           width: stepX,
           height: rectHeight,
           color: effectiveColorPalette()[series2[i]][series3[i]]
@@ -92,16 +92,27 @@
           fill={segment.color}
           opacity={colorFillingOpacity}
         />
+
       {/each}
     {/if}
-  
+    
+    {#each segments() as segment (segment.x)}
+        <rect 
+        x={segment.x - 2}
+        y={segment.y - 2}
+        width={segment.width + 4}
+        height={segment.height + 4}
+        fill={"white"}
+      />
+    {/each}
+
     <!-- Render rectangles with blended colors -->
     {#each segments() as segment (segment.x)}
       <rect 
         x={segment.x}
-        y={segment.y}
+        y={segment.y + 2}
         width={segment.width}
-        height={segment.height}
+        height={segment.height - 4}
         fill={segment.color} />
     {/each}
   </svg>

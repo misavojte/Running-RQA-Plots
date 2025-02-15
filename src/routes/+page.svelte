@@ -218,7 +218,7 @@
 
         <div class="flex flex-col items-center justify-center">
             {#if arrayOfRandomFixationSetsWithLabels.length > 0}
-                <RunningRqaPlotColor fixationGroups={arrayOfRandomFixationSetsWithLabels} width={500} lineColor="#006FAD" showGrid={true} showRisingPoints={false} aoiColors={aoiColors} series2Type={series2Type} series3Type={series3Type} />
+                <RunningRqaPlotColor fixationGroups={arrayOfRandomFixationSetsWithLabels} width={500} lineColor="#006FAD" showGrid={true} showRisingPoints={false} aoiColors={aoiColors} series2Type={series2Type} series3Type={series3Type} showColorFilling={true} />
             {/if}
         </div>
     </section>
