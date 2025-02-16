@@ -173,23 +173,45 @@
     }
 
     // Legend height calculation
-    function calculateLegendHeight(barHeight: number): { legendHeight: number; legendConstant: number } {
+    function calculateLegendHeight(barHeight: number, hasSeries2: boolean): { legendHeight: number; legendConstant: number } {
         // Constants from RRQAPlotHorizonLegend
+        const EXAMPLE_BAR_HEIGHT = 40;
         const SMALL_BAR_HEIGHT = 20;
-        const RANGE_EXAMPLES_Y = 100;
         const TEXT_OFFSET = 12;
         
-        // Total height needed is the range examples position + bar height + text offset
-        const legendConstant = RANGE_EXAMPLES_Y + SMALL_BAR_HEIGHT + TEXT_OFFSET;
-        const legendHeight = barHeight + legendConstant;
+        // Calculate total height needed
+        let totalHeight = 0;
         
-        return { legendHeight, legendConstant };
+        // Main example section (includes the example bar and spacing)
+        totalHeight += 25 + EXAMPLE_BAR_HEIGHT;  // 25px is the initial y-offset
+        
+        // Explanation text section
+        totalHeight += 20;  // Space between example and first text
+        totalHeight += 20;  // Space for "n slices" text
+        totalHeight += 10;  // Space before series1 label
+        totalHeight += 10;  // Space after series1 label
+        
+        // Range examples section
+        totalHeight += SMALL_BAR_HEIGHT + TEXT_OFFSET;  // First range examples with labels
+        
+        // Add height for second series if present
+        if (hasSeries2) {
+            totalHeight += 38;  // Space between series + SMALL_BAR_HEIGHT for series 2
+            totalHeight += 32;  // Space for series2 label and padding
+        }
+        
+        const legendConstant = totalHeight;
+        
+        return { 
+            legendHeight: totalHeight,
+            legendConstant: legendConstant
+        };
     }
 
     // Compute dimensions
     function computeAutoDimensions() {
         const plotAreaHeight = (fixationGroups.length * BAR_HEIGHT) + ((fixationGroups.length - 1) * BAR_GAP);
-        const { legendHeight } = calculateLegendHeight(BAR_HEIGHT);
+        const { legendHeight } = calculateLegendHeight(BAR_HEIGHT, !!series2Type);
         const totalHeight = plotAreaHeight + legendHeight + X_AXIS_EXTRA;
         return { plotAreaHeight, legendHeight, totalHeight };
     }
@@ -198,7 +220,7 @@
         if (height === "auto") {
             return computeAutoDimensions();
         }
-        const { legendHeight } = calculateLegendHeight(BAR_HEIGHT);
+        const { legendHeight } = calculateLegendHeight(BAR_HEIGHT, !!series2Type);
         const plotAreaHeight = (fixationGroups.length * BAR_HEIGHT) + ((fixationGroups.length - 1) * BAR_GAP);
         return {
             plotAreaHeight,

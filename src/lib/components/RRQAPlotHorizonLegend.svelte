@@ -227,7 +227,7 @@
         {/each}
         <text
             x={centerX}
-            y={190}
+            y={194}
             font-size="12px"
             fill="black"
             text-anchor="middle"
