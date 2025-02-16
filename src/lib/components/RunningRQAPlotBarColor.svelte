@@ -10,7 +10,7 @@
         ["#d3d3d3", "#5c9cad"],
         ["#b75252", "#4e3d42"],
       ],
-      hideDoubleIncrease = true,
+      hideDoubleIncrease = false,
       colorFilling = [],
       colorFillingOpacity = 0.15,
       x = 0,
@@ -29,6 +29,8 @@
       x?: number;
       y?: number;
     }>();
+
+
   
     // Compute horizontal spacing based on the number of data points
     const stepX = width / series1.length;

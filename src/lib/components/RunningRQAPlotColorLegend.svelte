@@ -1,15 +1,13 @@
 <script lang="ts">
 	import RunningRqaPlotBarColor from "./RunningRQAPlotBarColor.svelte";
 
-    let { width, y, height, barHeight, lineColor="black", aoiColors = [], aoiColorsOpacity = 0.2, showRisingPoints = false, colorPalette = [["#d3d3d3", "#5c9cad"], ["#b75252", "#4e3d42"]], label1 = "Recurrence Rate", label2 = "Determinism", label3 = "Laminarity" } = $props<{
+    let { width, y, height, barHeight, aoiColors = [], aoiColorsOpacity = 0.2, colorPalette = [["#d3d3d3", "#5c9cad"], ["#b75252", "#4e3d42"]], label1 = "Recurrence Rate", label2 = "Determinism", label3 = "Laminarity" } = $props<{
         width: number;
         y: number;
         height: number;
         barHeight: number;
-        lineColor?: string;
         aoiColors?: Array<{ aoi: string; color: string }>;
         aoiColorsOpacity?: number;
-        showRisingPoints?: boolean;
         colorPalette?: string[][];
         label1?: string;
         label2?: string;
@@ -154,15 +152,17 @@
     </g>
 
     <RunningRqaPlotBarColor 
-        series1={[10, 70, 60, 50]} 
-        series2={[0, 1, 1, 0]} 
-        series3={[0, 1, 1, 0]} 
+        series1={[10, 60, 30, 35]} 
+        series2={[0, 1, 0, 1]} 
+        series3={[0, 1, 0, 0]} 
         width={BAR_WIDTH}
         height={barHeight}
         backgroundColor="transparent"
         x={barX}
         y={0}
+        show
         colorFilling={colorFilling}
+        colorPalette={colorPalette}
     />
     <path
         d={`M ${lineStartX} ${lineStartY},
