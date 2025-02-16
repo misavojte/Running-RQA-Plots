@@ -57,6 +57,16 @@
     let lastMouseMoveTime = $state(0);
     const FRAME_TIME = 1000 / 40; // Limit to ~40fps
 
+    // Add a component-level function for formatting the tooltip content
+    function formatChange(currentValue: number, label: string, fixationIndex: number): string {
+        const group = groupValues.find((g: { label: string }) => g.label === label);
+        if (!group || fixationIndex <= 1) return "+0.000";
+        const prevValue = group.values[fixationIndex - 2];
+        if (prevValue === null) return "N/A";
+        const change = currentValue - prevValue;
+        return (change >= 0 ? "+" : "") + change.toFixed(3);
+    }
+
     function handleMouseMove(event: MouseEvent) {
         const currentTime = performance.now();
         if (currentTime - lastMouseMoveTime < FRAME_TIME) {
@@ -78,8 +88,8 @@
             // Update tooltip data
             const group = groupValues[rowIndex];
             tooltipData = {
-                x: event.clientX - plotContainer.getBoundingClientRect().left,
-                y: event.clientY - plotContainer.getBoundingClientRect().top,
+                x: event.clientX,  // Use clientX directly for fixed positioning
+                y: event.clientY,  // Use clientY directly for fixed positioning
                 value: group.values[index],
                 label: group.label,
                 fixationIndex: index + 1
@@ -311,59 +321,49 @@
             />
         {/if}
     </svg>
+</div>
 
-
-    {#snippet tooltipSnippetDefault(tooltipData: { x: number; y: number; value: number | null; label: string; fixationIndex: number })}
-        <strong>{tooltipData.label}</strong><br>
-        Fixation: {tooltipData.fixationIndex}<br>
-        Value: {tooltipData.value ? tooltipData.value.toFixed(3) : "0"}
-        {#if tooltipData.value !== null}
-            <br>
-            Change: {(() => {
-                const group = groupValues.find((g: { label: string }) => g.label === tooltipData.label);
-                if (!group || tooltipData.fixationIndex <= 1) return "+0.000";
-                const prevValue = group.values[tooltipData.fixationIndex - 2];
-                if (prevValue === null) return "N/A";
-                const change = tooltipData.value - prevValue;
-                return (change >= 0 ? "+" : "") + change.toFixed(3);
-            })()}
-        {/if}
-    {/snippet}
-
-    {#if tooltipData && tooltipData.value !== null}
+<!-- Portal the tooltip to body -->
+{#if tooltipData && tooltipData.value !== null}
+    <div style="position: absolute; top: 0; left: 0; pointer-events: none;">
         <div 
-            class="tooltip" 
+            class="tooltip"
             style="
-                left: {tooltipData.x + 15}px;
-                top: {tooltipData.y + 15}px;
+                transform: translate3d({tooltipData.x + 15}px, {tooltipData.y + 15}px, 0)
             "
             transition:fade
         >
             {#if tooltipSnippet}
                 {@render tooltipSnippet(tooltipData)}
             {:else}
-                {@render tooltipSnippetDefault(tooltipData)}
+                <strong>{tooltipData.label}</strong><br>
+                Fixation: {tooltipData.fixationIndex}<br>
+                Value: {tooltipData.value?.toFixed(3) ?? "0"}
+                {#if tooltipData.value !== null}
+                    <br>
+                    Change: {formatChange(tooltipData.value, tooltipData.label, tooltipData.fixationIndex)}
+                {/if}
             {/if}
         </div>
-    {/if}
-</div>
+    </div>
+{/if}
 
 <style>
-    .plot-container {
-        position: relative;
-    }
-
     .tooltip {
-        position: absolute;
+        position: fixed;
         background: white;
         border: 1px solid #ccc;
         padding: 4px 8px;
         border-radius: 4px;
         pointer-events: none;
-        z-index: 10;
+        z-index: 10000;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         font-size: 12px;
         width: 100px;
+    }
+
+    .plot-container {
+        position: relative;
     }
 
     .transition-all {

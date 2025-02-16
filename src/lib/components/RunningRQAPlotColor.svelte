@@ -161,6 +161,10 @@
     const FRAME_TIME = 1000 / 40;
     let segmentWidth = $derived.by(() => plotWidth / maxFixations);
 
+    function formatValue(value: number | null): string {
+        return value ? value.toFixed(3) : "0";
+    }
+
     function handleMouseMove(event: MouseEvent) {
         const currentTime = performance.now();
         if (currentTime - lastMouseMoveTime < FRAME_TIME) {
@@ -174,21 +178,19 @@
         const y = event.clientY - rect.top;
         const index = Math.floor(x / segmentWidth);
         const rowIndex = Math.floor(y / (BAR_HEIGHT + BAR_GAP));
-        const postionX = index * segmentWidth + LABEL_WIDTH;
-        const postionY = rowIndex * (BAR_HEIGHT + BAR_GAP) + BAR_HEIGHT + BAR_GAP / 2;
 
         if (x >= 0 && index >= 0 && index < maxFixations && rowIndex >= 0 && rowIndex < groupValues.length) {
             highlightIndex = index;
-			highlightRowIndex = rowIndex;
+            highlightRowIndex = rowIndex;
             const group = groupValues[rowIndex];
             tooltipData = {
-                x: postionX + segmentWidth + 7,
-                y: postionY,
+                x: event.clientX,
+                y: event.clientY,
                 value1: group.series1[index],
                 value2: group.series2original[index],
                 value3: group.series3original[index],
                 label: group.label,
-                fixationIndex: index + 1  // Adding 1 to make it 1-based instead of 0-based
+                fixationIndex: index + 1
             };
         } else {
             handleMouseLeave();
@@ -259,7 +261,12 @@
 
 <!-- Wrap everything in a single SVG so the bars and x-axis share the same coordinate system -->
 <div class="plot-container" bind:this={plotContainer}>
-    <svg width={width} height={totalHeight} style="background: {backgroundColor};" onmousemove={handleMouseMove} onmouseleave={handleMouseLeave} aria-label="Running RQA Plot" role="img">
+    <svg width={width} height={totalHeight} style="background: {backgroundColor};" 
+        onmousemove={handleMouseMove} 
+        onmouseleave={handleMouseLeave} 
+        aria-label="Running RQA Plot" 
+        role="img"
+    >
         {#key groupValues}
             <!-- Add participant labels -->
             {#each groupValues as group, index}
@@ -344,8 +351,7 @@
             <RunningRqaPlotColorLegend 
                 width={width} 
                 y={plotAreaHeight + X_AXIS_EXTRA} 
-                height={legendHeight} 
-                lineColor={lineColor} 
+                height={legendHeight}
                 barHeight={BAR_HEIGHT} 
                 aoiColors={aoiColors} 
                 label2={label2}
@@ -353,33 +359,29 @@
             />
         {/key}
     </svg>
+</div>
 
-    <!-- Default tooltip snippet (you can override via the tooltipSnippet prop) -->
-    {#snippet tooltipSnippetDefault(tooltipData: { x: number; y: number; value1: number | null; value2: number | null; value3: number | null; label: string; fixationIndex: number })}
-        <strong>{tooltipData.label}</strong><br>
-        Fixation: {tooltipData.fixationIndex}<br>
-        Value: {tooltipData.value1 ? tooltipData.value1.toFixed(3) : "0"}<br>
-        Value 2: {tooltipData.value2 ? tooltipData.value2.toFixed(3) : "0"}<br>
-        Value 3: {tooltipData.value3 ? tooltipData.value3.toFixed(3) : "0"}
-    {/snippet}
-
-    {#if tooltipData && tooltipData.value1 !== null}
-        <div
-            class="tooltip transition-all"
+{#if tooltipData && tooltipData.value1 !== null}
+    <div style="position: absolute; top: 0; left: 0; pointer-events: none;">
+        <div 
+            class="tooltip"
             style="
-                left: {tooltipData.x}px;
-                top: {tooltipData.y}px;
+                transform: translate3d({tooltipData.x + 15}px, {tooltipData.y + 15}px, 0)
             "
             transition:fade
         >
             {#if tooltipSnippet}
                 {@render tooltipSnippet(tooltipData)}
             {:else}
-                {@render tooltipSnippetDefault(tooltipData)}
+                <strong>{tooltipData.label}</strong><br>
+                Fixation: {tooltipData.fixationIndex}<br>
+                Value: {formatValue(tooltipData.value1)}<br>
+                Value 2: {formatValue(tooltipData.value2)}<br>
+                Value 3: {formatValue(tooltipData.value3)}
             {/if}
         </div>
-    {/if}
-</div>
+    </div>
+{/if}
 
 <style>
     .plot-container {
@@ -387,14 +389,14 @@
     }
 
     .tooltip {
-        position: absolute;
+        position: fixed;
         background: white;
         border: 1px solid #ccc;
         padding: 4px 8px;
         border-radius: 4px;
         pointer-events: none;
-        z-index: 10;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        z-index: 10000;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         font-size: 12px;
         width: 100px;
     }

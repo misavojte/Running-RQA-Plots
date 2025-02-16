@@ -54,7 +54,13 @@
   }
 
   // Replace hoverCell with more specific hover state
-  let hoverPoint: { i: number; j: number; isOverPoint: boolean } | null = $state(null);
+  let hoverPoint: { 
+    i: number; 
+    j: number; 
+    isOverPoint: boolean;
+    x: number;
+    y: number;
+  } | null = $state(null);
   
   // Add throttle state like in RunningRQAPlotColor
   let lastMouseMoveTime = $state(0);
@@ -81,7 +87,13 @@
       if (i >= 0 && i < recurrenceMatrix.length && j >= 0 && j < recurrenceMatrix.length) {
         // Check if there's a recurrence point at this position
         const isOverPoint = recurrenceMatrix[i][j] === 1;
-        hoverPoint = { i, j, isOverPoint };
+        hoverPoint = { 
+          i, 
+          j, 
+          isOverPoint,
+          x: event.clientX, // Store the actual mouse position
+          y: event.clientY
+        };
       } else {
         hoverPoint = null;
       }
@@ -324,16 +336,28 @@
   </svg>
 
   <!-- Update tooltip to use hoverPoint -->
-  {#if hoverPoint && hoverPoint.isOverPoint && plotContainer}
-    <div 
-      class="tooltip" 
-      style="
-        top: {yOffset + plotSize - (hoverPoint.i + 1) * (plotSize / (recurrenceMatrix.length + 1)) - (plotSize / (recurrenceMatrix.length + 1)) / 2}px;
-        left: {xOffset + (hoverPoint.j + 1) * (plotSize / (recurrenceMatrix.length + 1)) + 15}px;
-      "
-      transition:fade
-    >
-      {@render tooltipSnippet(fixations[hoverPoint.i]?.aoi, `Fixation ${hoverPoint.i + 1} ↔ ${hoverPoint.j + 1}`)}
+  {#if hoverPoint && hoverPoint.isOverPoint}
+    <div style="position: fixed; top: 0; left: 0; pointer-events: none;">
+        <div 
+            class="tooltip"
+            style="
+                transform: translate3d({
+                    Math.min(hoverPoint.x + 15, window.innerWidth - 120)}px, 
+                    {Math.min(hoverPoint.y + 15, window.innerHeight - 80)}px, 
+                    0
+                )
+            "
+            transition:fade
+        >
+            {#if tooltipSnippet}
+                {@render tooltipSnippet(fixations[hoverPoint.i]?.aoi ?? 'No AOI', `Fixation ${hoverPoint.i + 1} ↔ ${hoverPoint.j + 1}`)}
+            {:else}
+                <div class="tooltip-content">
+                    <strong>{fixations[hoverPoint.i]?.aoi ?? 'No AOI'}</strong><br>
+                    Fixation {hoverPoint.i + 1} ↔ {hoverPoint.j + 1}
+                </div>
+            {/if}
+        </div>
     </div>
   {/if}
 </div>
@@ -344,9 +368,14 @@
   }
   
   .tooltip {
-    position: absolute;
-    z-index: 10;
+    position: fixed;
     pointer-events: none;
+    z-index: 10000;
+  }
+
+  .tooltip-content {
+    white-space: normal;
+    word-wrap: break-word;
   }
 
   .highlight-rect {

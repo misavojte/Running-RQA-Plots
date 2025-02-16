@@ -124,6 +124,7 @@
         x: number;
         y: number;
         value: number | null;
+        value2: number | null;
         label: string;
         fixationIndex: number;
     } | null = $state(null);
@@ -135,6 +136,10 @@
     let lastMouseMoveTime = $state(0);
     const FRAME_TIME = 1000 / 40;
     let segmentWidth = $derived.by(() => plotWidth / maxFixations);
+
+    function formatValue(value: number | null): string {
+        return value ? value.toFixed(3) : "0";
+    }
 
     function handleMouseMove(event: MouseEvent) {
         const currentTime = performance.now();
@@ -149,17 +154,16 @@
         const y = event.clientY - rect.top;
         const index = Math.floor(x / segmentWidth);
         const rowIndex = Math.floor(y / (BAR_HEIGHT + BAR_GAP));
-        const postionX = index * segmentWidth + LABEL_WIDTH;
-        const postionY = rowIndex * (BAR_HEIGHT + BAR_GAP);
 
         if (x >= 0 && index >= 0 && index < maxFixations && rowIndex >= 0 && rowIndex < groupValues.length) {
             highlightIndex = index;
             highlightRowIndex = rowIndex;
             const group = groupValues[rowIndex];
             tooltipData = {
-                x: postionX + segmentWidth + 7,
-                y: postionY,
+                x: event.clientX,
+                y: event.clientY,
                 value: group.series[index],
+                value2: series2Type ? group.series2[index] : null,
                 label: group.label,
                 fixationIndex: index + 1
             };
@@ -265,8 +269,8 @@
         width={width} 
         height={totalHeight} 
         style="background: {backgroundColor};" 
-        onmousemove={handleMouseMove} 
-        onmouseleave={handleMouseLeave}
+        on:mousemove={handleMouseMove} 
+        on:mouseleave={handleMouseLeave}
         aria-label="Running RQA Horizon Plot" 
         role="img"
     >
@@ -336,13 +340,14 @@
             />
         {/key}
     </svg>
+</div>
 
-    {#if tooltipData && tooltipData.value !== null}
-        <div
-            class="tooltip transition-all"
+{#if tooltipData && tooltipData.value !== null}
+    <div style="position: absolute; top: 0; left: 0; pointer-events: none;">
+        <div 
+            class="tooltip"
             style="
-                left: {tooltipData.x}px;
-                top: {tooltipData.y}px;
+                transform: translate3d({tooltipData.x + 15}px, {tooltipData.y + 15}px, 0)
             "
             transition:fade
         >
@@ -351,11 +356,15 @@
             {:else}
                 <strong>{tooltipData.label}</strong><br>
                 Fixation: {tooltipData.fixationIndex}<br>
-                Value: {tooltipData.value.toFixed(3)}
+                {seriesType.label}: {formatValue(tooltipData.value)}
+                {#if series2Type && tooltipData.value2 !== null}
+                    <br>
+                    {series2Type.label}: {formatValue(tooltipData.value2)}
+                {/if}
             {/if}
         </div>
-    {/if}
-</div>
+    </div>
+{/if}
 
 <style>
     .plot-container {
@@ -363,14 +372,14 @@
     }
 
     .tooltip {
-        position: absolute;
+        position: fixed;
         background: white;
         border: 1px solid #ccc;
         padding: 4px 8px;
         border-radius: 4px;
         pointer-events: none;
-        z-index: 10;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        z-index: 10000;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         font-size: 12px;
         width: 100px;
     }
