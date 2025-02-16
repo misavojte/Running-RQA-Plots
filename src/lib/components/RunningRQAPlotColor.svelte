@@ -6,10 +6,9 @@
 	import RunningRQAPlotBarColor from "./RunningRQAPlotBarColor.svelte";
 	import type { MatrixGenerator } from "../types/MatrixGenerator.ts";
 	import RunningRQAPlotXAxis from "./RunningRQAPlotXAxis.svelte";
-    import RunningRqaPlotLegend from "./RunningRQAPlotLegend.svelte";
 	import RunningRqaPlotBarColorGradient from "./RunningRQAPlotBarColorGradient.svelte";
 	import { fade } from "svelte/transition";
-
+    import RunningRqaPlotColorLegend from "./RunningRQAPlotColorLegend.svelte";
     interface FixationGroup {
         label: string;
         fixations: Fixation[];
@@ -208,6 +207,7 @@
     ): { legendHeight: number; legendConstant: number } {
         const BASE_ITEM_WIDTH = 25;
         const CHAR_WIDTH = 7;
+        const LEGEND_MARGIN = 70;
         
         const maxLabelLength = Math.max(...aoiColors.map(item => item.aoi.length), 0);
         const estimatedItemWidth = BASE_ITEM_WIDTH + (maxLabelLength * CHAR_WIDTH);
@@ -220,7 +220,7 @@
         const legendFixedOffset = 75;
         const AOI_LEGEND_LINE_HEIGHT = 25;
         
-        const legendConstant = (numRows * AOI_LEGEND_LINE_HEIGHT) + legendFixedOffset;
+        const legendConstant = (numRows * AOI_LEGEND_LINE_HEIGHT) + legendFixedOffset + LEGEND_MARGIN;
         const legendHeight = barHeight + legendConstant;
         
         return { legendHeight, legendConstant };
@@ -339,7 +339,7 @@
                 maxFixations={maxFixations} />
 
             <!-- Add legend -->
-            <RunningRqaPlotLegend 
+            <RunningRqaPlotColorLegend 
                 width={width} 
                 y={plotAreaHeight + X_AXIS_EXTRA} 
                 height={legendHeight} 

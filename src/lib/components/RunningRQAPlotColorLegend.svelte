@@ -1,7 +1,8 @@
 <script lang="ts">
+	import RunningRqaPlotBarColor from "./RunningRQAPlotBarColor.svelte";
     import RunningRQAPlotBarGeneric from "./RunningRQAPlotBarLine.svelte";
 
-    let { width, y, height, barHeight, lineColor="black", aoiColors = [], aoiColorsOpacity = 0.2, showRisingPoints = false } = $props<{
+    let { width, y, height, barHeight, lineColor="black", aoiColors = [], aoiColorsOpacity = 0.2, showRisingPoints = false, label1 = "Recurrence Rate", label2 = "Determinism", label3 = "Laminarity" } = $props<{
         width: number;
         y: number;
         height: number;
@@ -10,6 +11,9 @@
         aoiColors?: Array<{ aoi: string; color: string }>;
         aoiColorsOpacity?: number;
         showRisingPoints?: boolean;
+        label1?: string;
+        label2?: string;
+        label3?: string;
     }>();
 
     const BAR_WIDTH = 50;
@@ -18,16 +22,16 @@
     let barX = $derived.by(() => width / 2 - BAR_WIDTH / 2);
     
     // Calculate positions for the diagonal line
-    let lineStartX = $derived.by(() => barX + BAR_WIDTH / 3);  // First segment boundary
-    let lineStartY = $derived.by(() => barHeight * 0.7);
-    let lineLength = $derived.by(() => barHeight * 0.3 + 10);
+    let lineStartX = $derived.by(() => barX + BAR_WIDTH / 8);  // First segment boundary
+    let lineStartY = $derived.by(() => barHeight * 0.5 );
+    let lineLength = $derived.by(() => BAR_WIDTH / 4);
     let lineEndX = $derived.by(() => lineStartX - lineLength - 10);  // Move left
-    let line2X = $derived.by(() => lineStartX + BAR_WIDTH / 6);
-    let line2StartY = $derived.by(() => barHeight * 0.85);
-    let line2Length = $derived.by(() => barHeight * 0.15 + 10);
+    let line2X = $derived.by(() => barX + BAR_WIDTH / 2);
+    let line2StartY = $derived.by(() => barHeight * 0.95);
+    let line2Length = $derived.by(() => barHeight * 0.05 + 10);
     let line2EndY = $derived.by(() => line2StartY + line2Length);
     let line3StartX = $derived.by(() => barX + BAR_WIDTH);
-    let line3Y = $derived.by(() => barHeight * 0.78);
+    let line3Y = $derived.by(() => barHeight * 0.5);
     let line3EndX = $derived.by(() => line3StartX + 10);
 
     // Add new constants for AOI legend
@@ -65,21 +69,27 @@
             };
         });
     });
+
+    const colorFilling = $derived.by(() => {
+       if (aoiColors.length > 0) {
+        return [aoiColors[0].color, aoiColors[0].color, aoiColors[0].color, aoiColors[0].color];
+       }
+       return ["gray", "gray", "gray", "gray"];
+    });
 </script>
 
-<svg x={0} y={y} width={width} height={height} viewBox={`0 -20 ${width} ${height}`}>
-    <RunningRQAPlotBarGeneric 
-        values={[0, 30, 20]} 
+<svg x={0} y={y} width={width} height={height} viewBox={`0 -90 ${width} ${height}`}>
+    <RunningRqaPlotBarColor 
+        series1={[10, 70, 60, 50]} 
+        series2={[0, 1, 1, 0]} 
+        series3={[0, 1, 1, 0]} 
         width={BAR_WIDTH}
         height={barHeight}
         backgroundColor="transparent"
-        margin={1}
-        lineColor={lineColor}
         x={barX}
         y={0}
-        colorFilling={["red", "red", "red"]}
+        colorFilling={colorFilling}
     />
-    {#if showRisingPoints}
     <line
         x1={lineStartX}
         y1={lineStartY}
@@ -97,11 +107,20 @@
         font-size="12px"
         fill="black"
     >
-        <tspan x={lineEndX - 2} dy="0">shows</tspan>
-        <tspan x={lineEndX - 2} dy="14">metric</tspan>
-            <tspan x={lineEndX - 2} dy="14">increase</tspan>
-        </text>
-    {/if}
+        <tspan x={lineEndX - 2} dy="0">{label1}</tspan>
+        <tspan x={lineEndX - 2} dy="14">& {label2}</tspan>
+        <tspan x={lineEndX - 2} dy="14">value increases</tspan>
+    </text>
+    <path
+        d={`M ${lineEndX - 95} ${barHeight - 28} 
+            C ${lineEndX - 140} ${barHeight - 28},
+              ${lineEndX - 140} ${barHeight - 50},
+              ${barX - 10} ${-15}`}
+        fill="none"
+        stroke="black"
+        stroke-dasharray="3 3"
+        stroke-width="1"
+    />
     <line
         x1={line2X}
         y1={line2StartY}
@@ -119,7 +138,7 @@
         font-size="12px"
         fill="black"
     >
-        color explained by AOI of underlying fixation:
+        AOI of underlying fixation:
     </text>
     <line
         x1={line3StartX}
@@ -132,9 +151,9 @@
     />
     <polyline
         points={`
-            ${barX + BAR_WIDTH + 10},1  
-            ${barX + BAR_WIDTH + 15},1
-            ${barX + BAR_WIDTH + 10},1
+            ${barX + BAR_WIDTH + 10},${barHeight/2}  
+            ${barX + BAR_WIDTH + 15},${barHeight/2}
+            ${barX + BAR_WIDTH + 10},${barHeight/2}
             ${barX + BAR_WIDTH + 10},${barHeight - 1}
             ${barX + BAR_WIDTH + 15},${barHeight - 1}
         `}
@@ -144,12 +163,12 @@
     />
     <text 
         x={barX + BAR_WIDTH + 18}
-        y={1}
+        y={barHeight/2}
         text-anchor="start"
         dominant-baseline="middle"
         font-size="10px"
         fill="black"
-    >100</text>
+    >0</text>
     <text 
         x={barX + BAR_WIDTH + 18}
         y={barHeight - 1}
@@ -157,7 +176,7 @@
         dominant-baseline="middle"
         font-size="10px"
         fill="black"
-    >0</text>
+    >100</text>
     <text 
         x={line3StartX + 45} 
         y={barHeight - RIGHT_LABEL_MIN_HEIGHT}
@@ -166,9 +185,9 @@
         font-size="12px"
         fill="black"
     >
-        <tspan x={line3StartX + 45} dy="0">running value</tspan>
-        <tspan x={line3StartX + 45} dy="14">range 0-100</tspan>
-        <tspan x={line3StartX + 45} dy="14">ends at result value</tspan>
+        <tspan x={line3StartX + 45} dy="0">bar volume</tspan>
+        <tspan x={line3StartX + 45} dy="14">explained by</tspan>
+        <tspan x={line3StartX + 45} dy="14">{label1}</tspan>
     </text>
 
     {#each aoiLegendItems as item}
