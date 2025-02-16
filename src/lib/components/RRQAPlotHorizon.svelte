@@ -6,9 +6,8 @@
     import RrqaPlotBarHorizon from "./RRQAPlotBarHorizon.svelte";
     import type { MatrixGenerator } from "../types/MatrixGenerator.ts";
     import RunningRQAPlotXAxis from "./RunningRQAPlotXAxis.svelte";
-    import RunningRqaPlotLegend from "./RunningRQAPlotLegend.svelte";
     import { fade } from "svelte/transition";
-    import RrqaPlotHorizonLegend from "./RrqaPlotHorizonLegend.svelte";
+    import RRQAPlotHorizonLegend from "./RRQAPlotHorizonLegend.svelte";
 
     interface FixationGroup {
         label: string;
@@ -269,7 +268,7 @@
                 maxFixations={maxFixations} 
             />
 
-            <RrqaPlotHorizonLegend 
+            <RRQAPlotHorizonLegend 
                 width={width} 
                 y={plotAreaHeight + X_AXIS_EXTRA} 
                 height={legendHeight} 
