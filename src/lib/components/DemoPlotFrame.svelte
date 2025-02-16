@@ -16,7 +16,7 @@
     {:else}
         <h2 class={headerClass}>{@html title}</h2>
     {/if}
-    <div class="w-full overflow-x-auto px-2 sm:px-4">
+    <div class="w-full overflow-x-auto">
         <div class="min-w-fit mx-auto">
             {@render children()}
         </div>

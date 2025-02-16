@@ -233,10 +233,10 @@
                         <option value="avgDiagonalLength">Average Diagonal Length</option>
                         <option value="corm">Center of Recurrence Mass</option>
                     </select>
-                    <select bind:value={plotMode} class="bg-gray-200 p-1 rounded-md border-gray-300 border mb-4 text-sm">
+                    <!-- <select bind:value={plotMode} class="bg-gray-200 p-1 rounded-md border-gray-300 border mb-4 text-sm">
                         <option value="rises">Rises</option>
                         <option value="normalized">Normalized</option>
-                    </select>
+                    </select> -->
                 </div>
                     <RunningRqaPlotColor fixationGroups={arrayOfRandomFixationSetsWithLabels} width={500} lineColor="#006FAD" showGrid={true} showRisingPoints={false} aoiColors={aoiColors} series2Type={series2Setup.metric} series3Type={series3Setup.metric} label2={series2Setup.label} label3={series3Setup.label} showColorFilling={true} plotMode={plotMode} matrixGenerator={matrixGenerator} />
                     
