@@ -10,7 +10,7 @@
 	import type { MatrixGenerator } from "$lib/types/MatrixGenerator.js";
 
     import { assignRandomColorToAoi, getUniqueAois } from '$lib/utils/colorUtils.js';
-	import { computeEuclideanRecurrenceMatrix, computeRecurrenceMatrix } from "$lib/utils/recurrenceMatrix.js";
+	import { computeRecurrenceMatrix } from "$lib/utils/recurrenceMatrix.js";
 	import { computeDeterminism } from "$lib/utils/recurrenceMetrics.js";
 
     import DemoUpload from "$lib/components/DemoUpload.svelte";

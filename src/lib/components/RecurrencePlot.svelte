@@ -170,6 +170,8 @@
     viewBox="0 0 {width} {height}"
     onmousemove={handleMouseMove}
     onmouseleave={handleMouseLeave}
+    role="img"
+    aria-label="Recurrence Plot"
   >
     <defs>
       {#if showGrid}
@@ -376,6 +378,7 @@
   .tooltip-content {
     white-space: normal;
     word-wrap: break-word;
+    font-size: 10px;
   }
 
   .highlight-rect {

@@ -269,8 +269,8 @@
         width={width} 
         height={totalHeight} 
         style="background: {backgroundColor};" 
-        on:mousemove={handleMouseMove} 
-        on:mouseleave={handleMouseLeave}
+        onmousemove={handleMouseMove} 
+        onmouseleave={handleMouseLeave}
         aria-label="Running RQA Horizon Plot" 
         role="img"
     >

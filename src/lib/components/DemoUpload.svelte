@@ -55,9 +55,9 @@
     <div
         class="w-full my-4 p-6 rounded-lg border-2 border-dashed transition-colors duration-200 
             {isDragging ? 'border-blue-400 bg-blue-50' : 'border-gray-300 bg-gray-50'}"
-        on:dragover={handleDragOver}
-        on:dragleave={handleDragLeave}
-        on:drop={handleDrop}
+        ondragover={handleDragOver}
+        ondragleave={handleDragLeave}
+        ondrop={handleDrop}
     >
         <div class="text-center">
             <svg 
@@ -84,7 +84,7 @@
                         type="file"
                         accept=".csv"
                         multiple
-                        on:change={handleFiles}
+                        onchange={handleFiles}
                         class="hidden"
                     />
                 </label>
