@@ -60,4 +60,22 @@ export function blendColors(color1: string, color2: string, ratio: number, mode:
                 rgb1[2] * (1 - ratio) + rgb2[2] * ratio
             );
     }
+}
+
+export function createColorGradient(startColor: string, endColor: string, steps: number, mode: BlendMode = 'rgb'): string[] {
+    if (steps < 2) return [startColor];
+    
+    const gradient: string[] = [];
+    
+    // Calculate step size
+    const stepSize = 1 / (steps - 1);
+    
+    // Generate colors for each step
+    for (let i = 0; i < steps; i++) {
+        const ratio = i * stepSize;
+        const color = blendColors(startColor, endColor, ratio, mode);
+        gradient.push(color);
+    }
+    
+    return gradient;
 } 

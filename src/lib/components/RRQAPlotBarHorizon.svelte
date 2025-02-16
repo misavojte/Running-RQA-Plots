@@ -4,19 +4,18 @@
       width = 500,
       height = 100,
       backgroundColor = "transparent",
-      colorPalette = "#5c9cad",
       x = 0,
       y = 0,
-      horizonSlices = 4
+      horizonSlicesColors = ["#aacfe3", "#0170ad"]
     } = $props<{
       series1: (number | null)[];
       width?: number;
       height?: number;
       backgroundColor?: string;
-      colorPalette?: string;
+      colorPalette?: string[];
+      horizonSlicesColors?: string[];
       x?: number;
       y?: number;
-      horizonSlices?: number;
     }>();
   
     // Compute horizontal spacing based on the number of data points
@@ -35,9 +34,10 @@
     let segments = $derived.by(() => {
       
       let optimizedSlices: {color: string, innerPath: string}[][] = [];
-      for (let sliceIndex = 0; sliceIndex < horizonSlices; sliceIndex++) {
+      for (let sliceIndex = 0; sliceIndex < horizonSlicesColors.length; sliceIndex++) {
         let optimizedSegments: {color: string, innerPath: string}[] = [];
         let currentGroup = null;
+        
         for (let i = 0; i < series1.length; i++) {
             if (series1[i] === null) {
             if (currentGroup) {
@@ -47,17 +47,19 @@
             continue;
             }
             
-            const rectHeight = scaleHeight(series1[i]!, height, sliceIndex, horizonSlices);
-            const color = colorPalette;
+            const rectHeight = scaleHeight(series1[i]!, height, sliceIndex, horizonSlicesColors.length);
+            // Blend between colorPalette[0] and colorPalette[1]
+            const blendedColor = horizonSlicesColors[sliceIndex];
+            
             const xPos = i * stepX;
             const yPos = height - rectHeight; // Start from bottom
             
-            if (!currentGroup || currentGroup.color !== color) {
+            if (!currentGroup || currentGroup.color !== blendedColor) {
             if (currentGroup) {
                 optimizedSegments.push(currentGroup);
             }
             currentGroup = {
-                color,
+                color: blendedColor,
                 innerPath: '',
             };
             }
@@ -95,7 +97,7 @@
   <!-- Colored paths -->
   {#each segments as slice}
     {#each slice as segment}
-      <path d={segment.innerPath} fill={segment.color} opacity={1 / horizonSlices - 0.001} />
+      <path d={segment.innerPath} fill={segment.color} />
     {/each}
   {/each}
 </svg> 

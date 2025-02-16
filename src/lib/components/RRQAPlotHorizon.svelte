@@ -8,6 +8,7 @@
     import RunningRQAPlotXAxis from "./RunningRQAPlotXAxis.svelte";
     import { fade } from "svelte/transition";
     import RRQAPlotHorizonLegend from "./RRQAPlotHorizonLegend.svelte";
+    import { createColorGradient } from "../utils/colorUtils.ts";
 
     interface FixationGroup {
         label: string;
@@ -21,7 +22,7 @@
         width = 500, 
         height = "auto", 
         backgroundColor = "white", 
-        colorPalette = "#006FAD",
+        colorPalette = ["#aacfe3", "#0170ad"],
         showGrid = false, 
         tooltipSnippet = null, 
         seriesType = "determinism",
@@ -33,7 +34,7 @@
         width?: number;
         height?: number | "auto";
         backgroundColor?: string;
-        colorPalette?: string;
+        colorPalette?: string[];
         showGrid?: boolean;
         seriesType?: SeriesHighlightType;
         tooltipSnippet?: Snippet<[{ x: number; y: number; value: number | null; label: string; fixationIndex: number }]> | null;
@@ -202,6 +203,7 @@
     const plotAreaHeight = $derived.by(() => dimensions.plotAreaHeight);
     const legendHeight = $derived.by(() => dimensions.legendHeight);
     const totalHeight = $derived.by(() => dimensions.totalHeight);
+    const horizonSlicesColors = $derived.by(() => createColorGradient(colorPalette[0], colorPalette[1], horizonSlices, 'rgb'));
 </script>
 
 <div class="plot-container" bind:this={plotContainer}>
@@ -230,10 +232,9 @@
                     width={plotWidth} 
                     height={BAR_HEIGHT} 
                     backgroundColor={backgroundColor}
-                    colorPalette={colorPalette}
                     y={index * (BAR_HEIGHT + BAR_GAP)}
                     x={LABEL_WIDTH}
-                    horizonSlices={horizonSlices}
+                    horizonSlicesColors={horizonSlicesColors}
                 />
             {/each}
 
@@ -275,7 +276,7 @@
                 barHeight={BAR_HEIGHT}
                 lineColor={lineColor}
                 colorPalette={colorPalette}
-                horizonSlices={horizonSlices}
+                horizonSlicesColors={horizonSlicesColors}
             />
         {/key}
     </svg>

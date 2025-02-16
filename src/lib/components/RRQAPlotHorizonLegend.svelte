@@ -6,8 +6,7 @@
         y, 
         height, 
         barHeight,
-        colorPalette = "#006FAD",
-        horizonSlices = 3
+        horizonSlicesColors = ["#aacfe3", "#0170ad"]
     } = $props<{
         width: number;
         y: number;
@@ -15,7 +14,7 @@
         barHeight: number;
         lineColor?: string;
         colorPalette?: string;
-        horizonSlices?: number;
+        horizonSlicesColors?: string[];
     }>();
 
     const EXAMPLE_BAR_WIDTH = 80;
@@ -30,23 +29,23 @@
     const barX = centerX - EXAMPLE_BAR_WIDTH / 2;
     
     // Calculate slice size
-    const sliceSize = 100 / horizonSlices;
+    const sliceSize = 100 / horizonSlicesColors.length;
 
     // Create range examples
-    const rangeExamples = Array(horizonSlices).fill(0).map((_, i) => {
+    const rangeExamples = Array(horizonSlicesColors.length).fill(0).map((_, i) => {
         const value = sliceSize * (i + 1);
         const activeSlices = i + 1;
         return {
             value,
             slices: Array(activeSlices).fill(0).map((_, j) => ({
-                opacity: (1 / horizonSlices - 0.001) * (j + 1)
+                opacity: (1 / horizonSlicesColors.length - 0.001) * (j + 1)
             })),
             range: `${Math.round(value - sliceSize)}-${Math.round(value)}`
         };
     });
 
     // Center range examples
-    const totalRangeWidth = (SMALL_BAR_WIDTH + SPACING) * horizonSlices;
+    const totalRangeWidth = (SMALL_BAR_WIDTH + SPACING) * horizonSlicesColors.length;
     const rangeStartX = (width - totalRangeWidth) / 2;
 </script>
 
@@ -67,8 +66,7 @@
                 width={EXAMPLE_BAR_WIDTH}
                 height={EXAMPLE_BAR_HEIGHT}
                 series1={[15, 35, 45, 80, 90, 75, 60, 40, 20, 10]}
-                horizonSlices={horizonSlices}
-                colorPalette={colorPalette}
+                horizonSlicesColors={horizonSlicesColors}
             />
 
         <!-- Value indicators -->
@@ -113,7 +111,7 @@
         fill="black"
         text-anchor="middle"
     >
-        {horizonSlices} bands, darker color indicates higher value:
+        {horizonSlicesColors.length} bands, darker color indicates higher value:
     </text>
 
     <!-- Range examples -->
@@ -130,7 +128,7 @@
                 <rect 
                     width={SMALL_BAR_WIDTH} 
                     height={SMALL_BAR_HEIGHT} 
-                    fill={colorPalette}
+                    fill={horizonSlicesColors[i]}
                     opacity={example.slices[i].opacity}
                 />
 
