@@ -1,8 +1,7 @@
 <script lang="ts">
 	import RunningRqaPlotBarColor from "./RunningRQAPlotBarColor.svelte";
-    import RunningRQAPlotBarGeneric from "./RunningRQAPlotBarLine.svelte";
 
-    let { width, y, height, barHeight, lineColor="black", aoiColors = [], aoiColorsOpacity = 0.2, showRisingPoints = false, label1 = "Recurrence Rate", label2 = "Determinism", label3 = "Laminarity" } = $props<{
+    let { width, y, height, barHeight, lineColor="black", aoiColors = [], aoiColorsOpacity = 0.2, showRisingPoints = false, colorPalette = [["#d3d3d3", "#5c9cad"], ["#b75252", "#4e3d42"]], label1 = "Recurrence Rate", label2 = "Determinism", label3 = "Laminarity" } = $props<{
         width: number;
         y: number;
         height: number;
@@ -11,6 +10,7 @@
         aoiColors?: Array<{ aoi: string; color: string }>;
         aoiColorsOpacity?: number;
         showRisingPoints?: boolean;
+        colorPalette?: string[][];
         label1?: string;
         label2?: string;
         label3?: string;
@@ -76,9 +76,83 @@
        }
        return ["gray", "gray", "gray", "gray"];
     });
+
+    // Add base position for diamond pattern
+    const DIAMOND_BASE_Y = -70;  // Original top position
+    const DIAMOND_SPACING = 11.25;  // Distance between diamond centers
 </script>
 
-<svg x={0} y={y} width={width} height={height} viewBox={`0 -90 ${width} ${height}`}>
+<svg x={0} y={y} width={width} height={height} viewBox={`0 -100 ${width} ${height}`}>
+    <!-- Diamond pattern with absolute coordinates -->
+    <g>
+        <!-- Top diamond -->
+        <path d={`M ${barX + BAR_WIDTH/2 + 2.8125} ${DIAMOND_BASE_Y}
+                  L ${barX + BAR_WIDTH/2 + 14.0625} ${DIAMOND_BASE_Y + DIAMOND_SPACING}
+                  L ${barX + BAR_WIDTH/2 + 2.8125} ${DIAMOND_BASE_Y + DIAMOND_SPACING * 2}
+                  L ${barX + BAR_WIDTH/2 - 8.4375} ${DIAMOND_BASE_Y + DIAMOND_SPACING} Z`} 
+              fill={colorPalette[1][1]}/>
+        <!-- Left diamond -->
+        <path d={`M ${barX + BAR_WIDTH/2 - 8.4375} ${DIAMOND_BASE_Y + DIAMOND_SPACING}
+                  L ${barX + BAR_WIDTH/2 + 2.8125} ${DIAMOND_BASE_Y + DIAMOND_SPACING * 2}
+                  L ${barX + BAR_WIDTH/2 - 8.4375} ${DIAMOND_BASE_Y + DIAMOND_SPACING * 3}
+                  L ${barX + BAR_WIDTH/2 - 19.6875} ${DIAMOND_BASE_Y + DIAMOND_SPACING * 2} Z`} 
+              fill={colorPalette[1][0]}/>
+        <!-- Right diamond -->
+        <path d={`M ${barX + BAR_WIDTH/2 + 14.0625} ${DIAMOND_BASE_Y + DIAMOND_SPACING}
+                  L ${barX + BAR_WIDTH/2 + 25.3125} ${DIAMOND_BASE_Y + DIAMOND_SPACING * 2}
+                  L ${barX + BAR_WIDTH/2 + 14.0625} ${DIAMOND_BASE_Y + DIAMOND_SPACING * 3}
+                  L ${barX + BAR_WIDTH/2 + 2.8125} ${DIAMOND_BASE_Y + DIAMOND_SPACING * 2} Z`} 
+              fill={colorPalette[0][1]}/>
+        <!-- Bottom diamond -->
+        <path d={`M ${barX + BAR_WIDTH/2 + 2.8125} ${DIAMOND_BASE_Y + DIAMOND_SPACING * 2}
+                  L ${barX + BAR_WIDTH/2 + 14.0625} ${DIAMOND_BASE_Y + DIAMOND_SPACING * 3}
+                  L ${barX + BAR_WIDTH/2 + 2.8125} ${DIAMOND_BASE_Y + DIAMOND_SPACING * 4}
+                  L ${barX + BAR_WIDTH/2 - 8.4375} ${DIAMOND_BASE_Y + DIAMOND_SPACING * 3} Z`} 
+              fill={colorPalette[0][0]}/>
+
+        <!-- Update text label positions to use the same variables -->
+        <text 
+            x={barX + BAR_WIDTH/2 + 2.8125} 
+            y={DIAMOND_BASE_Y - 5}
+            text-anchor="middle"
+            dominant-baseline="bottom"
+            font-size="10px"
+            fill="black"
+        >
+            Both rising
+        </text>
+        <text 
+            x={barX + BAR_WIDTH/2 - 23} 
+            y={DIAMOND_BASE_Y + DIAMOND_SPACING * 2}
+            text-anchor="end"
+            dominant-baseline="middle"
+            font-size="10px"
+            fill="black"
+        >
+            {label2} rises
+        </text>
+        <text 
+            x={barX + BAR_WIDTH/2 + 27} 
+            y={DIAMOND_BASE_Y + DIAMOND_SPACING * 2}
+            text-anchor="start"
+            dominant-baseline="middle"
+            font-size="10px"
+            fill="black"
+        >
+            {label3} rises
+        </text>
+        <text 
+            x={barX + BAR_WIDTH/2 + 2.8125} 
+            y={DIAMOND_BASE_Y + DIAMOND_SPACING * 4 + 10}
+            text-anchor="middle"
+            dominant-baseline="top"
+            font-size="10px"
+            fill="black"
+        >
+            No growth
+        </text>
+    </g>
+
     <RunningRqaPlotBarColor 
         series1={[10, 70, 60, 50]} 
         series2={[0, 1, 1, 0]} 
@@ -90,32 +164,12 @@
         y={0}
         colorFilling={colorFilling}
     />
-    <line
-        x1={lineStartX}
-        y1={lineStartY}
-        x2={lineEndX}
-        y2={lineStartY}
-        stroke="black"
-        stroke-dasharray="3 3"
-        stroke-width="1"
-    />
-    <text 
-        x={lineEndX - 2} 
-        y={barHeight - 42}
-        text-anchor="end"
-        dominant-baseline="hanging"
-        font-size="12px"
-        fill="black"
-    >
-        <tspan x={lineEndX - 2} dy="0">{label1}</tspan>
-        <tspan x={lineEndX - 2} dy="14">& {label2}</tspan>
-        <tspan x={lineEndX - 2} dy="14">value increases</tspan>
-    </text>
     <path
-        d={`M ${lineEndX - 95} ${barHeight - 28} 
-            C ${lineEndX - 140} ${barHeight - 28},
-              ${lineEndX - 140} ${barHeight - 50},
-              ${barX - 10} ${-15}`}
+        d={`M ${lineStartX} ${lineStartY},
+            ${lineStartX - lineLength} ${lineStartY},
+            C ${lineEndX} ${barHeight - 28},
+              ${lineEndX - 20} ${barHeight - 40},
+              ${barX + 14} ${DIAMOND_BASE_Y + DIAMOND_SPACING * 3}`}
         fill="none"
         stroke="black"
         stroke-dasharray="3 3"
@@ -135,7 +189,7 @@
         y={line2EndY + 12}
         text-anchor="middle"
         dominant-baseline="top"
-        font-size="12px"
+        font-size="10px"
         fill="black"
     >
         AOI of underlying fixation:
@@ -182,7 +236,7 @@
         y={barHeight - RIGHT_LABEL_MIN_HEIGHT}
         text-anchor="start"
         dominant-baseline="hanging"
-        font-size="12px"
+        font-size="10px"
         fill="black"
     >
         <tspan x={line3StartX + 45} dy="0">bar volume</tspan>
@@ -204,7 +258,7 @@
                 y={item.y}
                 text-anchor="start"
                 dominant-baseline="middle"
-                font-size="12px"
+                font-size="10px"
                 fill="black"
             >
                 {item.aoi}

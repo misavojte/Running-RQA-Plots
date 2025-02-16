@@ -207,7 +207,7 @@
     ): { legendHeight: number; legendConstant: number } {
         const BASE_ITEM_WIDTH = 25;
         const CHAR_WIDTH = 7;
-        const LEGEND_MARGIN = 70;
+        const LEGEND_MARGIN = 80;
         
         const maxLabelLength = Math.max(...aoiColors.map(item => item.aoi.length), 0);
         const estimatedItemWidth = BASE_ITEM_WIDTH + (maxLabelLength * CHAR_WIDTH);

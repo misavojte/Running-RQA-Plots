@@ -94,7 +94,7 @@
         y={barHeight - 42}
         text-anchor="end"
         dominant-baseline="hanging"
-        font-size="12px"
+        font-size="10px"
         fill="black"
     >
         <tspan x={lineEndX - 2} dy="0">shows</tspan>
@@ -116,10 +116,10 @@
         y={line2EndY + 12}
         text-anchor="middle"
         dominant-baseline="top"
-        font-size="12px"
+        font-size="10px"
         fill="black"
     >
-        color explained by AOI of underlying fixation:
+        AOI of underlying fixation:
     </text>
     <line
         x1={line3StartX}
@@ -163,7 +163,7 @@
         y={barHeight - RIGHT_LABEL_MIN_HEIGHT}
         text-anchor="start"
         dominant-baseline="hanging"
-        font-size="12px"
+        font-size="10px"
         fill="black"
     >
         <tspan x={line3StartX + 45} dy="0">running value</tspan>
@@ -185,7 +185,7 @@
                 y={item.y}
                 text-anchor="start"
                 dominant-baseline="middle"
-                font-size="12px"
+                font-size="10px"
                 fill="black"
             >
                 {item.aoi}
