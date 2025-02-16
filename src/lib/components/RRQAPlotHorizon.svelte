@@ -53,6 +53,8 @@
 
     const calculateValue = (matrix: number[][], type: SeriesHighlightType) => {
         switch (type) {
+            case "recurrenceRate":
+                return computeRecurrenceRate(matrix);
             case "determinism":
                 return computeDeterminism(matrix);
             case "determinism2":

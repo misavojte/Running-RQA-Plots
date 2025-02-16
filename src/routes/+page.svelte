@@ -270,6 +270,7 @@
         <DemoPlotFrame title="RRQA Horizon Plot">
             <div class="flex flex-row items-center justify-center gap-4">
                 <select bind:value={horizonSeries1} class="bg-gray-200 p-1 rounded-md border-gray-300 border mb-4 text-sm">
+                    <option value="recurrenceRate">Recurrence Rate</option>
                     <option value="determinism">Determinism</option>
                     <option value="laminarity">Laminarity</option>
                     <option value="verticalLaminarity">Vertical Laminarity</option>
@@ -279,11 +280,11 @@
                     <option value="verticalLaminarity2">Vertical Laminarity2</option>
                     <option value="horizontalLaminarity2">Horizontal Laminarity2</option>
                     <option value="cfr">Consecutive Fixation Ratio</option>
-                    <option value="avgDiagonalLength">Average Diagonal Length</option>
                     <option value="corm">Center of Recurrence Mass</option>
                 </select>
                 <select bind:value={horizonSeries2} class="bg-gray-200 p-1 rounded-md border-gray-300 border mb-4 text-sm">
                     <option value=null>No second series</option>
+                    <option value="recurrenceRate">Recurrence Rate</option>
                     <option value="determinism">Determinism</option>
                     <option value="laminarity">Laminarity</option>
                     <option value="verticalLaminarity">Vertical Laminarity</option>
@@ -293,7 +294,7 @@
                     <option value="verticalLaminarity2">Vertical Laminarity2</option>
                     <option value="horizontalLaminarity2">Horizontal Laminarity2</option>
                     <option value="cfr">Consecutive Fixation Ratio</option>
-                    <option value="avgDiagonalLength">Average Diagonal Length</option>
+                    <option value="corm">Center of Recurrence Mass</option>
                 </select>
             </div>
         <RrqaPlotHorizon 
