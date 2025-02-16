@@ -159,8 +159,8 @@
     <!-- Explanation text -->
     <text 
         x={centerX} 
-        y={90} 
-        font-size="12px" 
+        y={95} 
+        font-size="10px" 
         fill="black"
         text-anchor="middle"
     >
@@ -170,7 +170,7 @@
     <text
         x={centerX}
         y={110}
-        font-size="12px"
+        font-size="10px"
         fill="black"
         text-anchor="middle"
     >
@@ -228,7 +228,7 @@
         <text
             x={centerX}
             y={194}
-            font-size="12px"
+            font-size="10px"
             fill="black"
             text-anchor="middle"
         >{label2} (2)</text>

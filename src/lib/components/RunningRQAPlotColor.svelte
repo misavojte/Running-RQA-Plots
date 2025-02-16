@@ -16,7 +16,7 @@
 
     type SeriesHighlightType = "determinism" | "laminarity" | "determinism2" | "laminarity2" | "horizontalLaminarity" | "verticalLaminarity" | "horizontalLaminarity2" | "verticalLaminarity2" | "recurrenceRate" | "cfr" | "avgDiagonalLength" | "corm"
   
-    let { fixationGroups, width = 500, height = "auto", lineColor = "black", backgroundColor = "white", gridColor = "#CCCCCC", showGrid = false, tooltipSnippet = null, showRisingPoints = false, aoiColors = [], series2Type = "determinism2", series3Type = "laminarity2", showColorFilling = false, plotMode = "rises", matrixGenerator = computeRecurrenceMatrix } = $props<{
+    let { fixationGroups, width = 500, height = "auto", lineColor = "black", backgroundColor = "white", gridColor = "#CCCCCC", showGrid = false, tooltipSnippet = null, showRisingPoints = false, aoiColors = [], series2Type = "determinism2", series3Type = "laminarity2", showColorFilling = false, plotMode = "rises", matrixGenerator = computeRecurrenceMatrix, label2, label3 } = $props<{
         fixationGroups: FixationGroup[];
         width?: number;
         height?: number | "auto";
@@ -32,6 +32,8 @@
         showColorFilling?: boolean;
         plotMode?: "rises" | "normalized";
         matrixGenerator?: MatrixGenerator;
+        label2?: string;
+        label3?: string;
     }>();
 
     // Calculate the maximum number of fixations across all groups
@@ -346,6 +348,8 @@
                 lineColor={lineColor} 
                 barHeight={BAR_HEIGHT} 
                 aoiColors={aoiColors} 
+                label2={label2}
+                label3={label3}
             />
         {/key}
     </svg>

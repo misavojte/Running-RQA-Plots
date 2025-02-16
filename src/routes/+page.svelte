@@ -104,6 +104,16 @@
         }
     ]);
 
+    let series2Setup = $derived.by(() => ({
+        metric: series2Type,
+        label: series2Type.charAt(0).toUpperCase() + series2Type.slice(1),
+    }));
+
+    let series3Setup = $derived.by(() => ({
+        metric: series3Type,
+        label: series3Type.charAt(0).toUpperCase() + series3Type.slice(1),
+    }));
+
 </script>
 
 {#snippet tooltipSnippet(aoiLabel: string, fixationLabel: string)}
@@ -263,7 +273,7 @@
                 <option value="normalized">Normalized</option>
             </select>
         </div>
-            <RunningRqaPlotColor fixationGroups={arrayOfRandomFixationSetsWithLabels} width={500} lineColor="#006FAD" showGrid={true} showRisingPoints={false} aoiColors={aoiColors} series2Type={series2Type} series3Type={series3Type} showColorFilling={true} plotMode={plotMode} matrixGenerator={matrixGenerator} />
+            <RunningRqaPlotColor fixationGroups={arrayOfRandomFixationSetsWithLabels} width={500} lineColor="#006FAD" showGrid={true} showRisingPoints={false} aoiColors={aoiColors} series2Type={series2Setup.metric} series3Type={series3Setup.metric} label2={series2Setup.label} label3={series3Setup.label} showColorFilling={true} plotMode={plotMode} matrixGenerator={matrixGenerator} />
             
         </DemoPlotFrame>
 

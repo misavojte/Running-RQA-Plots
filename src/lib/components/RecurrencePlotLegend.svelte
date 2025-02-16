@@ -66,7 +66,7 @@
                 y={item.y}
                 text-anchor="start"
                 dominant-baseline="middle"
-                font-size="12px"
+                font-size="10px"
                 fill="black"
             >
                 {item.aoi}
