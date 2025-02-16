@@ -6,7 +6,6 @@
         y, 
         height, 
         barHeight,
-        lineColor = "black",
         colorPalette = "#006FAD",
         horizonSlices = 3
     } = $props<{
