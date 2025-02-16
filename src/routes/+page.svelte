@@ -10,10 +10,10 @@
 	import RunningRqaPlotColor from "$lib/components/RunningRQAPlotColor.svelte";
 	import type { MatrixGenerator } from "$lib/types/MatrixGenerator.js";
 
-    import { assignRandomColorToAoi, getUniqueAois } from '$lib/utility/colorUtils.js';
-    import { handleFileUpload } from '$lib/utility/csvUtils.js';
-	import { computeEuclideanRecurrenceMatrix, computeRecurrenceMatrix } from "$lib/utility/recurrenceMatrix.js";
-	import { computeDeterminism } from "$lib/utility/recurrenceMetrics.js";
+    import { assignRandomColorToAoi, getUniqueAois } from '$lib/utils/colorUtils.js';
+    import { handleFileUpload } from '$lib/utils/csvUtils.js';
+	import { computeEuclideanRecurrenceMatrix, computeRecurrenceMatrix } from "$lib/utils/recurrenceMatrix.js";
+	import { computeDeterminism } from "$lib/utils/recurrenceMetrics.js";
 
 
     const fixations = [

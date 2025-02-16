@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { computeRecurrenceMatrix } from "../utility/recurrenceMatrix.js";
+  import { computeRecurrenceMatrix } from "../utils/recurrenceMatrix.js";
   import type { Fixation } from "../types/Fixation.js";
 	import type { Snippet } from "svelte";
   import RecurrencePlotLegend from "./RecurrencePlotLegend.svelte";

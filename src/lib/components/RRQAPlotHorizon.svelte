@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { computeCenterOfRecurrenceMass, computeConsecutiveFixationRatio, computeDeterminism, computeDeterminism2, computeDetLamDifference, computeDiagonalLineMetrics, computeHorizontalLaminarity, computeHorizontalLaminarity2, computeLaminarity, computeLaminarity2, computeRecurrenceRate, computeVerticalLaminarity, computeVerticalLaminarity2 } from "../utility/recurrenceMetrics.js";
-    import { computeRecurrenceMatrix } from "../utility/recurrenceMatrix.js";
+    import { computeCenterOfRecurrenceMass, computeConsecutiveFixationRatio, computeDeterminism, computeDeterminism2, computeDetLamDifference, computeDiagonalLineMetrics, computeHorizontalLaminarity, computeHorizontalLaminarity2, computeLaminarity, computeLaminarity2, computeRecurrenceRate, computeVerticalLaminarity, computeVerticalLaminarity2 } from "../utils/recurrenceMetrics.js";
+    import { computeRecurrenceMatrix } from "../utils/recurrenceMatrix.js";
     import type { Fixation } from "../types/Fixation.js";
     import type { Snippet } from "svelte";
     import RrqaPlotBarHorizon from "./RRQAPlotBarHorizon.svelte";
