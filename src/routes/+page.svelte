@@ -112,173 +112,190 @@
     </div>
 {/snippet}
 
-<main class="p-8 max-w-screen-xl mx-auto">
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <DemoPlotFrame title="RRQA visualizations for eye-tracking" level="h1">
-                <div class="flex flex-col items-center justify-center max-w-lg mx-auto gap-2">
-                    <p>Recurrence—the reappearance of similar states—offers deep insights into complex system dynamics.</p>
-                    <p>Recurrence Quantification Analysis (RQA) extracts quantitative metrics from recurrence plots, revealing hidden patterns in eye-tracking data.</p>
-                    <p>Our innovation, Running RQA (RRQA), displays these metrics as continuous, evolving plots, enabling intuitive, direct comparisons of gaze behavior over time.</p>
-                </div> 
-                <DemoUpload bind:fixationGroups={arrayOfRandomFixationSetsWithLabels} />
-            </DemoPlotFrame>
+<div class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
+    <main class="p-8 max-w-screen-xl mx-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <DemoPlotFrame title="RRQA visualizations for eye-tracking" level="h1">
+                    <div class="flex flex-col items-center justify-center max-w-lg mx-auto gap-4">
+                        <p class="text-gray-700 leading-relaxed">
+                            <span class="font-medium">Recurrence</span>—the reappearance of similar states—offers deep insights into complex system dynamics.
+                        </p>
+                        <p class="text-gray-700 leading-relaxed">
+                            <span class="font-medium">Recurrence Quantification Analysis (RQA)</span> extracts quantitative metrics from recurrence plots, revealing hidden patterns in eye-tracking data.
+                        </p>
+                        <p class="text-gray-700 leading-relaxed">
+                            Our innovation, <span class="font-medium">Running RQA (RRQA)</span>, displays these metrics as continuous, evolving plots, enabling intuitive, direct comparisons of gaze behavior over time.
+                        </p>
+                    </div> 
+                    <DemoUpload bind:fixationGroups={arrayOfRandomFixationSetsWithLabels} />
+                </DemoPlotFrame>
+                <DemoPlotFrame title="Recurrence Plot">
+                    <div class="flex flex-col items-center justify-center">
+                        {#if arrayOfRandomFixationSetsWithLabels.length > 0}
+                            <select bind:value={selectedParticipantIndex} class="mb-4 bg-gray-200 p-1 rounded-md border-gray-300 border text-sm">
+                                {#each arrayOfRandomFixationSetsWithLabels as participant, index}
+                                    <option value={index}>{participant.label}</option>
+                                {/each}
+                            </select>
+                            
+                            <RecurrencePlot 
+                                fixations={arrayOfRandomFixationSetsWithLabels[selectedParticipantIndex]?.fixations ?? []} 
+                                height={500} 
+                                width={500}
+                                pointSize={4} 
+                                highlightColor="#006FAD" 
+                                showGrid={true} 
+                                aoiColors={aoiColors} 
+                                tooltipSnippet={tooltipSnippet} 
+                                matrixGenerator={matrixGenerator}
+                            />
+                        {/if}
+                    </div>
+                </DemoPlotFrame>
 
-        <DemoPlotFrame title="Recurrence Plot">
-            <div class="flex flex-col items-center justify-center">
-                {#if arrayOfRandomFixationSetsWithLabels.length > 0}
-                    <select bind:value={selectedParticipantIndex} class="mb-4 bg-gray-200 p-1 rounded-md border-gray-300 border text-sm">
-                        {#each arrayOfRandomFixationSetsWithLabels as participant, index}
-                            <option value={index}>{participant.label}</option>
-                        {/each}
+                <DemoPlotFrame title="RRQA Worm Plot (Participants)">
+                    <div class="flex flex-col items-center justify-center">
+                        <select bind:value={metric} class="mb-4 bg-gray-200 p-1 rounded-md border-gray-300 border text-sm">
+                            <option value="recurrenceRate">Recurrence Rate</option>
+                            <option value="determinism">Determinism</option>
+                            <option value="determinism2">Determinism2</option>
+                            <option value="laminarity">Laminarity</option>
+                            <option value="laminarity2">Laminarity2</option>
+                            <option value="verticalLaminarity">Vertical Laminarity</option>
+                            <option value="verticalLaminarity2">Vertical Laminarity2</option>
+                            <option value="horizontalLaminarity">Horizontal Laminarity</option>
+                            <option value="horizontalLaminarity2">Horizontal Laminarity2</option>
+                            <option value="detLamDifference">Determinism - Laminarity</option>
+                            <option value="corm">Center of Recurrence Mass</option>
+                        </select>
+
+                        <div class="flex flex-col items-center justify-center border-gray-300 my-4">
+                            {#if arrayOfRandomFixationSetsWithLabels.length > 0}
+                                <RunningRqaPlot 
+                                    metric={metric} 
+                                    fixationGroups={arrayOfRandomFixationSetsWithLabels} 
+                                    width={500} 
+                                    lineColor="#006FAD" 
+                                    showGrid={true}
+                                    showRisingPoints={false}
+                                    aoiColors={aoiColors} 
+                                    matrixGenerator={matrixGenerator}
+                                />
+                            {/if}
+                        </div>
+                    </div>
+                </DemoPlotFrame>
+
+                <DemoPlotFrame title="RRQA Worm Plot (Single)">
+                    <div class="flex flex-col items-center justify-center">
+                        {#if arrayOfRandomFixationSetsWithLabels.length > 0}
+                            <select bind:value={selectedParticipantIndex} class="bg-gray-200 p-1 rounded-md border-gray-300 border mb-4 text-sm">
+                                {#each arrayOfRandomFixationSetsWithLabels as participant, index}
+                                    <option value={index}>{participant.label}</option>
+                                {/each}
+                            </select>
+                            <FocusedRqaPlot
+                                fixationGroup={arrayOfRandomFixationSetsWithLabels[selectedParticipantIndex]}
+                                width={500}
+                                lineColor="#006FAD"
+                                showGrid={true}
+                                aoiColors={aoiColors}
+                                matrixGenerator={matrixGenerator}
+                            />
+                        {/if}
+                    </div>
+                </DemoPlotFrame>
+                <DemoPlotFrame title="RRQA Fence Plot">
+                    <div class="flex flex-row items-center justify-center gap-4">
+                    <select bind:value={series2Type} class="bg-gray-200 p-1 rounded-md border-gray-300 border mb-4 text-sm">
+                        <option value="determinism">Determinism</option>
+                        <option value="laminarity">Laminarity</option>
+                        <option value="verticalLaminarity">Vertical Laminarity</option>
+                        <option value="horizontalLaminarity">Horizontal Laminarity</option>
+                        <option value="determinism2">Determinism2</option>
+                        <option value="laminarity2">Laminarity2</option>
+                        <option value="verticalLaminarity2">Vertical Laminarity2</option>
+                        <option value="horizontalLaminarity2">Horizontal Laminarity2</option>
+                        <option value="cfr">Consecutive Fixation Ratio</option>
+                        <option value="avgDiagonalLength">Average Diagonal Length</option>
+                        <option value="corm">Center of Recurrence Mass</option>
                     </select>
-                    
-                    <RecurrencePlot 
-                        fixations={arrayOfRandomFixationSetsWithLabels[selectedParticipantIndex]?.fixations ?? []} 
-                        height={500} 
-                        width={500}
-                        pointSize={4} 
-                        highlightColor="#006FAD" 
-                        showGrid={true} 
-                        aoiColors={aoiColors} 
-                        tooltipSnippet={tooltipSnippet} 
-                        matrixGenerator={matrixGenerator}
-                    />
-                {/if}
-            </div>
-        </DemoPlotFrame>
-
-        <DemoPlotFrame title="RRQA Worm Plot (Participants)">
-            <div class="flex flex-col items-center justify-center">
-                <select bind:value={metric} class="mb-4 bg-gray-200 p-1 rounded-md border-gray-300 border text-sm">
-                    <option value="recurrenceRate">Recurrence Rate</option>
-                    <option value="determinism">Determinism</option>
-                    <option value="determinism2">Determinism2</option>
-                    <option value="laminarity">Laminarity</option>
-                    <option value="laminarity2">Laminarity2</option>
-                    <option value="verticalLaminarity">Vertical Laminarity</option>
-                    <option value="verticalLaminarity2">Vertical Laminarity2</option>
-                    <option value="horizontalLaminarity">Horizontal Laminarity</option>
-                    <option value="horizontalLaminarity2">Horizontal Laminarity2</option>
-                    <option value="detLamDifference">Determinism - Laminarity</option>
-                    <option value="corm">Center of Recurrence Mass</option>
-                </select>
-
-                <div class="flex flex-col items-center justify-center border-gray-300 my-4">
-                    {#if arrayOfRandomFixationSetsWithLabels.length > 0}
-                        <RunningRqaPlot 
-                            metric={metric} 
-                            fixationGroups={arrayOfRandomFixationSetsWithLabels} 
-                            width={500} 
-                            lineColor="#006FAD" 
-                            showGrid={true}
-                            showRisingPoints={false}
-                            aoiColors={aoiColors} 
-                            matrixGenerator={matrixGenerator}
-                        />
-                    {/if}
+                    <select bind:value={series3Type} class="bg-gray-200 p-1 rounded-md border-gray-300 border mb-4 text-sm">
+                        <option value="determinism">Determinism</option>
+                        <option value="laminarity">Laminarity</option>
+                        <option value="verticalLaminarity">Vertical Laminarity</option>
+                        <option value="horizontalLaminarity">Horizontal Laminarity</option>
+                        <option value="determinism2">Determinism2</option>
+                        <option value="laminarity2">Laminarity2</option>
+                        <option value="verticalLaminarity2">Vertical Laminarity2</option>
+                        <option value="horizontalLaminarity2">Horizontal Laminarity2</option>
+                        <option value="cfr">Consecutive Fixation Ratio</option>
+                        <option value="avgDiagonalLength">Average Diagonal Length</option>
+                        <option value="corm">Center of Recurrence Mass</option>
+                    </select>
+                    <select bind:value={plotMode} class="bg-gray-200 p-1 rounded-md border-gray-300 border mb-4 text-sm">
+                        <option value="rises">Rises</option>
+                        <option value="normalized">Normalized</option>
+                    </select>
                 </div>
-            </div>
-        </DemoPlotFrame>
+                    <RunningRqaPlotColor fixationGroups={arrayOfRandomFixationSetsWithLabels} width={500} lineColor="#006FAD" showGrid={true} showRisingPoints={false} aoiColors={aoiColors} series2Type={series2Setup.metric} series3Type={series3Setup.metric} label2={series2Setup.label} label3={series3Setup.label} showColorFilling={true} plotMode={plotMode} matrixGenerator={matrixGenerator} />
+                    
+                </DemoPlotFrame>
 
-        <DemoPlotFrame title="RRQA Worm Plot (Single)">
-            <div class="flex flex-col items-center justify-center">
-                {#if arrayOfRandomFixationSetsWithLabels.length > 0}
-                    <select bind:value={selectedParticipantIndex} class="bg-gray-200 p-1 rounded-md border-gray-300 border mb-4 text-sm">
-                        {#each arrayOfRandomFixationSetsWithLabels as participant, index}
-                            <option value={index}>{participant.label}</option>
-                        {/each}
-                    </select>
-                    <FocusedRqaPlot
-                        fixationGroup={arrayOfRandomFixationSetsWithLabels[selectedParticipantIndex]}
-                        width={500}
-                        lineColor="#006FAD"
-                        showGrid={true}
-                        aoiColors={aoiColors}
-                        matrixGenerator={matrixGenerator}
-                    />
-                {/if}
+                <DemoPlotFrame title="RRQA Horizon Plot">
+                    <div class="flex flex-row items-center justify-center gap-4">
+                        <select bind:value={horizonSeries1} class="bg-gray-200 p-1 rounded-md border-gray-300 border mb-4 text-sm">
+                            <option value="recurrenceRate">Recurrence Rate</option>
+                            <option value="determinism">Determinism</option>
+                            <option value="laminarity">Laminarity</option>
+                            <option value="verticalLaminarity">Vertical Laminarity</option>
+                            <option value="horizontalLaminarity">Horizontal Laminarity</option>
+                            <option value="determinism2">Determinism2</option>
+                            <option value="laminarity2">Laminarity2</option>
+                            <option value="verticalLaminarity2">Vertical Laminarity2</option>
+                            <option value="horizontalLaminarity2">Horizontal Laminarity2</option>
+                            <option value="cfr">Consecutive Fixation Ratio</option>
+                            <option value="corm">Center of Recurrence Mass</option>
+                        </select>
+                        <select bind:value={horizonSeries2} class="bg-gray-200 p-1 rounded-md border-gray-300 border mb-4 text-sm">
+                            <option value=null>No second series</option>
+                            <option value="recurrenceRate">Recurrence Rate</option>
+                            <option value="determinism">Determinism</option>
+                            <option value="laminarity">Laminarity</option>
+                            <option value="verticalLaminarity">Vertical Laminarity</option>
+                            <option value="horizontalLaminarity">Horizontal Laminarity</option>
+                            <option value="determinism2">Determinism2</option>
+                            <option value="laminarity2">Laminarity2</option>
+                            <option value="verticalLaminarity2">Vertical Laminarity2</option>
+                            <option value="horizontalLaminarity2">Horizontal Laminarity2</option>
+                            <option value="cfr">Consecutive Fixation Ratio</option>
+                            <option value="corm">Center of Recurrence Mass</option>
+                        </select>
+                    </div>
+                <RrqaPlotHorizon 
+                    fixationGroups={arrayOfRandomFixationSetsWithLabels} 
+                    width={500} 
+                    backgroundColor="transparent" 
+                    horizonSlices={3}
+                    seriesType={horizonSeriesSetup[0]}
+                    series2Type={horizonSeriesSetup[1]}
+                />
+                </DemoPlotFrame>
             </div>
-        </DemoPlotFrame>
+    </main>
 
-        <DemoPlotFrame title="RRQA Fence Plot">
-            <div class="flex flex-row items-center justify-center gap-4">
-            <select bind:value={series2Type} class="bg-gray-200 p-1 rounded-md border-gray-300 border mb-4 text-sm">
-                <option value="determinism">Determinism</option>
-                <option value="laminarity">Laminarity</option>
-                <option value="verticalLaminarity">Vertical Laminarity</option>
-                <option value="horizontalLaminarity">Horizontal Laminarity</option>
-                <option value="determinism2">Determinism2</option>
-                <option value="laminarity2">Laminarity2</option>
-                <option value="verticalLaminarity2">Vertical Laminarity2</option>
-                <option value="horizontalLaminarity2">Horizontal Laminarity2</option>
-                <option value="cfr">Consecutive Fixation Ratio</option>
-                <option value="avgDiagonalLength">Average Diagonal Length</option>
-                <option value="corm">Center of Recurrence Mass</option>
-            </select>
-            <select bind:value={series3Type} class="bg-gray-200 p-1 rounded-md border-gray-300 border mb-4 text-sm">
-                <option value="determinism">Determinism</option>
-                <option value="laminarity">Laminarity</option>
-                <option value="verticalLaminarity">Vertical Laminarity</option>
-                <option value="horizontalLaminarity">Horizontal Laminarity</option>
-                <option value="determinism2">Determinism2</option>
-                <option value="laminarity2">Laminarity2</option>
-                <option value="verticalLaminarity2">Vertical Laminarity2</option>
-                <option value="horizontalLaminarity2">Horizontal Laminarity2</option>
-                <option value="cfr">Consecutive Fixation Ratio</option>
-                <option value="avgDiagonalLength">Average Diagonal Length</option>
-                <option value="corm">Center of Recurrence Mass</option>
-            </select>
-            <select bind:value={plotMode} class="bg-gray-200 p-1 rounded-md border-gray-300 border mb-4 text-sm">
-                <option value="rises">Rises</option>
-                <option value="normalized">Normalized</option>
-            </select>
+    <footer class="text-center text-sm text-gray-500 mt-8 max-w-screen-xl mx-auto px-8 pb-8">
+        <div class="py-8">
+            <p>Created by 
+                <a href="https://vojtechovska.com" class="text-gray-600 hover:text-blue-600 transition-colors duration-200">Michaela Vojtechovska</a> 
+                and 
+                <a href="https://muczkova.com" class="text-gray-600 hover:text-blue-600 transition-colors duration-200">Marketa Muczkova</a>
+                in 2025 at Palacký University, Olomouc, Czechia (EU)
+            </p>
+            <p>
+                Soon to be implemented into 
+                <a href="https://gazeplotter.com" class="text-gray-600 hover:text-blue-600 transition-colors duration-200">GazePlotter</a>
+            </p>
         </div>
-            <RunningRqaPlotColor fixationGroups={arrayOfRandomFixationSetsWithLabels} width={500} lineColor="#006FAD" showGrid={true} showRisingPoints={false} aoiColors={aoiColors} series2Type={series2Setup.metric} series3Type={series3Setup.metric} label2={series2Setup.label} label3={series3Setup.label} showColorFilling={true} plotMode={plotMode} matrixGenerator={matrixGenerator} />
-            
-        </DemoPlotFrame>
-
-        <DemoPlotFrame title="RRQA Horizon Plot">
-            <div class="flex flex-row items-center justify-center gap-4">
-                <select bind:value={horizonSeries1} class="bg-gray-200 p-1 rounded-md border-gray-300 border mb-4 text-sm">
-                    <option value="recurrenceRate">Recurrence Rate</option>
-                    <option value="determinism">Determinism</option>
-                    <option value="laminarity">Laminarity</option>
-                    <option value="verticalLaminarity">Vertical Laminarity</option>
-                    <option value="horizontalLaminarity">Horizontal Laminarity</option>
-                    <option value="determinism2">Determinism2</option>
-                    <option value="laminarity2">Laminarity2</option>
-                    <option value="verticalLaminarity2">Vertical Laminarity2</option>
-                    <option value="horizontalLaminarity2">Horizontal Laminarity2</option>
-                    <option value="cfr">Consecutive Fixation Ratio</option>
-                    <option value="corm">Center of Recurrence Mass</option>
-                </select>
-                <select bind:value={horizonSeries2} class="bg-gray-200 p-1 rounded-md border-gray-300 border mb-4 text-sm">
-                    <option value=null>No second series</option>
-                    <option value="recurrenceRate">Recurrence Rate</option>
-                    <option value="determinism">Determinism</option>
-                    <option value="laminarity">Laminarity</option>
-                    <option value="verticalLaminarity">Vertical Laminarity</option>
-                    <option value="horizontalLaminarity">Horizontal Laminarity</option>
-                    <option value="determinism2">Determinism2</option>
-                    <option value="laminarity2">Laminarity2</option>
-                    <option value="verticalLaminarity2">Vertical Laminarity2</option>
-                    <option value="horizontalLaminarity2">Horizontal Laminarity2</option>
-                    <option value="cfr">Consecutive Fixation Ratio</option>
-                    <option value="corm">Center of Recurrence Mass</option>
-                </select>
-            </div>
-        <RrqaPlotHorizon 
-            fixationGroups={arrayOfRandomFixationSetsWithLabels} 
-            width={500} 
-            backgroundColor="transparent" 
-            horizonSlices={3}
-            seriesType={horizonSeriesSetup[0]}
-            series2Type={horizonSeriesSetup[1]}
-        />
-        </DemoPlotFrame>
-    </div>
-</main>
-
-<footer class="text-center text-sm text-gray-500 mt-8 max-w-screen-xl mx-auto px-8 pb-8">
-    <p>Created by <a href="https://vojtechovska.com" class="text-gray-500 hover:text-gray-700">Michaela Vojtechovska</a> and <a href="https://muczkova.com" class="text-gray-500 hover:text-gray-700">Marketa Muczkova</a></p>
-</footer>
+    </footer>
+</div>
