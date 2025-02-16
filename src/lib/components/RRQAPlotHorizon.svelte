@@ -23,9 +23,11 @@
         height = "auto", 
         backgroundColor = "white", 
         colorPalette = ["#aacfe3", "#0170ad"],
+        colorPalette2 = ["#ffcccb", "#ff0000"],
         showGrid = false, 
         tooltipSnippet = null, 
         seriesType = "determinism",
+        series2Type = "corm",
         matrixGenerator = computeRecurrenceMatrix,
         horizonSlices = 3,
         lineColor = "black"
@@ -35,8 +37,10 @@
         height?: number | "auto";
         backgroundColor?: string;
         colorPalette?: string[];
+        colorPalette2?: string[];
         showGrid?: boolean;
         seriesType?: SeriesHighlightType;
+        series2Type?: SeriesHighlightType;
         tooltipSnippet?: Snippet<[{ x: number; y: number; value: number | null; label: string; fixationIndex: number }]> | null;
         matrixGenerator?: MatrixGenerator;
         horizonSlices?: number;
@@ -81,10 +85,11 @@
     let groupValues = $derived.by(() => {
         return fixationGroups.map((group: FixationGroup) => {
             const series = [];
-            
+            const series2 = [];
             for (let i = 0; i < group.fixations.length; i++) {
                 const matrix = matrixGenerator(group.fixations.slice(0, i + 1));
                 series.push(calculateValue(matrix, seriesType));
+                series2.push(calculateValue(matrix, series2Type));
             }
                 
             // Pad with null values if this group has fewer fixations
@@ -95,6 +100,7 @@
             return {
                 label: group.label,
                 series: series,
+                series2: series2,
                 fixations: group.fixations
             };
         });
@@ -204,6 +210,7 @@
     const legendHeight = $derived.by(() => dimensions.legendHeight);
     const totalHeight = $derived.by(() => dimensions.totalHeight);
     const horizonSlicesColors = $derived.by(() => createColorGradient(colorPalette[0], colorPalette[1], horizonSlices, 'rgb'));
+    const horizonSlicesColors2 = $derived.by(() => createColorGradient(colorPalette2[0], colorPalette2[1], horizonSlices, 'rgb'));
 </script>
 
 <div class="plot-container" bind:this={plotContainer}>
@@ -229,12 +236,14 @@
                 
                 <RrqaPlotBarHorizon 
                     series1={group.series}
+                    series2={group.series2}
                     width={plotWidth} 
                     height={BAR_HEIGHT} 
                     backgroundColor={backgroundColor}
                     y={index * (BAR_HEIGHT + BAR_GAP)}
                     x={LABEL_WIDTH}
                     horizonSlicesColors={horizonSlicesColors}
+                    horizonSlicesColors2={horizonSlicesColors2}
                 />
             {/each}
 
@@ -277,6 +286,7 @@
                 lineColor={lineColor}
                 colorPalette={colorPalette}
                 horizonSlicesColors={horizonSlicesColors}
+                horizonSlicesColors2={horizonSlicesColors2}
             />
         {/key}
     </svg>
