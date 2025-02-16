@@ -8,7 +8,8 @@
     import RunningRQAPlotXAxis from "./RunningRQAPlotXAxis.svelte";
     import { fade } from "svelte/transition";
     import RRQAPlotHorizonLegend from "./RRQAPlotHorizonLegend.svelte";
-    import { createColorGradient } from "../utils/colorUtils.ts";
+    import { createColorGradient } from "../utils/colorUtils.js";
+    import type { HorizonPlotSeriesSetup, HorizonPlotBarVector } from "../types/PlotMetric.ts";
 
     interface FixationGroup {
         label: string;
@@ -21,13 +22,11 @@
         fixationGroups, 
         width = 500, 
         height = "auto", 
-        backgroundColor = "white", 
-        colorPalette = ["#aacfe3", "#0170ad"],
-        colorPalette2 = ["#ffcccb", "#ff0000"],
+        backgroundColor = "white",
         showGrid = false, 
         tooltipSnippet = null, 
-        seriesType = "determinism",
-        series2Type = "corm",
+        seriesType = {metric: "determinism", label: "Determinism", colorPalette: ["#aacfe3", "#0170ad"]},
+        series2Type = {metric: "corm", label: "Center of Recurrence Mass", colorPalette: ["#ffcccb", "#ff0000"]},
         matrixGenerator = computeRecurrenceMatrix,
         horizonSlices = 3,
         lineColor = "black"
@@ -39,8 +38,8 @@
         colorPalette?: string[];
         colorPalette2?: string[];
         showGrid?: boolean;
-        seriesType?: SeriesHighlightType;
-        series2Type?: SeriesHighlightType;
+        seriesType?: HorizonPlotSeriesSetup;
+        series2Type?: HorizonPlotSeriesSetup | null;
         tooltipSnippet?: Snippet<[{ x: number; y: number; value: number | null; label: string; fixationIndex: number }]> | null;
         matrixGenerator?: MatrixGenerator;
         horizonSlices?: number;
@@ -88,8 +87,8 @@
             const series2 = [];
             for (let i = 0; i < group.fixations.length; i++) {
                 const matrix = matrixGenerator(group.fixations.slice(0, i + 1));
-                series.push(calculateValue(matrix, seriesType));
-                series2.push(calculateValue(matrix, series2Type));
+                series.push(calculateValue(matrix, seriesType.metric));
+                series2.push(calculateValue(matrix, series2Type.metric));
             }
                 
             // Pad with null values if this group has fewer fixations
@@ -206,11 +205,33 @@
         };
     });
 
+    $effect(() => {
+        console.log(groupValues);
+    });
     const plotAreaHeight = $derived.by(() => dimensions.plotAreaHeight);
     const legendHeight = $derived.by(() => dimensions.legendHeight);
     const totalHeight = $derived.by(() => dimensions.totalHeight);
-    const horizonSlicesColors = $derived.by(() => createColorGradient(colorPalette[0], colorPalette[1], horizonSlices, 'rgb'));
-    const horizonSlicesColors2 = $derived.by(() => createColorGradient(colorPalette2[0], colorPalette2[1], horizonSlices, 'rgb'));
+    const series1Palette = $derived.by(() => createColorGradient(seriesType.colorPalette[0], seriesType.colorPalette[1], horizonSlices, 'rgb'));
+    const series2Palette = $derived.by(() => createColorGradient(series2Type.colorPalette[0], series2Type.colorPalette[1], horizonSlices, 'rgb'));
+    const horizonSeries1: HorizonPlotBarVector[] = $derived.by(() => (
+        groupValues.map((group: any) => {
+            return {
+                values: group.series,
+                horizonSlicesColors: series1Palette
+            }
+        })
+    ));
+    const horizonSeries2: HorizonPlotBarVector[] | null = $derived.by(() => {
+        if (series2Type) {
+            return groupValues.map((group: any) => {
+                return {
+                    values: group.series2,
+                    horizonSlicesColors: series2Palette
+                }
+            })
+        }
+        return null;
+    });
 </script>
 
 <div class="plot-container" bind:this={plotContainer}>
@@ -234,16 +255,14 @@
                     fill="black"
                 >{group.label}</text>
                 
-                <RrqaPlotBarHorizon 
-                    series1={group.series}
-                    series2={group.series2}
+                <RrqaPlotBarHorizon
                     width={plotWidth} 
                     height={BAR_HEIGHT} 
                     backgroundColor={backgroundColor}
                     y={index * (BAR_HEIGHT + BAR_GAP)}
                     x={LABEL_WIDTH}
-                    horizonSlicesColors={horizonSlicesColors}
-                    horizonSlicesColors2={horizonSlicesColors2}
+                    horizonSeries1={horizonSeries1[index]}
+                    horizonSeries2={horizonSeries2 ? horizonSeries2[index] : null}
                 />
             {/each}
 
@@ -284,9 +303,8 @@
                 height={legendHeight} 
                 barHeight={BAR_HEIGHT}
                 lineColor={lineColor}
-                colorPalette={colorPalette}
-                horizonSlicesColors={horizonSlicesColors}
-                horizonSlicesColors2={horizonSlicesColors2}
+                horizonSeries1={horizonSeries1[0]}
+                horizonSeries2={horizonSeries2 ? horizonSeries2[0] : null}
             />
         {/key}
     </svg>

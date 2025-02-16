@@ -1,12 +1,14 @@
 <script lang="ts">
 	import RrqaPlotBarHorizon from "./RRQAPlotBarHorizon.svelte";
+	import type { HorizonPlotBarVector } from "$lib/types/PlotMetric.js";
 
     let { 
         width, 
         y, 
         height, 
         barHeight,
-        horizonSlicesColors = ["#aacfe3", "#0170ad"]
+        horizonSeries1,
+        horizonSeries2,
     } = $props<{
         width: number;
         y: number;
@@ -14,7 +16,8 @@
         barHeight: number;
         lineColor?: string;
         colorPalette?: string;
-        horizonSlicesColors?: string[];
+        horizonSeries1: HorizonPlotBarVector;
+        horizonSeries2?: HorizonPlotBarVector | null;
     }>();
 
     const EXAMPLE_BAR_WIDTH = 80;
@@ -29,24 +32,40 @@
     const barX = centerX - EXAMPLE_BAR_WIDTH / 2;
     
     // Calculate slice size
-    const sliceSize = 100 / horizonSlicesColors.length;
+    const sliceSize = 100 / horizonSeries1.horizonSlicesColors.length;
 
     // Create range examples
-    const rangeExamples = Array(horizonSlicesColors.length).fill(0).map((_, i) => {
+    const rangeExamples = Array(horizonSeries1.horizonSlicesColors.length).fill(0).map((_, i) => {
         const value = sliceSize * (i + 1);
         const activeSlices = i + 1;
         return {
             value,
             slices: Array(activeSlices).fill(0).map((_, j) => ({
-                opacity: (1 / horizonSlicesColors.length - 0.001) * (j + 1)
+                opacity: (1 / horizonSeries1.horizonSlicesColors.length - 0.001) * (j + 1)
             })),
             range: `${Math.round(value - sliceSize)}-${Math.round(value)}`
         };
     });
 
     // Center range examples
-    const totalRangeWidth = (SMALL_BAR_WIDTH + SPACING) * horizonSlicesColors.length;
+    const totalRangeWidth = (SMALL_BAR_WIDTH + SPACING) * horizonSeries1.horizonSlicesColors.length;
     const rangeStartX = (width - totalRangeWidth) / 2;
+
+    const fakeHorizonSeries1: HorizonPlotBarVector = $derived.by(() => ({
+        values: [15, 35, 45, 80, 90, 75, 60, 40, 20, 10],
+        horizonSlicesColors: horizonSeries1.horizonSlicesColors
+    }));
+
+    const fakeHorizonSeries2: HorizonPlotBarVector | null = $derived.by(() => {
+        if (horizonSeries2) {
+            return {
+                values: [5, 10, 28, 40, 56, 70, 52, 48, 44, 38],
+                horizonSlicesColors: horizonSeries2.horizonSlicesColors
+            };
+        }
+        return null;
+    });
+    
 </script>
 
 <svg x={0} y={y} width={width} height={height}>
@@ -65,8 +84,8 @@
             <RrqaPlotBarHorizon
                 width={EXAMPLE_BAR_WIDTH}
                 height={EXAMPLE_BAR_HEIGHT}
-                series1={[15, 35, 45, 80, 90, 75, 60, 40, 20, 10]}
-                horizonSlicesColors={horizonSlicesColors}
+                horizonSeries1={fakeHorizonSeries1}
+                horizonSeries2={fakeHorizonSeries2}
             />
 
         <!-- Value indicators -->
@@ -111,7 +130,7 @@
         fill="black"
         text-anchor="middle"
     >
-        {horizonSlicesColors.length} bands, darker color indicates higher value:
+        {horizonSeries1.horizonSlicesColors.length} bands, darker color indicates higher value:
     </text>
 
     <!-- Range examples -->
@@ -128,7 +147,7 @@
                 <rect 
                     width={SMALL_BAR_WIDTH} 
                     height={SMALL_BAR_HEIGHT} 
-                    fill={horizonSlicesColors[i]}
+                    fill={horizonSeries1.horizonSlicesColors[i]}
                     opacity={example.slices[i].opacity}
                 />
 

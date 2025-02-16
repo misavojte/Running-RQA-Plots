@@ -1,29 +1,27 @@
 <script lang="ts">
+	import type { HorizonPlotBarVector } from "$lib/types/PlotMetric.js";
+
   let {
-    series1,
-    series2 = null, // Optional second series
     width = 500,
     height = 100,
     backgroundColor = "transparent",
     x = 0,
     y = 0,
     // Color palettes for each series
-    horizonSlicesColors = ["#aacfe3", "#0170ad"],
-    horizonSlicesColors2 = ["#fcbf49", "#e85d04"]
+    horizonSeries1,
+    horizonSeries2 = null,
   } = $props<{
-    series1: (number | null)[];
-    series2?: (number | null)[];
+    horizonSeries1: HorizonPlotBarVector;
+    horizonSeries2?: HorizonPlotBarVector | null;
     width?: number;
     height?: number;
     backgroundColor?: string;
-    horizonSlicesColors?: string[];
-    horizonSlicesColors2?: string[];
     x?: number;
     y?: number;
   }>();
 
   // Compute horizontal spacing based on the number of data points.
-  const stepX = width / series1.length;
+  const stepX = width / horizonSeries1.values.length;
   const GLOBAL_MAX_SERIES_VALUE = 100;
 
   // Scaling function to compute bar height (for each color slice).
@@ -92,7 +90,7 @@
 
   // Compute segments for series1 and, if provided, series2.
   let segments = $derived.by(() => {
-    const hasSeries2 = series2 && series2.length > 0;
+    const hasSeries2 = horizonSeries2 && horizonSeries2.values.length > 0;
     let segments1, segments2 = null;
 
     if (hasSeries2) {
@@ -100,15 +98,15 @@
       // Series1 uses the top half.
       const effectiveHeight1 = height / 2;
       const yOffset1 = 0;
-      segments1 = computeSeriesSegments(series1, horizonSlicesColors, effectiveHeight1, yOffset1, false);
+      segments1 = computeSeriesSegments(horizonSeries1.values, horizonSeries1.horizonSlicesColors, effectiveHeight1, yOffset1, false);
       
       // Series2 uses the bottom half and is drawn inverted.
       const effectiveHeight2 = height / 2;
       const yOffset2 = height / 2;
-      segments2 = computeSeriesSegments(series2!, horizonSlicesColors2, effectiveHeight2, yOffset2, true);
+      segments2 = computeSeriesSegments(horizonSeries2.values, horizonSeries2.horizonSlicesColors, effectiveHeight2, yOffset2, true);
     } else {
       // If no series2, series1 takes the full height.
-      segments1 = computeSeriesSegments(series1, horizonSlicesColors, height, 0, false);
+      segments1 = computeSeriesSegments(horizonSeries1.values, horizonSeries1.horizonSlicesColors, height, 0, false);
     }
     return { segments1, segments2 };
   });

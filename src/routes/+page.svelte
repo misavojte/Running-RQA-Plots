@@ -266,7 +266,7 @@
                 <option value="avgDiagonalLength">Average Diagonal Length</option>
                 <option value="corm">Center of Recurrence Mass</option>
             </select>
-        <RrqaPlotHorizon fixationGroups={arrayOfRandomFixationSetsWithLabels} width={500} backgroundColor="transparent" colorPalette={["#aacfe3", "#0170ad"]} horizonSlices={3} seriesType={series2Type} series2Type={series3Type} />
+        <RrqaPlotHorizon fixationGroups={arrayOfRandomFixationSetsWithLabels} width={500} backgroundColor="transparent" horizonSlices={3} />
         </DemoPlotFrame>
 
     <footer class="text-center text-sm text-gray-500 mt-8">
