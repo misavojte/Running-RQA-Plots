@@ -200,7 +200,7 @@
             </div>
         </DemoPlotFrame>
 
-        <DemoPlotFrame title="RRQA Prism Plot">
+        <DemoPlotFrame title="RRQA Fence Plot">
             <div class="flex flex-row items-center justify-center gap-4">
             <select bind:value={series2Type} class="bg-gray-200 p-1 rounded-md border-gray-300 border mb-4 text-sm">
                 <option value="determinism">Determinism</option>
