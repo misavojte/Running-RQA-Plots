@@ -172,9 +172,9 @@
         const x = event.clientX - rect.left - LABEL_WIDTH;
         const y = event.clientY - rect.top;
         const index = Math.floor(x / segmentWidth);
-        const rowIndex = Math.floor(y / BAR_HEIGHT);
+        const rowIndex = Math.floor(y / (BAR_HEIGHT + BAR_GAP));
         const postionX = index * segmentWidth + LABEL_WIDTH;
-        const postionY = rowIndex * (BAR_HEIGHT + BAR_GAP);
+        const postionY = rowIndex * (BAR_HEIGHT + BAR_GAP) + BAR_HEIGHT + BAR_GAP / 2;
 
         if (x >= 0 && index >= 0 && index < maxFixations && rowIndex >= 0 && rowIndex < groupValues.length) {
             highlightIndex = index;
@@ -253,25 +253,6 @@
     const plotAreaHeight = $derived.by(() => dimensions.plotAreaHeight);
     const legendHeight = $derived.by(() => dimensions.legendHeight);
     const totalHeight = $derived.by(() => dimensions.totalHeight);
-
-    $effect(() => {
-        // Create structured data objects for both series
-        const series2Data = {
-            metricType: series2Type,
-            participants: groupValues.map((group: any) => ({
-                participant: group.label,
-                values: group.series2original
-            }))
-        };
-
-        const series3Data = {
-            metricType: series3Type,
-            participants: groupValues.map((group: any) => ({
-                participant: group.label,
-                values: group.series3original
-            }))
-        };
-    });
 </script>
 
 <!-- Wrap everything in a single SVG so the bars and x-axis share the same coordinate system -->

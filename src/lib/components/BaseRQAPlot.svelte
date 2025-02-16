@@ -69,7 +69,7 @@
         const y = event.clientY - rect.top;
         const segmentWidth = plotWidth / maxFixations;
         const index = Math.floor(x / segmentWidth);
-        const rowIndex = Math.floor(y / barHeight);
+        const rowIndex = Math.floor(y / (barHeight + rowGap));
         
         if (x >= 0 && index >= 0 && index < maxFixations && rowIndex >= 0 && rowIndex < groupValues.length) {
             highlightIndex = index;
