@@ -88,6 +88,21 @@
         console.log(calculateSeriesOfDeterminismForEachParticipant);
     });
 
+    let horizonSeries1 = $state("determinism");
+    let horizonSeries2 = $state("corm");
+
+    let horizonSeriesSetup = $derived.by(() => [
+        {
+            metric: horizonSeries1,
+            label: horizonSeries1.charAt(0).toUpperCase() + horizonSeries1.slice(1),
+            colorPalette: ["#aacfe3", "#0170ad"] as [string, string]
+        },
+        horizonSeries2 === "null" ? null : {
+            metric: horizonSeries2,
+            label: horizonSeries2.charAt(0).toUpperCase() + horizonSeries2.slice(1),
+            colorPalette: ["#ffcccb", "#ff0000"] as [string, string]
+        }
+    ]);
 
 </script>
 
@@ -253,20 +268,42 @@
         </DemoPlotFrame>
 
         <DemoPlotFrame title="RRQA Horizon Plot">
-            <select bind:value={series2Type} class="bg-gray-200 p-1 rounded-md border-gray-300 border mb-4 text-sm">
-                <option value="determinism">Determinism</option>
-                <option value="laminarity">Laminarity</option>
-                <option value="verticalLaminarity">Vertical Laminarity</option>
-                <option value="horizontalLaminarity">Horizontal Laminarity</option>
-                <option value="determinism2">Determinism2</option>
-                <option value="laminarity2">Laminarity2</option>
-                <option value="verticalLaminarity2">Vertical Laminarity2</option>
-                <option value="horizontalLaminarity2">Horizontal Laminarity2</option>
-                <option value="cfr">Consecutive Fixation Ratio</option>
-                <option value="avgDiagonalLength">Average Diagonal Length</option>
-                <option value="corm">Center of Recurrence Mass</option>
-            </select>
-        <RrqaPlotHorizon fixationGroups={arrayOfRandomFixationSetsWithLabels} width={500} backgroundColor="transparent" horizonSlices={3} />
+            <div class="flex flex-row items-center justify-center gap-4">
+                <select bind:value={horizonSeries1} class="bg-gray-200 p-1 rounded-md border-gray-300 border mb-4 text-sm">
+                    <option value="determinism">Determinism</option>
+                    <option value="laminarity">Laminarity</option>
+                    <option value="verticalLaminarity">Vertical Laminarity</option>
+                    <option value="horizontalLaminarity">Horizontal Laminarity</option>
+                    <option value="determinism2">Determinism2</option>
+                    <option value="laminarity2">Laminarity2</option>
+                    <option value="verticalLaminarity2">Vertical Laminarity2</option>
+                    <option value="horizontalLaminarity2">Horizontal Laminarity2</option>
+                    <option value="cfr">Consecutive Fixation Ratio</option>
+                    <option value="avgDiagonalLength">Average Diagonal Length</option>
+                    <option value="corm">Center of Recurrence Mass</option>
+                </select>
+                <select bind:value={horizonSeries2} class="bg-gray-200 p-1 rounded-md border-gray-300 border mb-4 text-sm">
+                    <option value=null>No second series</option>
+                    <option value="determinism">Determinism</option>
+                    <option value="laminarity">Laminarity</option>
+                    <option value="verticalLaminarity">Vertical Laminarity</option>
+                    <option value="horizontalLaminarity">Horizontal Laminarity</option>
+                    <option value="determinism2">Determinism2</option>
+                    <option value="laminarity2">Laminarity2</option>
+                    <option value="verticalLaminarity2">Vertical Laminarity2</option>
+                    <option value="horizontalLaminarity2">Horizontal Laminarity2</option>
+                    <option value="cfr">Consecutive Fixation Ratio</option>
+                    <option value="avgDiagonalLength">Average Diagonal Length</option>
+                </select>
+            </div>
+        <RrqaPlotHorizon 
+            fixationGroups={arrayOfRandomFixationSetsWithLabels} 
+            width={500} 
+            backgroundColor="transparent" 
+            horizonSlices={3}
+            seriesType={horizonSeriesSetup[0]}
+            series2Type={horizonSeriesSetup[1]}
+        />
         </DemoPlotFrame>
 
     <footer class="text-center text-sm text-gray-500 mt-8">

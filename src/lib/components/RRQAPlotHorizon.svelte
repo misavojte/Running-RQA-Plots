@@ -88,7 +88,9 @@
             for (let i = 0; i < group.fixations.length; i++) {
                 const matrix = matrixGenerator(group.fixations.slice(0, i + 1));
                 series.push(calculateValue(matrix, seriesType.metric));
-                series2.push(calculateValue(matrix, series2Type.metric));
+                if (series2Type) {
+                    series2.push(calculateValue(matrix, series2Type.metric));
+                }
             }
                 
             // Pad with null values if this group has fewer fixations
@@ -305,6 +307,8 @@
                 lineColor={lineColor}
                 horizonSeries1={horizonSeries1[0]}
                 horizonSeries2={horizonSeries2 ? horizonSeries2[0] : null}
+                label1={seriesType.label}
+                label2={series2Type ? series2Type.label : null}
             />
         {/key}
     </svg>
