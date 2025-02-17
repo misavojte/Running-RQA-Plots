@@ -16,15 +16,11 @@
 
     type SeriesHighlightType = "determinism" | "laminarity" | "determinism2" | "laminarity2" | "horizontalLaminarity" | "verticalLaminarity" | "horizontalLaminarity2" | "verticalLaminarity2" | "recurrenceRate" | "cfr" | "avgDiagonalLength" | "corm"
   
-    let { fixationGroups, width = 500, height = "auto", lineColor = "black", backgroundColor = "white", gridColor = "#CCCCCC", showGrid = false, tooltipSnippet = null, showRisingPoints = false, aoiColors = [], series2Type = "determinism2", series3Type = "laminarity2", showColorFilling = false, plotMode = "rises", matrixGenerator = computeRecurrenceMatrix, label2, label3 } = $props<{
+    let { fixationGroups, width = 500, height = "auto", backgroundColor = "white", tooltipSnippet = null, aoiColors = [], series2Type = "determinism2", series3Type = "laminarity2", showColorFilling = false, plotMode = "rises", matrixGenerator = computeRecurrenceMatrix, label2, label3 } = $props<{
         fixationGroups: FixationGroup[];
         width?: number;
         height?: number | "auto";
-        lineColor?: string;
         backgroundColor?: string;
-        gridColor?: string;
-        showGrid?: boolean;
-        showRisingPoints?: boolean;
         series2Type?: SeriesHighlightType;
         series3Type?: SeriesHighlightType;
         tooltipSnippet?: Snippet<[{ x: number; y: number; value: number | null; label: string; fixationIndex: number }]> | null;
@@ -73,11 +69,6 @@
             default:
                 return 0;
         }
-    }
-
-    const normalizeValues = (values: number[]) => {
-        const maxValue = Math.max(...values.filter(v => v !== null));
-        return values.map(v => v !== null ? (v / maxValue) * 100 : null);
     }
 
     // Modify groupValues calculation

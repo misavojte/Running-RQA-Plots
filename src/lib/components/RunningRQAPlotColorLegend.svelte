@@ -94,13 +94,13 @@
                   L ${barX + BAR_WIDTH/2 + 2.8125} ${DIAMOND_BASE_Y + DIAMOND_SPACING * 2}
                   L ${barX + BAR_WIDTH/2 - 8.4375} ${DIAMOND_BASE_Y + DIAMOND_SPACING * 3}
                   L ${barX + BAR_WIDTH/2 - 19.6875} ${DIAMOND_BASE_Y + DIAMOND_SPACING * 2} Z`} 
-              fill={colorPalette[1][0]}/>
+              fill={colorPalette[0][1]}/>
         <!-- Right diamond -->
         <path d={`M ${barX + BAR_WIDTH/2 + 14.0625} ${DIAMOND_BASE_Y + DIAMOND_SPACING}
                   L ${barX + BAR_WIDTH/2 + 25.3125} ${DIAMOND_BASE_Y + DIAMOND_SPACING * 2}
                   L ${barX + BAR_WIDTH/2 + 14.0625} ${DIAMOND_BASE_Y + DIAMOND_SPACING * 3}
                   L ${barX + BAR_WIDTH/2 + 2.8125} ${DIAMOND_BASE_Y + DIAMOND_SPACING * 2} Z`} 
-              fill={colorPalette[0][1]}/>
+              fill={colorPalette[1][0]}/>
         <!-- Bottom diamond -->
         <path d={`M ${barX + BAR_WIDTH/2 + 2.8125} ${DIAMOND_BASE_Y + DIAMOND_SPACING * 2}
                   L ${barX + BAR_WIDTH/2 + 14.0625} ${DIAMOND_BASE_Y + DIAMOND_SPACING * 3}

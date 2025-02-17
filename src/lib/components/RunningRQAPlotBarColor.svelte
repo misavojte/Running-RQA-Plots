@@ -7,8 +7,8 @@
       height = 100,
       backgroundColor = "transparent",
       colorPalette = [
-        ["#d3d3d3", "#5c9cad"],
-        ["#b75252", "#4e3d42"],
+        ["#d3d3d3", "#b75252"],
+        ["#5c9cad", "#4e3d42"],
       ],
       hideDoubleIncrease = false,
       colorFilling = [],

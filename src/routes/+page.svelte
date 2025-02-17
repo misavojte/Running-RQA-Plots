@@ -238,7 +238,7 @@
                         <option value="normalized">Normalized</option>
                     </select> -->
                 </div>
-                    <RunningRqaPlotColor fixationGroups={arrayOfRandomFixationSetsWithLabels} width={500} lineColor="#006FAD" showGrid={true} showRisingPoints={false} aoiColors={aoiColors} series2Type={series2Setup.metric} series3Type={series3Setup.metric} label2={series2Setup.label} label3={series3Setup.label} showColorFilling={true} plotMode={plotMode} matrixGenerator={matrixGenerator} />
+                    <RunningRqaPlotColor fixationGroups={arrayOfRandomFixationSetsWithLabels} width={500} aoiColors={aoiColors} series2Type={series2Setup.metric} series3Type={series3Setup.metric} label2={series2Setup.label} label3={series3Setup.label} showColorFilling={true} plotMode={plotMode} matrixGenerator={matrixGenerator} />
                     
                 </DemoPlotFrame>
 
