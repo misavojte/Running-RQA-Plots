@@ -72,7 +72,7 @@ export const handleFileUpload = async (files: FileList): Promise<FixationGroup[]
 
     try {
         const fixationGroups = await Promise.all(csvFiles.map(parseCSVFile));
-        return fixationGroups;
+        return fixationGroups.sort((a, b) => a.label.localeCompare(b.label));
     } catch (error) {
         console.error('Error parsing CSV files:', error);
         throw error;
