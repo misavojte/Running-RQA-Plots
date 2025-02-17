@@ -160,7 +160,7 @@
         backgroundColor="transparent"
         x={barX}
         y={0}
-        show
+        hideDoubleIncrease={false}
         colorFilling={colorFilling}
         colorPalette={colorPalette}
     />
