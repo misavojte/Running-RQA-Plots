@@ -366,9 +366,10 @@
             {:else}
                 <strong>{tooltipData.label}</strong><br>
                 Fixation: {tooltipData.fixationIndex}<br>
-                Value: {formatValue(tooltipData.value1)}<br>
-                Value 2: {formatValue(tooltipData.value2)}<br>
-                Value 3: {formatValue(tooltipData.value3)}
+                AOI: {highlightRowIndex !== null ? groupValues[highlightRowIndex].fixations[tooltipData.fixationIndex - 1]?.aoi?.[0] || 'None' : 'None'}<br>
+                Recurrence Rate: {formatValue(tooltipData.value1)}<br>
+                {label2}: {formatValue(tooltipData.value2)}<br>
+                {label3}: {formatValue(tooltipData.value3)}
             {/if}
         </div>
     </div>
@@ -389,6 +390,6 @@
         z-index: 10000;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         font-size: 12px;
-        width: 100px;
+        width: 150px;
     }
 </style> 

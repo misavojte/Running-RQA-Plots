@@ -356,6 +356,7 @@
             {:else}
                 <strong>{tooltipData.label}</strong><br>
                 Fixation: {tooltipData.fixationIndex}<br>
+                AOI: {highlightRowIndex !== null ? groupValues[highlightRowIndex].fixations[tooltipData.fixationIndex - 1]?.aoi || 'None' : 'None'}<br>
                 {seriesType.label}: {formatValue(tooltipData.value)}
                 {#if series2Type && tooltipData.value2 !== null}
                     <br>
@@ -381,6 +382,6 @@
         z-index: 10000;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         font-size: 12px;
-        width: 100px;
+        width: 150px;
     }
 </style> 

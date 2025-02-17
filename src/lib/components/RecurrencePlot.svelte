@@ -12,12 +12,37 @@
   const LABEL_OFFSET = 32;      // Distance of axis labels from plot
   const LEGEND_HEIGHT = 40;     // Base height for one row of legend items
 
+  function calculateLegendHeight(
+    width: number,
+    aoiColors: Array<{ aoi: string; color: string }>,
+  ): { legendHeight: number; legendConstant: number } {
+    const BASE_ITEM_WIDTH = 25;   // Base space for the circle and padding
+    const CHAR_WIDTH = 7;         // Estimated width per character
+    
+    // Calculate max label length
+    const maxLabelLength = Math.max(...aoiColors.map(item => item.aoi.length), 0);
+    const estimatedItemWidth = BASE_ITEM_WIDTH + (maxLabelLength * CHAR_WIDTH);
+    const ITEM_WIDTH = Math.min(estimatedItemWidth, 150);
+    
+    // Calculate rows needed for legend items
+    const AOI_LEGEND_MAX_WIDTH = width - 20;
+    const ITEMS_PER_ROW = Math.max(Math.floor(AOI_LEGEND_MAX_WIDTH / ITEM_WIDTH), 1);
+    const numRows = aoiColors.length > 0 ? Math.ceil(aoiColors.length / ITEMS_PER_ROW) : 0;
+    
+    const legendFixedOffset = 5;  // Base offset for legend elements
+    const AOI_LEGEND_LINE_HEIGHT = 25;  // Height per legend row
+    
+    const legendConstant = (numRows * AOI_LEGEND_LINE_HEIGHT) + legendFixedOffset;
+    const legendHeight = legendConstant;
+    
+    return { legendHeight, legendConstant };
+  }
+
   let { 
     fixations, 
     height = 600, 
     width = 500,
-    pointSize = 4, 
-    highlightColor = "#006FAD",
+    pointSize = 4,
     showGrid = false, 
     gridColor = "#CCCCCC",
     xLabel = "Fixation i",
@@ -32,7 +57,6 @@
     height?: number;
     width?: number;
     pointSize?: number;
-    highlightColor?: string;
     showGrid?: boolean;
     gridColor?: string;
     xLabel?: string;
@@ -116,14 +140,18 @@
 
   // Compute the actual plot size based on available space
   const plotSize = $derived.by(() => {
-    const availableWidth = width - (2 * MARGIN);  // Equal margins on both sides
-    const availableHeight = height - X_AXIS_HEIGHT - LEGEND_HEIGHT;
+    const { legendHeight } = calculateLegendHeight(width, aoiColors);
+    const availableWidth = width - (2 * MARGIN);
+    const availableHeight = height - X_AXIS_HEIGHT - legendHeight;
     return Math.min(availableWidth, availableHeight);
   });
 
   // Compute the centering offsets using plotSize value directly
   const xOffset = $derived.by(() => MARGIN + (width - 2 * MARGIN - plotSize) / 2);
-  const yOffset = $derived.by(() => (height - X_AXIS_HEIGHT - LEGEND_HEIGHT - plotSize) / 2);
+  const yOffset = $derived.by(() => {
+    const { legendHeight } = calculateLegendHeight(width, aoiColors);
+    return (height - X_AXIS_HEIGHT - legendHeight - plotSize) / 2 + 2;
+  });
 
   // Update points calculation to use plotSize value directly
   const points = $derived.by(() => {
@@ -332,8 +360,8 @@
       width={width}
       aoiColors={aoiColors}
       aoiColorsOpacity={1}
-      height={LEGEND_HEIGHT}
-      y={yOffset + plotSize + 40}
+      height={calculateLegendHeight(width, aoiColors).legendHeight}
+      y={yOffset + plotSize + X_AXIS_HEIGHT}
     />
   </svg>
 
