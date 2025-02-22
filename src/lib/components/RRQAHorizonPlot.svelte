@@ -29,7 +29,8 @@
         series2Type = {metric: "corm", label: "Center of Recurrence Mass", colorPalette: ["#ffcccb", "#ff0000"]},
         matrixGenerator = computeRecurrenceMatrix,
         horizonSlices = 3,
-        lineColor = "black"
+        lineColor = "black",
+        minRecurrenceStructureLength = 2
     } = $props<{
         fixationGroups: FixationGroup[];
         width?: number;
@@ -44,6 +45,7 @@
         matrixGenerator?: MatrixGenerator;
         horizonSlices?: number;
         lineColor?: string;
+        minRecurrenceStructureLength?: number;
     }>();
 
     // Calculate the maximum number of fixations across all groups
@@ -56,25 +58,25 @@
             case "recurrenceRate":
                 return computeRecurrenceRate(matrix);
             case "determinism":
-                return computeDeterminism(matrix);
+                return computeDeterminism(matrix, minRecurrenceStructureLength);
             case "determinism2":
-                return computeDeterminism2(matrix);
+                return computeDeterminism2(matrix, minRecurrenceStructureLength);
             case "laminarity":
-                return computeLaminarity(matrix);
+                return computeLaminarity(matrix, minRecurrenceStructureLength);
             case "laminarity2":
-                return computeLaminarity2(matrix);
+                return computeLaminarity2(matrix, minRecurrenceStructureLength);
             case "horizontalLaminarity":
-                return computeHorizontalLaminarity(matrix);
+                return computeHorizontalLaminarity(matrix, minRecurrenceStructureLength);
             case "horizontalLaminarity2":
-                return computeHorizontalLaminarity2(matrix);
+                return computeHorizontalLaminarity2(matrix, minRecurrenceStructureLength);
             case "verticalLaminarity":
-                return computeVerticalLaminarity(matrix);
+                return computeVerticalLaminarity(matrix, minRecurrenceStructureLength);
             case "verticalLaminarity2":
-                return computeVerticalLaminarity2(matrix);
+                return computeVerticalLaminarity2(matrix, minRecurrenceStructureLength);
             case "cfr":
                 return computeConsecutiveFixationRatio(matrix);
             case "avgDiagonalLength":
-                return computeDiagonalLineMetrics(matrix).averageLength;
+                return computeDiagonalLineMetrics(matrix, minRecurrenceStructureLength).averageLength;
             case "corm":
                 return computeCenterOfRecurrenceMass(matrix);
             default:

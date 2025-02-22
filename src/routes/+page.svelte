@@ -14,6 +14,7 @@
 	import { computeDeterminism } from "$lib/utils/recurrenceMetrics.js";
 
     import DemoUpload from "$lib/components/DemoUpload.svelte";
+	import DemoMinLenghtSlider from "$lib/components/DemoSettings.svelte";
 
     const fixations = [
         { id: 1, timestamp: 100, aoi: ["AOI1"], x: 100, y: 100},
@@ -101,6 +102,8 @@
         label: series3Type.charAt(0).toUpperCase() + series3Type.slice(1),
     }));
 
+    let minRecurrenceStructureLength = $state(2);
+
 </script>
 
 {#snippet tooltipSnippet(aoiLabel: string, fixationLabel: string)}
@@ -127,6 +130,7 @@
                             Our innovation, <span class="font-medium">Running RQA (RRQA)</span>, displays these metrics as continuous, evolving plots, enabling intuitive, direct comparisons of gaze behavior over time.
                         </p>
                     </div> 
+                    <DemoMinLenghtSlider bind:minRecurrenceStructureLength />
                     <DemoUpload bind:fixationGroups={arrayOfRandomFixationSetsWithLabels} />
                 </DemoPlotFrame>
                 <DemoPlotFrame title="Recurrence Plot">
@@ -180,6 +184,7 @@
                                     showRisingPoints={false}
                                     aoiColors={aoiColors} 
                                     matrixGenerator={matrixGenerator}
+                                    minRecurrenceStructureLength={minRecurrenceStructureLength}
                                 />
                             {/if}
                         </div>
@@ -201,6 +206,7 @@
                                 showGrid={true}
                                 aoiColors={aoiColors}
                                 matrixGenerator={matrixGenerator}
+                                minRecurrenceStructureLength={minRecurrenceStructureLength}
                             />
                         {/if}
                     </div>
@@ -238,7 +244,19 @@
                         <option value="normalized">Normalized</option>
                     </select> -->
                 </div>
-                    <RunningRqaPlotColor fixationGroups={arrayOfRandomFixationSetsWithLabels} width={500} aoiColors={aoiColors} series2Type={series2Setup.metric} series3Type={series3Setup.metric} label2={series2Setup.label} label3={series3Setup.label} showColorFilling={true} plotMode={plotMode} matrixGenerator={matrixGenerator} />
+                    <RunningRqaPlotColor 
+                        fixationGroups={arrayOfRandomFixationSetsWithLabels}
+                        width={500}
+                        aoiColors={aoiColors}
+                        series2Type={series2Setup.metric}
+                        series3Type={series3Setup.metric}
+                        label2={series2Setup.label}
+                        label3={series3Setup.label} 
+                        showColorFilling={true} 
+                        plotMode={plotMode} 
+                        matrixGenerator={matrixGenerator} 
+                        minRecurrenceStructureLength={minRecurrenceStructureLength}
+                    />
                     
                 </DemoPlotFrame>
 
@@ -279,6 +297,7 @@
                     horizonSlices={3}
                     seriesType={horizonSeriesSetup[0]}
                     series2Type={horizonSeriesSetup[1]}
+                    minRecurrenceStructureLength={minRecurrenceStructureLength}
                 />
                 </DemoPlotFrame>
             </div>

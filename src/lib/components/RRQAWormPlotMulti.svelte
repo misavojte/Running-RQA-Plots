@@ -11,7 +11,7 @@
         fixations: Fixation[];
     }
   
-    let { fixationGroups, metric = "recurrenceRate", width = 500, height = "auto", lineColor = "black", backgroundColor = "white", gridColor = "#CCCCCC", showGrid = false, tooltipSnippet = null, showRisingPoints = false, aoiColors = [], matrixGenerator = computeRecurrenceMatrix } = $props<{
+    let { fixationGroups, metric = "recurrenceRate", width = 500, height = "auto", lineColor = "black", backgroundColor = "white", gridColor = "#CCCCCC", showGrid = false, tooltipSnippet = null, showRisingPoints = false, aoiColors = [], matrixGenerator = computeRecurrenceMatrix, minRecurrenceStructureLength = 2 } = $props<{
         fixationGroups: FixationGroup[];
         metric: "determinism" | "determinism2" | "recurrenceRate" | "laminarity" | "laminarity2" | "horizontalLaminarity" | "verticalLaminarity" | "horizontalLaminarity2" | "verticalLaminarity2" | "detLamDifference" | "avgDiagonalLength" | "corm";
         width?: number;
@@ -24,6 +24,7 @@
         tooltipSnippet?: Snippet<[{ x: number; y: number; value: number | null; label: string; fixationIndex: number }]> | null;
         aoiColors?: Array<{ aoi: string; color: string }>;
         matrixGenerator?: MatrixGenerator;
+        minRecurrenceStructureLength?: number;
     }>();
 
     // Calculate the maximum number of fixations across all groups
@@ -45,25 +46,25 @@
                 if (metric === "recurrenceRate") {
                     result.push(computeRecurrenceRate(matrix));
                 } else if (metric === "determinism") {
-                    result.push(computeDeterminism(matrix));
+                    result.push(computeDeterminism(matrix, minRecurrenceStructureLength));
                 } else if (metric === "determinism2") {
-                    result.push(computeDeterminism2(matrix));
+                    result.push(computeDeterminism2(matrix, minRecurrenceStructureLength));
                 } else if (metric === "laminarity") {   
-                    result.push(computeLaminarity(matrix));
+                    result.push(computeLaminarity(matrix, minRecurrenceStructureLength));
                 } else if (metric === "laminarity2") {
-                    result.push(computeLaminarity2(matrix));
+                    result.push(computeLaminarity2(matrix, minRecurrenceStructureLength));
                 } else if (metric === "horizontalLaminarity") {
-                    result.push(computeHorizontalLaminarity(matrix));
+                    result.push(computeHorizontalLaminarity(matrix, minRecurrenceStructureLength));
                 } else if (metric === "verticalLaminarity") {
-                    result.push(computeVerticalLaminarity(matrix));
+                    result.push(computeVerticalLaminarity(matrix, minRecurrenceStructureLength));
                 } else if (metric === "horizontalLaminarity2") {
-                    result.push(computeHorizontalLaminarity2(matrix));
+                    result.push(computeHorizontalLaminarity2(matrix, minRecurrenceStructureLength));
                 } else if (metric === "verticalLaminarity2") {
-                    result.push(computeVerticalLaminarity2(matrix));
+                    result.push(computeVerticalLaminarity2(matrix, minRecurrenceStructureLength));
                 } else if (metric === "detLamDifference") {
-                    result.push(computeDetLamDifference(matrix));
+                    result.push(computeDetLamDifference(matrix, minRecurrenceStructureLength));
                 } else if (metric === "avgDiagonalLength") {
-                    result.push(computeDiagonalLineMetrics(matrix).averageLength);
+                    result.push(computeDiagonalLineMetrics(matrix, minRecurrenceStructureLength).averageLength);
                 } else if (metric === "corm") {
                     result.push(computeCenterOfRecurrenceMass(matrix));
                 }
