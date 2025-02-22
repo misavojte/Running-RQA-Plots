@@ -29,7 +29,7 @@
     const ITEMS_PER_ROW = Math.max(Math.floor(AOI_LEGEND_MAX_WIDTH / ITEM_WIDTH), 1);
     const numRows = aoiColors.length > 0 ? Math.ceil(aoiColors.length / ITEMS_PER_ROW) : 0;
     
-    const legendFixedOffset = 5;  // Base offset for legend elements
+    const legendFixedOffset = 10;  // Base offset for legend elements
     const AOI_LEGEND_LINE_HEIGHT = 25;  // Height per legend row
     
     const legendConstant = (numRows * AOI_LEGEND_LINE_HEIGHT) + legendFixedOffset;
