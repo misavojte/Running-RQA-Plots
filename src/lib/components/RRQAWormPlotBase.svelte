@@ -1,9 +1,9 @@
 <script lang="ts">
-    import RunningRQAPlotBarGeneric from "./RunningRQAPlotBarLine.svelte";
+    import RunningRQAPlotBarGeneric from "./RRQAWormPlotBar.svelte";
     import type { Fixation } from "../types/Fixation.js";
 	import type { Snippet } from "svelte";
-    import XAxis from "./RunningRQAPlotXAxis.svelte";
-	import RunningRqaPlotLegend from "./RunningRQAPlotLegend.svelte";
+    import XAxis from "./GenericPlotXAxis.svelte";
+	import RunningRqaPlotLegend from "./RRQAWormPlotLegened.svelte";
 	import { fade } from "svelte/transition";
   
     let { width = 500, height = "auto", lineColor = "black", backgroundColor = "white", gridColor = "#CCCCCC", showGrid = false, showRisingPoints = false, tooltipSnippet = null, aoiColors = [], plotData = [], rowGap = 4 } = $props<{

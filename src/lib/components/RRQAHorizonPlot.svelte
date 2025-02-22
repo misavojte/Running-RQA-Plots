@@ -2,13 +2,15 @@
     import { computeCenterOfRecurrenceMass, computeConsecutiveFixationRatio, computeDeterminism, computeDeterminism2, computeDetLamDifference, computeDiagonalLineMetrics, computeHorizontalLaminarity, computeHorizontalLaminarity2, computeLaminarity, computeLaminarity2, computeRecurrenceRate, computeVerticalLaminarity, computeVerticalLaminarity2 } from "../utils/recurrenceMetrics.js";
     import { computeRecurrenceMatrix } from "../utils/recurrenceMatrix.js";
     import type { Fixation } from "../types/Fixation.js";
-	import type { Snippet } from "svelte";
-	import RunningRQAPlotBarColor from "./RunningRQAPlotBarColor.svelte";
-	import type { MatrixGenerator } from "../types/MatrixGenerator.ts";
-	import RunningRQAPlotXAxis from "./RunningRQAPlotXAxis.svelte";
-	import RunningRqaPlotBarColorGradient from "./RunningRQAPlotBarColorGradient.svelte";
-	import { fade } from "svelte/transition";
-    import RunningRqaPlotColorLegend from "./RunningRQAPlotColorLegend.svelte";
+    import type { Snippet } from "svelte";
+    import RrqaPlotBarHorizon from "./RRQAHorizonPlotBar.svelte";
+    import type { MatrixGenerator } from "../types/MatrixGenerator.js";
+    import RunningRQAPlotXAxis from "./GenericPlotXAxis.svelte";
+    import { fade } from "svelte/transition";
+    import RRQAPlotHorizonLegend from "./RRQAHorizonPlotLegend.svelte";
+    import { createColorGradient } from "../utils/colorUtils.js";
+    import type { HorizonPlotSeriesSetup, HorizonPlotBarVector } from "../types/PlotMetric.js";
+
     interface FixationGroup {
         label: string;
         fixations: Fixation[];
@@ -16,20 +18,32 @@
 
     type SeriesHighlightType = "determinism" | "laminarity" | "determinism2" | "laminarity2" | "horizontalLaminarity" | "verticalLaminarity" | "horizontalLaminarity2" | "verticalLaminarity2" | "recurrenceRate" | "cfr" | "avgDiagonalLength" | "corm"
   
-    let { fixationGroups, width = 500, height = "auto", backgroundColor = "white", tooltipSnippet = null, aoiColors = [], series2Type = "determinism2", series3Type = "laminarity2", showColorFilling = false, plotMode = "rises", matrixGenerator = computeRecurrenceMatrix, label2, label3 } = $props<{
+    let { 
+        fixationGroups, 
+        width = 500, 
+        height = "auto", 
+        backgroundColor = "white",
+        showGrid = false, 
+        tooltipSnippet = null, 
+        seriesType = {metric: "determinism", label: "Determinism", colorPalette: ["#aacfe3", "#0170ad"]},
+        series2Type = {metric: "corm", label: "Center of Recurrence Mass", colorPalette: ["#ffcccb", "#ff0000"]},
+        matrixGenerator = computeRecurrenceMatrix,
+        horizonSlices = 3,
+        lineColor = "black"
+    } = $props<{
         fixationGroups: FixationGroup[];
         width?: number;
         height?: number | "auto";
         backgroundColor?: string;
-        series2Type?: SeriesHighlightType;
-        series3Type?: SeriesHighlightType;
+        colorPalette?: string[];
+        colorPalette2?: string[];
+        showGrid?: boolean;
+        seriesType?: HorizonPlotSeriesSetup;
+        series2Type?: HorizonPlotSeriesSetup | null;
         tooltipSnippet?: Snippet<[{ x: number; y: number; value: number | null; label: string; fixationIndex: number }]> | null;
-        aoiColors?: Array<{ aoi: string; color: string }>;
-        showColorFilling?: boolean;
-        plotMode?: "rises" | "normalized";
         matrixGenerator?: MatrixGenerator;
-        label2?: string;
-        label3?: string;
+        horizonSlices?: number;
+        lineColor?: string;
     }>();
 
     // Calculate the maximum number of fixations across all groups
@@ -37,13 +51,10 @@
         return Math.max(...fixationGroups.map((group: FixationGroup) => group.fixations.length));
     });
 
-    const calculateTrendValue = (currentValue: number, previousValue: number, mode: "rises") => {
-        if (previousValue === null || currentValue === null || previousValue === undefined || currentValue === undefined ||currentValue === 0) return 0;
-        return currentValue > previousValue ? 1 : 0;
-    }
-
     const calculateValue = (matrix: number[][], type: SeriesHighlightType) => {
         switch (type) {
+            case "recurrenceRate":
+                return computeRecurrenceRate(matrix);
             case "determinism":
                 return computeDeterminism(matrix);
             case "determinism2":
@@ -73,73 +84,47 @@
 
     // Modify groupValues calculation
     let groupValues = $derived.by(() => {
-
         return fixationGroups.map((group: FixationGroup) => {
-            const matrices = [];
-            const series1 = [];
+            const series = [];
             const series2 = [];
-            const series3 = [];
-            let series2original: number[] = [];
-            let series3original: number[] = [];
-            
-
-            let previousSeries2 = 0;
-            let previousSeries3 = 0;
             for (let i = 0; i < group.fixations.length; i++) {
                 const matrix = matrixGenerator(group.fixations.slice(0, i + 1));
-                matrices.push(matrix);
-                const currentSeries2 = calculateValue(matrix, series2Type);
-                const currentSeries3 = calculateValue(matrix, series3Type);
-                series1.push(computeRecurrenceRate(matrix));
-                if (plotMode === "normalized") {
-                    series2.push(currentSeries2);
-                    series3.push(currentSeries3);
-                } else {
-                    series2.push(calculateTrendValue(currentSeries2, previousSeries2, plotMode));
-                    series3.push(calculateTrendValue(currentSeries3, previousSeries3, plotMode));
+                series.push(calculateValue(matrix, seriesType.metric));
+                if (series2Type) {
+                    series2.push(calculateValue(matrix, series2Type.metric));
                 }
-                series2original.push(currentSeries2);
-                series3original.push(currentSeries3);
-                previousSeries2 = currentSeries2;
-                previousSeries3 = currentSeries3;
             }
                 
             // Pad with null values if this group has fewer fixations
-            while (series1.length < maxFixations) {
-                series1.push(null);
-                series2.push(null);
-                series3.push(null);
+            while (series.length < maxFixations) {
+                series.push(null);
             }
             
             return {
                 label: group.label,
-                series1: series1,
+                series: series,
                 series2: series2,
-                series2original: series2original,
-                series3: series3,
-                series3original: series3original,
                 fixations: group.fixations
             };
         });
     });
 
-    // --- NEW: compute proper plot dimensions (inspired by BaseRQAPlot.svelte) ---
+    // Dimensions
     const LABEL_WIDTH = 100;
     const labelWidth = $derived.by(() => LABEL_WIDTH);
     const RIGHT_LABEL_WIDTH = 50;
     const plotWidth = width - LABEL_WIDTH - RIGHT_LABEL_WIDTH;
-    const BAR_HEIGHT = 50; // each group's bar height
-    const BAR_GAP = 4; // gap between rows
+    const BAR_HEIGHT = 50;
+    const BAR_GAP = 4;
     const X_AXIS_EXTRA = 30;
 
-    // --- TOOLTIP STATE & HANDLERS ---
+    // Tooltip and highlight state
     let plotContainer: HTMLDivElement;
     let tooltipData: {
         x: number;
         y: number;
-        value1: number | null;
+        value: number | null;
         value2: number | null;
-        value3: number | null;
         label: string;
         fixationIndex: number;
     } | null = $state(null);
@@ -147,7 +132,7 @@
     let highlightIndex = $state<number | null>(null);
     let highlightRowIndex = $state<number | null>(null);
 
-    // Add throttle state
+    // Mouse interaction handling
     let lastMouseMoveTime = $state(0);
     const FRAME_TIME = 1000 / 40;
     let segmentWidth = $derived.by(() => plotWidth / maxFixations);
@@ -177,9 +162,8 @@
             tooltipData = {
                 x: event.clientX,
                 y: event.clientY,
-                value1: group.series1[index],
-                value2: group.series2original[index],
-                value3: group.series3original[index],
+                value: group.series[index],
+                value2: series2Type ? group.series2[index] : null,
                 label: group.label,
                 fixationIndex: index + 1
             };
@@ -194,48 +178,55 @@
         highlightRowIndex = null;
     }
 
-    // Add legend height calculation functions
-    function calculateLegendHeight(
-        width: number,
-        aoiColors: Array<{ aoi: string; color: string }>,
-        barHeight: number
-    ): { legendHeight: number; legendConstant: number } {
-        const BASE_ITEM_WIDTH = 25;
-        const CHAR_WIDTH = 7;
-        const LEGEND_MARGIN = 80;
+    // Legend height calculation
+    function calculateLegendHeight(barHeight: number, hasSeries2: boolean): { legendHeight: number; legendConstant: number } {
+        // Constants from RRQAPlotHorizonLegend
+        const EXAMPLE_BAR_HEIGHT = 40;
+        const SMALL_BAR_HEIGHT = 20;
+        const TEXT_OFFSET = 12;
         
-        const maxLabelLength = Math.max(...aoiColors.map(item => item.aoi.length), 0);
-        const estimatedItemWidth = BASE_ITEM_WIDTH + (maxLabelLength * CHAR_WIDTH);
-        const ITEM_WIDTH = Math.min(estimatedItemWidth, 150);
+        // Calculate total height needed
+        let totalHeight = 0;
         
-        const AOI_LEGEND_MAX_WIDTH = width - 20;
-        const ITEMS_PER_ROW = Math.max(Math.floor(AOI_LEGEND_MAX_WIDTH / ITEM_WIDTH), 1);
-        const numRows = aoiColors.length > 0 ? Math.ceil(aoiColors.length / ITEMS_PER_ROW) : 0;
+        // Main example section (includes the example bar and spacing)
+        totalHeight += 25 + EXAMPLE_BAR_HEIGHT;  // 25px is the initial y-offset
         
-        const legendFixedOffset = 75;
-        const AOI_LEGEND_LINE_HEIGHT = 25;
+        // Explanation text section
+        totalHeight += 20;  // Space between example and first text
+        totalHeight += 20;  // Space for "n slices" text
+        totalHeight += 10;  // Space before series1 label
+        totalHeight += 10;  // Space after series1 label
         
-        const legendConstant = (numRows * AOI_LEGEND_LINE_HEIGHT) + legendFixedOffset + LEGEND_MARGIN;
-        const legendHeight = barHeight + legendConstant;
+        // Range examples section
+        totalHeight += SMALL_BAR_HEIGHT + TEXT_OFFSET;  // First range examples with labels
         
-        return { legendHeight, legendConstant };
+        // Add height for second series if present
+        if (hasSeries2) {
+            totalHeight += 38;  // Space between series + SMALL_BAR_HEIGHT for series 2
+            totalHeight += 32;  // Space for series2 label and padding
+        }
+        
+        const legendConstant = totalHeight;
+        
+        return { 
+            legendHeight: totalHeight,
+            legendConstant: legendConstant
+        };
     }
 
     // Compute dimensions
     function computeAutoDimensions() {
         const plotAreaHeight = (fixationGroups.length * BAR_HEIGHT) + ((fixationGroups.length - 1) * BAR_GAP);
-        const { legendHeight } = calculateLegendHeight(width, aoiColors, BAR_HEIGHT);
+        const { legendHeight } = calculateLegendHeight(BAR_HEIGHT, !!series2Type);
         const totalHeight = plotAreaHeight + legendHeight + X_AXIS_EXTRA;
         return { plotAreaHeight, legendHeight, totalHeight };
     }
 
-    // Update height calculations
     const dimensions = $derived.by(() => {
         if (height === "auto") {
             return computeAutoDimensions();
         }
-        // If height is fixed, adjust legend accordingly
-        const { legendHeight } = calculateLegendHeight(width, aoiColors, BAR_HEIGHT);
+        const { legendHeight } = calculateLegendHeight(BAR_HEIGHT, !!series2Type);
         const plotAreaHeight = (fixationGroups.length * BAR_HEIGHT) + ((fixationGroups.length - 1) * BAR_GAP);
         return {
             plotAreaHeight,
@@ -244,22 +235,46 @@
         };
     });
 
-    // Update derived values
+    $effect(() => {
+        console.log(groupValues);
+    });
     const plotAreaHeight = $derived.by(() => dimensions.plotAreaHeight);
     const legendHeight = $derived.by(() => dimensions.legendHeight);
     const totalHeight = $derived.by(() => dimensions.totalHeight);
+    const series1Palette = $derived.by(() => createColorGradient(seriesType.colorPalette[0], seriesType.colorPalette[1], horizonSlices, 'rgb'));
+    const series2Palette = $derived.by(() => createColorGradient(series2Type.colorPalette[0], series2Type.colorPalette[1], horizonSlices, 'rgb'));
+    const horizonSeries1: HorizonPlotBarVector[] = $derived.by(() => (
+        groupValues.map((group: any) => {
+            return {
+                values: group.series,
+                horizonSlicesColors: series1Palette
+            }
+        })
+    ));
+    const horizonSeries2: HorizonPlotBarVector[] | null = $derived.by(() => {
+        if (series2Type) {
+            return groupValues.map((group: any) => {
+                return {
+                    values: group.series2,
+                    horizonSlicesColors: series2Palette
+                }
+            })
+        }
+        return null;
+    });
 </script>
 
-<!-- Wrap everything in a single SVG so the bars and x-axis share the same coordinate system -->
 <div class="plot-container" bind:this={plotContainer}>
-    <svg width={width} height={totalHeight} style="background: {backgroundColor};" 
+    <svg 
+        width={width} 
+        height={totalHeight} 
+        style="background: {backgroundColor};" 
         onmousemove={handleMouseMove} 
-        onmouseleave={handleMouseLeave} 
-        aria-label="Running RQA Plot" 
+        onmouseleave={handleMouseLeave}
+        aria-label="Running RQA Horizon Plot" 
         role="img"
     >
         {#key groupValues}
-            <!-- Add participant labels -->
             {#each groupValues as group, index}
                 <text 
                     x={labelWidth - 5}
@@ -269,45 +284,18 @@
                     font-size="12px"
                     fill="black"
                 >{group.label}</text>
-                {#if plotMode === "rises" || plotMode === "risesAndSteady"}
-                <RunningRQAPlotBarColor 
-                    series1={group.series1} 
-                    series2={group.series2} 
-                    series3={group.series3}
+                
+                <RrqaPlotBarHorizon
                     width={plotWidth} 
                     height={BAR_HEIGHT} 
-                    backgroundColor={backgroundColor} 
+                    backgroundColor={backgroundColor}
                     y={index * (BAR_HEIGHT + BAR_GAP)}
                     x={LABEL_WIDTH}
-                    hideDoubleIncrease={false}
-                    colorFilling={
-                        showColorFilling ? group.fixations.map((f: { aoi?: string[] }) => {
-                            const aoiMapping = aoiColors.find((ac: { aoi: string; color: string }) => ac.aoi === f.aoi?.[0]);
-                            return aoiMapping?.color ?? 'gray';
-                        }) : null
-                    }
+                    horizonSeries1={horizonSeries1[index]}
+                    horizonSeries2={horizonSeries2 ? horizonSeries2[index] : null}
                 />
-                {:else if plotMode === "normalized"}
-                <RunningRqaPlotBarColorGradient 
-                    series1={group.series1} 
-                    series2={group.series2} 
-                    series3={group.series3} 
-                    width={plotWidth} 
-                    height={BAR_HEIGHT} 
-                    backgroundColor={backgroundColor} 
-                    y={index * (BAR_HEIGHT + BAR_GAP)}
-                    x={LABEL_WIDTH}
-                    colorFilling={
-                        showColorFilling ? group.fixations.map((f: { aoi?: string[] }) => {
-                            const aoiMapping = aoiColors.find((ac: { aoi: string; color: string }) => ac.aoi === f.aoi?.[0]);
-                            return aoiMapping?.color ?? 'gray';
-                        }) : null
-                    }
-                />
-                {/if}
             {/each}
 
-            <!-- Existing highlight rects -->
             {#if highlightIndex !== null && highlightRowIndex !== null}
                 <rect
                     class="highlight-rect transition-all"
@@ -336,23 +324,25 @@
                 width={plotWidth} 
                 height={plotAreaHeight} 
                 labelWidth={LABEL_WIDTH} 
-                maxFixations={maxFixations} />
+                maxFixations={maxFixations} 
+            />
 
-            <!-- Add legend -->
-            <RunningRqaPlotColorLegend 
+            <RRQAPlotHorizonLegend 
                 width={width} 
                 y={plotAreaHeight + X_AXIS_EXTRA} 
-                height={legendHeight}
-                barHeight={BAR_HEIGHT} 
-                aoiColors={aoiColors} 
-                label2={label2}
-                label3={label3}
+                height={legendHeight} 
+                barHeight={BAR_HEIGHT}
+                lineColor={lineColor}
+                horizonSeries1={horizonSeries1[0]}
+                horizonSeries2={horizonSeries2 ? horizonSeries2[0] : null}
+                label1={seriesType.label}
+                label2={series2Type ? series2Type.label : null}
             />
         {/key}
     </svg>
 </div>
 
-{#if tooltipData && tooltipData.value1 !== null}
+{#if tooltipData && tooltipData.value !== null}
     <div style="position: absolute; top: 0; left: 0; pointer-events: none;">
         <div 
             class="tooltip"
@@ -366,10 +356,12 @@
             {:else}
                 <strong>{tooltipData.label}</strong><br>
                 Fixation: {tooltipData.fixationIndex}<br>
-                AOI: {highlightRowIndex !== null ? groupValues[highlightRowIndex].fixations[tooltipData.fixationIndex - 1]?.aoi?.[0] || 'None' : 'None'}<br>
-                Recurrence Rate: {formatValue(tooltipData.value1)}<br>
-                {label2}: {formatValue(tooltipData.value2)}<br>
-                {label3}: {formatValue(tooltipData.value3)}
+                AOI: {highlightRowIndex !== null ? groupValues[highlightRowIndex].fixations[tooltipData.fixationIndex - 1]?.aoi || 'None' : 'None'}<br>
+                {seriesType.label}: {formatValue(tooltipData.value)}
+                {#if series2Type && tooltipData.value2 !== null}
+                    <br>
+                    {series2Type.label}: {formatValue(tooltipData.value2)}
+                {/if}
             {/if}
         </div>
     </div>

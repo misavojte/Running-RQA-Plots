@@ -1,5 +1,5 @@
 <script lang="ts">
-    import RunningRQAPlotBarGeneric from "./RunningRQAPlotBarLine.svelte";
+    import RunningRQAPlotBarGeneric from "./RRQAWormPlotBar.svelte";
 
     let { width, y, height, barHeight, lineColor="black", aoiColors = [], aoiColorsOpacity = 0.2, showRisingPoints = false } = $props<{
         width: number;

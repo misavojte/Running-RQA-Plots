@@ -1,12 +1,12 @@
 <script lang="ts">
 	import DemoPlotFrame from "$lib/components/DemoPlotFrame.svelte";
-	import FocusedRqaPlot from "$lib/components/FocusedRQAPlot.svelte";
+	import FocusedRqaPlot from "$lib/components/RRQAWormPlotSingle.svelte";
 
 
 	import RecurrencePlot from "$lib/components/RecurrencePlot.svelte";
-	import RrqaPlotHorizon from "$lib/components/RRQAPlotHorizon.svelte";
-	import RunningRqaPlot from "$lib/components/RunningRQAPlot.svelte";
-	import RunningRqaPlotColor from "$lib/components/RunningRQAPlotColor.svelte";
+	import RrqaPlotHorizon from "$lib/components/RRQAHorizonPlot.svelte";
+	import RunningRqaPlot from "$lib/components/RRQAWormPlotMulti.svelte";
+	import RunningRqaPlotColor from "$lib/components/RRQAFencePlot.svelte";
 	import type { MatrixGenerator } from "$lib/types/MatrixGenerator.js";
 
     import { assignRandomColorToAoi, getUniqueAois } from '$lib/utils/colorUtils.js';

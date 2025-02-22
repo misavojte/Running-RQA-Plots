@@ -3,8 +3,8 @@
     import { computeRecurrenceMatrix } from "../utils/recurrenceMatrix.js";
     import type { Fixation } from "../types/Fixation.js";
 	import type { Snippet } from "svelte";
-	import BaseRqaPlot from "./BaseRQAPlot.svelte";
-    import type { MatrixGenerator } from "../types/MatrixGenerator.ts";
+	import BaseRqaPlot from "./RRQAWormPlotBase.svelte";
+    import type { MatrixGenerator } from "../types/MatrixGenerator.js";
 
     interface FixationGroup {
         label: string;

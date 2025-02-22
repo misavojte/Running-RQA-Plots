@@ -1,5 +1,5 @@
 <script lang="ts">
-	import RrqaPlotBarHorizon from "./RRQAPlotBarHorizon.svelte";
+	import RrqaPlotBarHorizon from "./RRQAHorizonPlotBar.svelte";
 	import type { HorizonPlotBarVector } from "$lib/types/PlotMetric.js";
 
     let { 

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import RunningRqaPlotBarColor from "./RunningRQAPlotBarColor.svelte";
+	import RunningRqaPlotBarColor from "./RRQAFencePlotBarDiscrete.svelte";
 
     let { width, y, height, barHeight, aoiColors = [], aoiColorsOpacity = 0.2, colorPalette = [["#d3d3d3", "#5c9cad"], ["#b75252", "#4e3d42"]], label1 = "Recurrence Rate", label2 = "Determinism", label3 = "Laminarity" } = $props<{
         width: number;
