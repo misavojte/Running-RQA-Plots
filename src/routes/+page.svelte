@@ -115,8 +115,8 @@
 {/snippet}
 
 <div class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
-    <main class="p-8 max-w-screen-xl mx-auto">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <main class="p-8 max-w-screen-xl 3xl:max-w-[1800px] mx-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-2 3xl:grid-cols-3 gap-8">
                     <DemoPlotFrame title="RRQA visualizations for eye-tracking" level="h1">
                     <div class="flex flex-col items-center justify-center max-w-lg mx-auto gap-4">
                         <p class="text-gray-700 leading-relaxed">
