@@ -14,7 +14,7 @@
 	import { computeDeterminism } from "$lib/utils/recurrenceMetrics.js";
 
     import DemoUpload from "$lib/components/DemoUpload.svelte";
-	import DemoMinLenghtSlider from "$lib/components/DemoSettings.svelte";
+	import DemoSettings from "$lib/components/DemoSettings.svelte";
 
     const fixations = [
         { id: 1, timestamp: 100, aoi: ["AOI1"], x: 100, y: 100},
@@ -53,7 +53,6 @@
         {label: "Participant 3", fixations: fixations.slice(0, 10).sort(() => Math.random() - 0.5)},
         {label: "Participant 4", fixations: fixations.slice(0, 18).sort(() => Math.random() - 0.5)},
     ]);
-    let fileInput: HTMLInputElement;
     let aoiColors = $derived.by(() => assignRandomColorToAoi(getUniqueAois(arrayOfRandomFixationSetsWithLabels)));
     let matrixGenerator: MatrixGenerator = $state(computeRecurrenceMatrix);
 
@@ -130,7 +129,7 @@
                             Our innovation, <span class="font-medium">Running RQA (RRQA)</span>, displays these metrics as continuous, evolving plots, enabling intuitive, direct comparisons of gaze behavior over time.
                         </p>
                     </div> 
-                    <DemoMinLenghtSlider bind:minRecurrenceStructureLength />
+                    <DemoSettings bind:minRecurrenceStructureLength bind:matrixGenerator />
                     <DemoUpload bind:fixationGroups={arrayOfRandomFixationSetsWithLabels} />
                 </DemoPlotFrame>
                 <DemoPlotFrame title="Recurrence Plot">
@@ -147,7 +146,6 @@
                                 height={500} 
                                 width={500}
                                 pointSize={4} 
-                                highlightColor="#006FAD" 
                                 showGrid={true} 
                                 aoiColors={aoiColors} 
                                 tooltipSnippet={tooltipSnippet} 
@@ -296,6 +294,7 @@
                     backgroundColor="transparent" 
                     horizonSlices={3}
                     seriesType={horizonSeriesSetup[0]}
+                    matrixGenerator={matrixGenerator}
                     series2Type={horizonSeriesSetup[1]}
                     minRecurrenceStructureLength={minRecurrenceStructureLength}
                 />

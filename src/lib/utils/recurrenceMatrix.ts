@@ -34,10 +34,10 @@ export const computeRecurrenceMatrix = (fixations: Fixation[]): number[][] => {
  * @returns The Euclidean distance.
  */
 const euclideanDistance = (fix1: Fixation, fix2: Fixation): number => {
-  if (!fix1.x || !fix1.y || !fix2.x || !fix2.y) return 999;
+  if (typeof fix1.x !== 'number' || typeof fix1.y !== 'number' || 
+      typeof fix2.x !== 'number' || typeof fix2.y !== 'number') return 999;
   const dx = fix1.x - fix2.x;
   const dy = fix1.y - fix2.y;
-  console.log(dx, dy, Math.sqrt(dx * dx + dy * dy));
   return Math.sqrt(dx * dx + dy * dy);
 };
 
@@ -82,7 +82,7 @@ export const computeEuclideanRecurrenceMatrix = (fixations: Fixation[], threshol
         // If the Euclidean distance is less than the threshold,
         // mark recurrence only if the fixations belong to different groups.
         if (euclideanDistance(fixations[i], fixations[j]) < threshold) {
-          matrix[i][j] = (groupIndices[i] === groupIndices[j]) ? 0 : 1;
+          matrix[i][j] = 1;
         } else {
           matrix[i][j] = 0;
         }
