@@ -155,6 +155,27 @@
                     </div>
                 </DemoPlotFrame>
 
+                <DemoPlotFrame title="RRQA Worm Plot (Single)">
+                    <div class="flex flex-col items-center justify-center">
+                        {#if arrayOfRandomFixationSetsWithLabels.length > 0}
+                            <select bind:value={selectedParticipantIndex} class="bg-gray-200 p-1 rounded-md border-gray-300 border mb-4 text-sm">
+                                {#each arrayOfRandomFixationSetsWithLabels as participant, index}
+                                    <option value={index}>{participant.label}</option>
+                                {/each}
+                            </select>
+                            <FocusedRqaPlot
+                                fixationGroup={arrayOfRandomFixationSetsWithLabels[selectedParticipantIndex]}
+                                width={500}
+                                lineColor="#006FAD"
+                                showGrid={true}
+                                aoiColors={aoiColors}
+                                matrixGenerator={matrixGenerator}
+                                minRecurrenceStructureLength={minRecurrenceStructureLength}
+                            />
+                        {/if}
+                    </div>
+                </DemoPlotFrame>
+
                 <DemoPlotFrame title="RRQA Worm Plot (Participants)">
                     <div class="flex flex-col items-center justify-center">
                         <select bind:value={metric} class="mb-4 bg-gray-200 p-1 rounded-md border-gray-300 border text-sm">
@@ -189,26 +210,6 @@
                     </div>
                 </DemoPlotFrame>
 
-                <DemoPlotFrame title="RRQA Worm Plot (Single)">
-                    <div class="flex flex-col items-center justify-center">
-                        {#if arrayOfRandomFixationSetsWithLabels.length > 0}
-                            <select bind:value={selectedParticipantIndex} class="bg-gray-200 p-1 rounded-md border-gray-300 border mb-4 text-sm">
-                                {#each arrayOfRandomFixationSetsWithLabels as participant, index}
-                                    <option value={index}>{participant.label}</option>
-                                {/each}
-                            </select>
-                            <FocusedRqaPlot
-                                fixationGroup={arrayOfRandomFixationSetsWithLabels[selectedParticipantIndex]}
-                                width={500}
-                                lineColor="#006FAD"
-                                showGrid={true}
-                                aoiColors={aoiColors}
-                                matrixGenerator={matrixGenerator}
-                                minRecurrenceStructureLength={minRecurrenceStructureLength}
-                            />
-                        {/if}
-                    </div>
-                </DemoPlotFrame>
                 <DemoPlotFrame title="RRQA Fence Plot">
                     <div class="flex flex-row items-center justify-center gap-4">
                     <select bind:value={series2Type} class="bg-gray-200 p-1 rounded-md border-gray-300 border mb-4 text-sm">
