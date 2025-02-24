@@ -1,58 +1,46 @@
-# create-svelte
+# Running Recurrence Quantification Analysis (RRQA) Visualizations
 
-Everything you need to build a Svelte library, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/main/packages/create-svelte).
+This repository contains the source code for the RRQA visualizations, a Svelte, SvelteKit, TailwindCSS, and TypeScript application.
 
-Read more about creating a library [in the docs](https://svelte.dev/docs/kit/packaging).
+## Running the application
 
-## Creating a project
+### Prerequisites
 
-If you're seeing this, you've probably already done this step. Congrats!
+- Node.js (v18 or higher)
+- npm (comes with Node.js)
+
+### Installation
+
+From the root directory, run:
 
 ```bash
-# create a new project in the current directory
-npx sv create
-
-# create a new project in my-app
-npx sv create my-app
+npm install
 ```
 
-## Developing
+### Running the development server
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+From the root directory, run:
 
 ```bash
 npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
 ```
 
-Everything inside `src/lib` is part of your library, everything inside `src/routes` can be used as a showcase or preview app.
+This will start the development server on `http://localhost:5173`.
 
-## Building
+### Building the application
 
-To build your library:
-
-```bash
-npm run package
-```
-
-To create a production version of your showcase app:
+From the root directory, run:
 
 ```bash
 npm run build
 ```
 
-You can preview the production build with `npm run preview`.
+This will create a production-ready build in the `build` directory.
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
-
-## Publishing
-
-Go into the `package.json` and give your package the desired name through the `"name"` option. Also consider adding a `"license"` field and point it to a `LICENSE` file which you can create from a template (one popular option is the [MIT license](https://opensource.org/license/mit/)).
-
-To publish your library to [npm](https://www.npmjs.com):
+From the root directory, run:
 
 ```bash
-npm publish
+npm run preview
 ```
+
+This will start the production server on `http://localhost:4173`.
