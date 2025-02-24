@@ -305,15 +305,8 @@
 
     <footer class="text-center text-sm text-gray-500 mt-8 max-w-screen-xl mx-auto px-8 pb-8">
         <div class="py-8">
-            <p>Created by 
-                <a href="https://vojtechovska.com" class="text-gray-600 hover:text-blue-600 transition-colors duration-200">Michaela Vojtechovska</a> 
-                and 
-                <a href="https://muczkova.com" class="text-gray-600 hover:text-blue-600 transition-colors duration-200">Marketa Muczkova</a>
-                in 2025 at Palacký University, Olomouc, Czechia (EU)
-            </p>
             <p>
-                Soon to be implemented into 
-                <a href="https://gazeplotter.com" class="text-gray-600 hover:text-blue-600 transition-colors duration-200">GazePlotter</a>
+                Anonymised, 2025
             </p>
         </div>
     </footer>
